@@ -1,0 +1,2 @@
+var Url={getHost:function(e){var t=document.createElement("A");return t.href=e,t.hostname},isSecure:function(e){var t=document.createElement("A");return t.href=e,"https:"===t.protocol}};
+//# sourceMappingURL=chrome-minified/src/common/url.js.map

@@ -1,0 +1,118 @@
+<html>
+	<body>
+		<!-- ko stopBinding: true -->
+		<div id="itw_predictionsmain" data-bind="visible: showPrediction" style="display: none;" class="no-print">
+		<div class="itw_predictions_disabled_overlay" data-bind="style: { display: $root.mainViewModel.profileIsLoading() ? 'block' : 'none' }"></div>
+			<div class="itw_moveclose">
+				<div class="itw_moveclosebar">
+					<!--<div class="itw_product_name"></div>-->
+					<span class="itw_predictions_header" data-bind="event: {mouseover: $root.mainViewModel.onTextHover}, text: text_Predictions"></span>
+					<a href="#" class="itw_btn_close" data-bind="event: {mouseup: function(){isPredictionVisible(!isPredictionVisible());},
+						click: $root.preventTouchStart}"></a>
+				</div>
+			</div>
+			<div id="itw_predictions">				
+				<!--<div id="itw_predictionsonoff" data-bind="css: {'left': showAlternatives()}">
+					<a class="itw_btn_with_text" href="#">
+						<div></div><br /><span data-bind="text: text_Predictions"></span>
+					</a>
+				</div>-->
+				<div id="itw_predictionsnavstart" data-bind="css: {'alt_toggle': showAlternatives()}">
+				</div>
+				<div id="itw_predictionsnav" data-bind="css: {'itw_specificdict_supported': specDictSupported}">
+					<div class="itw_buttons_frame">
+						<a id="itw_altbtn" class="itw_btn_with_text" href="#"
+							data-bind="click: changeAlternatives, css:{'alt_toggle': showAlternatives()}">
+							<div></div><br />
+							<span data-bind="event: {mouseover: $root.mainViewModel.onTextHover}, text: text_SpellHelp"></span>
+						</a>
+						<div class="itw_btn_rounded_side" data-bind="css: {'itw_left': isPredictNextWord() && !showAlternatives(), 'itw_right': showAlternatives() && !isPredictNextWord(), 'both': isPredictNextWord() && showAlternatives()}">
+						</div>
+						<a id="itw_prebtn" class="itw_btn_with_text" href="#"
+							data-bind="click: togglePredictNextWord, css:{'pre_toggle': isPredictNextWord()}">
+							<div></div><br />
+							<span data-bind="event: {mouseover: $root.mainViewModel.onTextHover}, text: text_SuggestNextWord"></span>
+						</a>
+						<div class="itw_btn_rounded_side" data-bind="visible: specDictSupported(), css: {'itw_right': isPredictNextWord()}">
+						</div>
+						<a id="itw_topicbtn" class="itw_btn_with_text" href="#" data-bind="visible: specDictSupported(), click: specificWordPredictionsClick">
+			                <div></div>
+			                <br />
+			                <span data-bind="event: {mouseover: $root.mainViewModel.onTextHover}, text: text_Dictionary"></span>
+			            </a>					
+					</div>
+				</div>
+				<div id="itw_predictionsnavend" data-bind="css: {'itw_right': isPredictNextWord() && !specDictSupported(), 'itw_specificdict_supported': specDictSupported}">
+				</div>
+			</div>
+			
+			<div style="margin: -2px 5px 0px 5px; border: 2px solid rgb(167, 170, 173);">
+				<div id="itw_listwords_resizable">
+					<ul id="itw_listwords" style="">
+						<!-- ko foreach: predictedWords -->
+						<li class="itw_wordholder" data-bind="css: {'selected': ($parent.selectedWord() == $data), 'empty': !word},
+							event: { mouseover:$parent.selectAndPlay, mouseout: $parent.stopPlaying, click: $parent.preWordClick}">
+							<div class="itw_word" data-bind="css:{alternative:  wClass == 1}">
+								<span class="wordPrediction" data-bind="text: word"></span>
+							</div>
+							
+							<div class="itw_shortcut" data-bind="visible: $parent.isShortcutsShown, text: $data.word == '' ? '' : 'ctrl+'+$parent.getShortcutIndex($data)">
+								<img class="shortcut" data-bind="attr: { alt: $parent.getShortcutIndex($data),
+									src: $parent.getShortcutSource($data)}" />
+								<div class="speakerbutton"></div>
+							</div>
+
+							<div class="itw_predictionspanel_dictionarysearchbtn" data-bind="event: {click: $root.mainViewModel.onPredictionDblClick}, visible: $root.mainViewModel.dictionaryAccessAvailable"></div>
+
+						</li>
+						<!-- /ko -->
+					</ul>
+					<div id="itw_predictionsscrollbar">
+						<div class="itw_pager">
+							<!-- ko foreach: allPredictedWordsPager -->
+								<a href="#" class="itw_pageritem" data-bind="css: {'active': $data.active}, event: {click: function(){$parent.OnWordPagerClick($data); return false;}}"></a>
+							<!-- /ko -->
+						</div>
+						<div class="itw_wildcards">
+							<div class="itw_wildcardAsterisk" data-bind="event: {mouseover: $root.mainViewModel.onTextHover, click: onWildcardClick.bind($data, '*')}, text: text_wildcardAsterisk, attr: {title: text_wildcardAsterisk}"></div>
+							<div class="itw_wildcardNumberSign" data-bind="event: {mouseover: $root.mainViewModel.onTextHover, click: onWildcardClick.bind($data, '#')}, text: text_wildcardNumberSign, attr: {title: text_wildcardNumberSign}"></div>
+						</div>
+					</div>
+				</div>
+		        <div id="itw_specificwordstoggle" data-bind="css: {'itw_collapsed': dictionaryWordsCollapsed()}, event: {'click': toggleDictionaryWords}, visible: isDictionariesSelected() && specDictSupported()">
+		            <div class="itw_toggleimage"></div>
+		            <div class="itw_specificwordsheader" data-bind="event: {mouseover: $root.mainViewModel.onTextHover}, text: text_SpecificPredictions"></div>
+		        </div>
+		        <ul id="itw_specificwords" data-bind="visible: !dictionaryWordsCollapsed() && isDictionariesSelected() && specDictSupported()">
+		            <!-- ko foreach: dictionaryWords -->
+		            <li class="itw_wordholder" data-bind="css: {'selected': ($parent.selectedWord() == $data), 'empty': !word},
+		                event: { mouseover: $parent.selectAndPlay, mouseout: $parent.stopPlaying, click: $parent.preWordClick}">
+		                <div data-bind="css: { itw_wordSourceDict: wOrigin == 1 }"></div>
+		                <div class="itw_word" data-bind="css:{alternative:  wClass == 1}">
+		                    <span class="wordPrediction" data-bind="text: word"></span>
+		                </div>
+		                <div class="itw_shortcut" data-bind="visible: $parent.isShortcutsShown, text: $data.word == '' ? '' : 'ctrl+'+$parent.getShortcutIndexDict($data)">
+		                    <img class="shortcut" data-bind="attr: { alt: $parent.getShortcutIndexDict($data),
+		    src: $parent.getShortcutSource($data)}" />
+		                    <div class="speakerbutton"></div>
+		                </div>
+		                <div class="itw_predictionspanel_dictionarysearchbtn" data-bind="event: {click: $root.mainViewModel.onPredictionDblClick}, visible: $root.mainViewModel.dictionaryAccessAvailable" ></div>
+		            </li>
+		            <!-- /ko -->
+		        </ul>
+		        <div id="itw_dictionaryscrollbar" data-bind="visible: !dictionaryWordsCollapsed() && isDictionariesSelected() && specDictSupported()">
+		            <div class="itw_pager">
+		                <!-- ko foreach: allDictionaryWordsPager -->
+		                <a href="#" class="itw_pageritem" data-bind="css: {'active': $data.active}, event: {click: function(){$parent.OnDictionaryWordPagerClick($data); return false;}}"></a>
+		                <!-- /ko -->
+		            </div>
+		            <div class="itw_wildcards">
+						<div class="itw_wildcardAsterisk" data-bind="event: {mouseover: $root.mainViewModel.onTextHover, click: onWildcardClick.bind($data, '*')}, text: text_wildcardAsterisk, attr: {title: text_wildcardAsterisk}"></div>
+						<div class="itw_wildcardNumberSign" data-bind="event: {mouseover: $root.mainViewModel.onTextHover, click: onWildcardClick.bind($data, '#')}, text: text_wildcardNumberSign, attr: {title: text_wildcardNumberSign}"></div>
+		            </div>
+		        </div>
+	    	</div>
+		</div>
+		<!-- /ko -->
+	</body>
+</html>

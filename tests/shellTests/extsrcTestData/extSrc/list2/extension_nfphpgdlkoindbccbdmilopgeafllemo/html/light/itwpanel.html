@@ -1,0 +1,36 @@
+<html>
+	<body>
+		<div id="itw_panel_bar" class="no-print">		
+			<div id="itw_profile" data-bind="visible: isLoggedIn()">
+				<div data-bind="event:{ mouseover: function(){ viewProfiles(true); }, mouseout: function(){ viewProfiles(false);} }">
+					<div data-bind="attr: { 'class': selectedProfileClass(), title: selectProfileTitle  }"></div>
+					<div id="profilebox" data-bind="visible: viewProfiles">
+						<ul>
+							<!-- ko foreach: profiles -->
+							<li data-bind="click: $parent.changeSelectedProfile"><a href="javascript:void(0)"
+								data-bind="attr: { 'class':  $parent.profileClass($data), title: $parent.getProfileTooltips($data)}">
+							</a></li>
+							<!-- /ko -->
+						</ul>
+					</div>
+				</div>
+			</div>
+			<div>
+				<div id="itw_login" data-bind="event: {mousedown: preventTouchStart}, visible: !isLoggedIn(), attr: {title: loginBtnTitle}">
+					<a onclick="var top = window.screen.availHeight/2-200;var left = window.screen.availWidth/2-250;window.open('https://mv-login.mv-nordic.com/mvid-login/chrome-device-login.php', 'login', 'height=400,width=500,top='+top+',left='+left);"></a>
+				</div>
+				<div class="itw_transition">
+				</div>
+				<div id="itw_playpausetext" class="itw_button" data-bind="event: {mousedown: preventTouchStart, mouseup: playText}, css: {'pause': isPlayPause()}, 
+					attr: {title: !isPlayPause() ? playBtnTitle : pauseBtnTitle }"></div>
+				<div id="itw_stoptext" class="itw_button" data-bind="event: {mousedown: preventTouchStart, mouseup: stopText}, attr: {title: stopBtnTitle}"></div>
+				<div id="itw_speedslider" data-bind="jqSlider: { value: voiceSpeed, minValue: minVoiceSpeed, maxValue: maxVoiceSpeed},
+					jqOptions: { min: 65, max: 490, step: 1 }, attr:{ title: voiceSpeedText }"></div>
+				<div class="itw_overlay" data-bind="visible: !$root.isLoggedIn()"></div>
+			</div>
+			<div class="itw_move">			
+			</div>
+			&nbsp;
+		</div>
+	</body>
+</html>

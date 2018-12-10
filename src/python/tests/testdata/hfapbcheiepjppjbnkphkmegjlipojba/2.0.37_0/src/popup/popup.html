@@ -1,0 +1,160 @@
+<html>
+    <head>
+        <script src="../../js/jquery/jquery.min.js"></script>
+        <script src="../../src/config.js"></script>
+        <script src="../../src/common/url.js"></script>
+        <script src="../../src/common/cofund.js"></script>
+        <script src="../../src/popup/bootstrap.min.js"></script>
+        <script src="../../src/popup/bootstrap-switch.min.js"></script>
+        <script src="../../src/popup/popup.js"></script>
+        <link href="../../src/popup/bootstrap-switch.min.css" rel="stylesheet">
+        <link href="http://fonts.googleapis.com/css?family=Cabin:400,700" rel="stylesheet" type="text/css">
+        <link rel="stylesheet" href="../../src/popup/popup.css" type="text/css">
+        <script type="text/javascript" src="../../js/jquery.share.js"></script>
+    </head>
+    <body>
+        <div id="piggy-sliderapp" style="display: block;">
+            <div class="piggy-sliderapp-header">
+                <img src="../../src/new-img/app-logo.png" alt="Piggy">
+                <a id="slideapp-close"><span class="glyphicon glyphicon-remove"></span></a>
+                <a id="slideapp-back" class="piggy-sliderapp-back">&lt; Go Back</a>
+            </div>
+            <div id="appMain">
+
+                <div id="cashback" class="piggy-sliderapp-big-notification">
+                    <h3>Piggy pays +<span id="percent">0.0</span> Cash Back here! See whats on sale... </h3>
+                    <img src="../../src/new-img/piggy-yay-170x170.png" alt="Piggy">
+                    <!-- IF auto coupons works here we add the following: -->
+                    <p class="piggy-popup-autotry-txt" id="autotry">(plus automatic coupons works at checkout)</p>
+                    <a id="seeDeals" href="#" target="_blank" tabindex="-1" class="btn btn-primary btn-lg">See Deals</a>
+                    <a href="#" target="_blank" tabindex="-1" class="btn btn-primary btn-lg see-coupons">See Coupons</a>
+               </div>
+               <div id="coupons" class="piggy-sliderapp-big-notification">
+                    <h3>Piggy works here with automatic coupons!</h3>
+                    <p class="piggy-popup-autotry-txt">He is napping until you get to the checkout page... </p>
+                    <img src="../../src/new-img/piggy-dollarpack-170x170.png" alt="Piggy">
+                    <a href="#" target="_blank" tabindex="-1" class="btn btn-primary btn-lg see-coupons">See Coupons</a>
+                    <ul id="coupon-list"></ul>
+               </div>
+               <div id="sleeping" class="piggy-sliderapp-big-notification">
+                    <h3>Piggy is sleeping until you visit a store he supports...</h3>
+                    <img src="../../src/new-img/piggy-sleeping-170x170.png" alt="Piggy">
+                    <a class="btn btn-primary btn-lg">Request we add <span class="this-site">this website</span></a>  
+               </div>
+
+               <!-- auto try coupons works, no cash back though -->
+               <div id="nc" class="piggy-sliderapp-big-notification" style="display:none;">  
+                   <h3>Piggy's coupon button works at this store too!</h3>
+                   <img src="../../src/new-img/piggy-yay-170x170.png" alt="Piggy">
+                   <a class="btn btn-primary btn-lg">See what's on<span>sale today!</span></a>              
+               </div>
+                
+                <div class="piggy-sliderapp-content">
+                    <div id="accountActivity" style="display: none">
+                        <h3>Savings so far <a tabindex="-1" href="http://www.joinpiggy.com/account/earnings" target="_blank">View your account</a></h3>
+                        <div class="piggy-sliderapp-savings">
+                            <div class="piggy-sliderapp-savings-half">
+                                <p><sup>$</sup><span id="savings">0.00</span></p>
+                                <em>Saved!</em>
+                            </div>
+                            <div class="piggy-sliderapp-savings-half">
+                                <p><sup>$</sup><span id="earnings">0.00</span></p>
+                                <em>Rebates!</em>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="preLogin">
+                        <h3>Log in to view your Cash Back!</h3>
+                        <p>When you shop, Piggy pays bonus Cash Back. You need to create an account with us to claim your earnings.</p>
+                        <a tabindex="-1" class="btn btn-sm btn-primary login-cashback">Yes, Login & Claim my Earnings</a>
+                        <a tabindex="-1" class="btn btn-sm btn-gray disable-cashback">NO, DISABLE CASH BACK</a>
+                        <!--
+                        <p style="font-size:.9em; line-height:.9em; letter-spacing:.9;margin: -10px 0px -8px;">Need an account? <strong>Click below</strong> to create one. Existing users please double check the website and ensure you are still logged in after update.</p>
+                        <a class="btn btn-primary nick btn-lg" style="margin-left: 25%; width:52%; margin-top:0px;" href="http://www.joinpiggy.com/account" tabindex="-1" target="_blank">View Your Earnings</a>
+                        -->
+                   </div>
+                </div>
+            </div>
+            <div id="appLogin" class="piggy-sliderapp-content">
+                <h3>Claim your earnings</h3>
+                <p>Login or <a href="http://www.joinpiggy.com/register?ref1=piggy-chrome" tabindex="-1" target="_blank">Create an Account</a> here to claim <!--<strong>$19.50</strong> of --> your earned rebates</p>
+                <p id="loginError">Please make sure you entered the correct email and password</p>
+                <form id="loginForm" class="form-horizontal">
+                    <div class="form-group">
+                        <div class="col-xs-2"></div>
+                        <div class="col-xs-8">
+                            <input type="email" class="form-control" id="loginEmail" placeholder="Email">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-xs-2"></div>
+                        <div class="col-xs-5">
+                            <input type="password" class="form-control" id="loginPw" placeholder="Password">
+                        </div>
+                        <div class="col-xs-3 piggy-submit-btn">
+                            <button type="submit" class="btn btn-default btn-primary">Claim Earnings</button>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-xs-2"></div>
+                        <div class="col-xs-8 form-group-border-top form-group-center">
+                            <p>Or</p>
+                            <a id="fbAuth" class="btn btn-facebook"><img src="../../src/new-img/icon-social-facebook.png" alt="Facebook"> Login via Facebook</a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div id="appSharing" class="piggy-sliderapp-content">
+            <!-- sharing page here -->
+                <h2>Share Piggy with Friends</h2>
+                <p>Make sure they know about Piggy's amazing Chrome app so they can save money too! Especially before the holidays!</p>
+                <p></p>
+                <h3>Click any icon to share the App</h3>
+                <div id="shareButtons"></div>
+                <p><strong>You may need to close the Share window to use multiple networks :)</strong></p>
+            </div>
+            <div id="appSettings" class="piggy-sliderapp-content">
+                <h3>Settings</h3>
+                <form class="form-horizontal">
+                    <div class="form-group">
+                        <div class="col-sm-12 form-group-border-bottom">
+                            Cash Back Alerts <input class="piggy-settings-checkbox cashbackAlerts" data-preference="cashbackAlerts" type="checkbox" data-size="mini" name="my-checkbox" checked>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-sm-12 form-group-border-bottom">
+                            Daily Deals emails <input class="piggy-settings-checkbox dailyDeals" data-preference="dailyDeals" type="checkbox" data-size="mini" name="my-checkbox" checked>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-sm-12 form-group-border-bottom">
+                            Piggy works here! Notification <input class="piggy-settings-checkbox worksHere" data-preference="worksHere" type="checkbox" data-size="mini" name="my-checkbox" checked>
+                        </div>
+                    </div>
+                </form>
+                <div><a href="#" id="logout">Sign out of your account</a></div>
+            </div>
+            <div id="appFaqs" class="piggy-sliderapp-content">
+                <h3>FAQs</h3>
+                <!-- Nav tabs -->
+                <ul class="nav nav-tabs piggy-faq-nav" role="tablist">
+                    <!-- Questions -->
+                </ul>
+                <!-- Tab panes -->
+                <div class="tab-content">
+                    <!-- Answers -->
+                </div>
+            </div>
+            <div class="piggy-sliderapp-footer">
+                <ul>
+                    
+                    <li><a tabindex="-1" id="sharepopup" href="">Tell your Friends!</a></li>
+                    <li><a tabindex="-1" id="faqs" href="">FAQ's</a></li>
+                    <li><a tabindex="-1" id="account" href="">Settings</a></li>
+                    <li><a tabindex="-1" id="support" href="mailto:help@joinpiggy.com" target="_blank">Support</a></li>
+                    
+                </ul>
+            </div>
+        </div>
+    </body>
+</html>

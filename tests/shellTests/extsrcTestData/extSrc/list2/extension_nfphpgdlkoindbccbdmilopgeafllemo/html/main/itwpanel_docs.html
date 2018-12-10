@@ -1,0 +1,245 @@
+<html>
+	<body>
+		<!-- ko stopBinding: true -->
+		<div id="itw_panel" data-bind="event: {mouseup: openLoginDialog}" style="width: 450px; visibility:hidden;" class="no-print">
+			<div class="itw_moveclose">
+				<div class="itw_moveclosebar">
+					<div class="itw_product_name">IntoWords</div>
+					<a href="#" class="itw_btn_close" data-bind="event: {mouseup: function(){ disable(); }, click: preventTouchStart}"></a>
+				</div>
+			</div>
+			<div class="itw_main">
+				<div id="itw_profile">
+					<div data-bind="event:{ mouseover: toggleViewProfiles, mouseout: toggleViewProfiles }, visible: languagesLoaded()&&isLoggedIn()">
+						<div class="itw_loading_wrapper" data-bind="visible: profileIsLoading()">
+		                    <div id="floatingBarsG">
+				                <div class="blockG" id="rotateG_01"></div>
+				                <div class="blockG" id="rotateG_02"></div>
+				                <div class="blockG" id="rotateG_03"></div>
+				                <div class="blockG" id="rotateG_04"></div>
+				                <div class="blockG" id="rotateG_05"></div>
+				                <div class="blockG" id="rotateG_06"></div>
+				                <div class="blockG" id="rotateG_07"></div>
+				                <div class="blockG" id="rotateG_08"></div>
+				            </div>
+			            </div>
+	            		<a href="#" data-bind="visible: !profileIsLoading(), event: {click: preventTouchStart}, attr: { 'class': 'itw_btn_with_text ' + selectedProfileClass() }">
+							<div></div><br />
+							<span data-bind="event: {mouseover: onTextHover}, text: selectProfileTitle"></span>
+						</a>
+						<div id="profilebox" data-bind="visible: viewProfiles() && viewProfilesEnabled() && viewProfilesEnabled1(), style: {'width': isRestLangsExpanded() ? '441px' : '62px'}"><!-- visible: viewProfiles,  -->
+							<div class="itw_latest_langs">
+								<div class="itw_latest_langs_cont">
+								</div>
+								<a id="itw_btn_rest_langs_toggle" href="#" class="itw_btn_with_text" data-bind="event: { mouseup: toggleRestLangs,
+									click: preventTouchStart }, css: {'expanded': isRestLangsExpanded()}, ">
+									<div></div><br />
+									<span data-bind="event: {mouseover: onTextHover}, text: text_MoreHideRestLangs"></span>
+								</a>
+                                <div class="plugin-version">$Revision$</div>	
+							</div>
+							<div class="itw_rest_langs" data-bind="visible: isRestLangsExpanded">
+							</div>
+						</div>
+					</div>
+					<a id="itw_login" class="itw_btn_with_text" href="#" data-bind="event: {mousedown: preventTouchStart, click: login}, visible: !isLoggedIn()"><div></div><br /><span data-bind="text: loginBtnTitle"></span></a>
+				</div>
+				<div class="itw_player">
+					<div class="navbar_disabled_overlay_player" data-bind="style: { display: profileIsLoading() ? 'block' : 'none' }">
+						<div class="itw_inner_fog_overlay"></div>
+					</div>
+					<div class="itw_buttons_frame">
+						<a id="itw_playpausetext" href="#" class="itw_btn_with_text" data-bind="event: {mouseup: playText, click: preventTouchStart}, css: {'pause': isPlayPause(), 'disabled': !isLoggedIn()}">
+							<div></div><br /><span data-bind="event: {mouseover: onTextHover}, text: !isPlayPause() ? playBtnTitle : pauseBtnTitle"></span>
+						</a>
+						<div id="itw_speedslider" data-bind="jqSlider: { value: voiceSpeed, minValue: minVoiceSpeed, maxValue: maxVoiceSpeed},
+							jqOptions: { min: 65, max: 490, step: 1 }, css: {'disabled': !isLoggedIn()}">
+							<span data-bind="event: {mouseover: onTextHover}, html: text_voiceSppedValue"></span>
+						</div>
+						<div data-bind="with: $root.getPredictionViewModel()" style="display: inline-block; vertical-align: top; height: 100%;">
+							<div class="itw_btn_rounded_side" data-bind="css: {'itw_left': $root.isLoggedIn() && $root.predictionsSupported() && isPredictionVisible() && !$root.profileIsLoading()}">
+							</div>
+							<a id="itw_predictionsonoff" href="#" class="itw_btn_with_text" data-bind="event: {mouseup: function(){isPredictionVisible(!isPredictionVisible());}, click: preventTouchStart}, css: {'itw_toggle': $root.isLoggedIn() && $root.predictionsSupported() && isPredictionVisible() && !$root.profileIsLoading(), 'disabled': !$root.isLoggedIn(), 'itw_notsupported': !$root.predictionsSupported()}">
+								<div></div><br /><span data-bind="event: {mouseover: $root.onTextHover}, text: $parent.text_Predictions"></span>
+							</a>
+						</div>
+						<div class="itw_btn_rounded_side" data-bind="css: {'itw_left': appsExpanded() && !profileIsLoading() &&isLoggedIn(), 'itw_right': $root.getPredictionViewModel().isPredictionVisible() && predictionsSupported() && !profileIsLoading() &&isLoggedIn(), 'both': appsExpanded() && $root.getPredictionViewModel().isPredictionVisible()  && predictionsSupported() && !profileIsLoading() &&isLoggedIn() }">
+						</div>
+						<a id="itw_btn_apps" href="#" class="itw_btn_with_text"
+							data-bind="event: {mouseup: toggleApps, click: preventTouchStart}, css: {'itw_toggle': appsExpanded(), 'disabled': !$root.isLoggedIn()}">
+							<div></div><br />
+							<span data-bind="event: {mouseover: onTextHover}, text: text_Apps"></span>
+						</a>
+						<div id="itw_apps_options" class="itw_apps_container" data-bind="visible: appsExpanded(), click: appLinksClick.bind($data)">
+							<div class="itw_apps_arrow">
+							</div>
+							<div class="itw_apps_links" style="width: 140px;">
+								<a id="itw_link_online" href="https://online.intowords.com/Main" target="_blank">
+									<div data-bind="text: text_AppIntoWords"></div>
+								</a>
+								<a id="itw_link_dictionary" href="https://dictionary.intowords.com/" target="_blank"
+									data-bind="visible: isDictionaryAppVisible">
+									<div data-bind="text: text_AppDictionary"></div>
+								</a>
+								<a id="itw_link_pdf" href="https://online.intowords.com/pdfviewer" target="_blank">
+									<div data-bind="text: text_AppPdfViewer"></div>
+								</a>
+                                <a id="itw_link_epub" href="https://online.intowords.com/epubviewer" target="_blank">
+                                    <div data-bind="text: text_AppEpubViewer"></div>
+                                </a>
+								<a id="itw_link_specdictionary" style="display:none;" href="https://online.intowords.com/SpecificPredictions" target="_blank">
+									<div data-bind="text: text_AppSpecDictionary"></div>
+								</a>
+								<a id="itw_link_templates" href="https://online.intowords.com/Templates" target="_blank"
+									data-bind="visible: templatesAvailable()">
+									<div data-bind="text: text_AppWritingTemplates"></div>
+								</a>
+								<a id="itw_link_commasuggestion" href="https://kommaforslag.mv-nordic.com/" target="_blank"
+									data-bind="visible: isUserLanguageDanish, css: {'itw_unavailable': !isCommaSuggestionAppAvailable()}">
+									<div data-bind="text: text_AppCommaSuggestion"></div>
+								</a>
+								<a id="itw_link_statistics" href="https://stats.mv-nordic.com/" target="_blank"
+									data-bind="visible: statisticsAvailable">
+									<div data-bind="text: text_AppStatistics"></div>
+								</a>
+								<a id="itw_link_mivo" href="https://mivo.mv-nordic.com/" target="_blank"
+									data-bind="css: {'itw_unavailable': !isMivoAppAvailable()}, visible: isMivoLanguageAvailable()">
+									<div data-bind="text: text_AppMivo"></div>
+								</a>
+								<a id="itw_link_grammateket" href="https://grammateket.com/" target="_blank"
+									data-bind="css: {'itw_unavailable': !isGrammateketAppAvailable()}, visible: isGrammateketLanguageAvailable()">
+									<div data-bind="text: text_AppGrammateket"></div>
+								</a>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="itw_playermoreseparator" data-bind="visible: optionsExpanded(), css: {'itw_right': appsExpanded() && !profileIsLoading(), 'both': appsExpanded() && readStrategyExpanded(), 'itw_left': readStrategyExpanded() && !appsExpanded() && !profileIsLoading()}"></div>
+				<div class="itw_optionscontainer" data-bind="visible: optionsExpanded()">
+					<div class="navbar_disabled_overlay_options" data-bind="style: { display: profileIsLoading() ? 'block' : 'none' }">
+						<div class="itw_inner_fog_overlay"></div>
+					</div>
+					<div class="itw_buttons_frame">
+						<a id="itw_btn_read_strategy" href="#" class="itw_btn_with_text"
+							data-bind="event: {mouseup: toggleReadStrategy, click: preventTouchStart}, css: {'itw_toggle': readStrategyExpanded()}">
+							<div></div><br />
+							<span data-bind="event: {mouseover: onTextHover}, text: text_ReadLikeThis"></span>
+						</a>
+						<div class="itw_btn_rounded_side" data-bind="css: {'itw_left': readWhileWritingExpanded(), 'itw_right': readStrategyExpanded()}">
+						</div>
+						<a id="itw_btn_read_while_writing" href="#" class="itw_btn_with_text"
+							data-bind="event: {mouseup: toggleReadWhileWriting, click: preventTouchStart}, css: {'itw_toggle': readWhileWritingExpanded()}">
+							<div></div><br />
+							<span data-bind="event: {mouseover: onTextHover}, text: text_ReadWhileWriting"></span>
+						</a>
+						<div class="itw_btn_rounded_side" data-bind="css: {'itw_left': highlightExpanded(), 'itw_right': readWhileWritingExpanded()}">
+						</div>
+						<a id="itw_btn_highlight" href="#" class="itw_btn_with_text"
+							data-bind="event: {mouseup: toggleHighlight, click: preventTouchStart}, css: {'itw_toggle': highlightExpanded()}">
+							<div></div><br />
+							<span data-bind="event: {mouseover: onTextHover}, text: text_Highlight"></span>
+						</a>
+						<div class="itw_btn_rounded_side" data-bind="css: {'itw_right': highlightExpanded()}">
+						</div>
+						<a id="itw_btn_restore" href="#" class="itw_btn_with_text" data-bind="click: $root.showHideRestoreDialog">
+							<div></div><br />
+							<span data-bind="event: {mouseover: onTextHover}, text: text_Restore"></span>
+						</a>
+						<a id="itw_btn_info" href="#" class="itw_btn_with_text" data-bind="event: {click: preventTouchStart, mouseup: clickInfoBtn}">
+							<div></div><br />
+							<span data-bind="event: {mouseover: onTextHover}, text: text_Information"></span>
+						</a>
+						<a id="itw_btn_log_out_user" href="#" class="itw_btn_with_text" data-bind="event: {click: preventTouchStart, mouseup: logOutUser}, visible: isChromeOS">
+							<div></div><br />
+							<span data-bind="event: {mouseover: onTextHover}, text: text_LogOutUser"></span>
+						</a>
+					</div>
+					<div id="itw_read_strategy_options" class="itw_options_container" data-bind="visible: readStrategyExpanded()">
+						<a id="" href="#" data-bind="click: toggleReadForwardFromCursor,
+							css:{'enabled': !isSentenceFromCursor()}">
+							<div></div>
+							<span data-bind="event: {mouseover: onTextHover}, text: text_ReadPage"></span>
+						</a>
+						<a id="" href="#" data-bind="click: toggleReadSentenceFromCursor,
+							css:{'enabled': isSentenceFromCursor()}, visible: isSentenceFromCursorVisible">
+							<div></div>
+							<span data-bind="event: {mouseover: onTextHover}, text: text_ReadSentence"></span>
+						</a>
+					</div>
+					<div id="itw_read_while_writing_options" class="itw_options_container" data-bind="visible: readWhileWritingExpanded()">
+						<a id="" href="#" data-bind="click: toggleLetterReadingStyleName,
+							css:{'enabled': readLetterNameTyping()}, visible: isReadLetterNameTypingVisible()">
+							<div></div>
+							<span data-bind="event: {mouseover: onTextHover}, text: text_ReadLetterName"></span>
+						</a>
+						<a id="" href="#" data-bind="click: toggleLetterReadingStyleSound,
+							css:{'enabled': readLetterSoundTyping()}, visible: isReadLetterSoundTypingVisible()">
+							<div></div>
+							<span data-bind="event: {mouseover: onTextHover}, text: text_ReadLetterSound"></span>
+						</a>
+						<a id="" href="#" data-bind="click: toggleReadWordAfterType,
+							css:{'enabled': readWordAfterType()}">
+							<div></div>
+							<span data-bind="event: {mouseover: onTextHover}, text: text_ReadWord"></span>
+						</a>
+						<a id="" href="#" data-bind="click: toggleReadSentanceAfterType,
+							css:{'enabled': readSentanceAfterType()}">
+							<div></div>
+							<span data-bind="event: {mouseover: onTextHover}, text: text_ReadSentence"></span>
+						</a>
+					</div>
+					<div id="itw_highlight_options" class="itw_options_container" data-bind="visible: highlightExpanded()">
+						<a id="" href="#" data-bind="click: toggleWordHightlightStrategy, css: {'enabled': isWordHighlightStrategy()}">
+							<div></div>
+							<span data-bind="event: {mouseover: onTextHover}, text: text_HighlightWord"></span>
+						</a>
+						<a id="" href="#" data-bind="click: toggleSentenceHighlightStrategy,
+							css: {'enabled': isSentanceHighlightStrategy ()}">
+							<div></div>
+							<span data-bind="event: {mouseover: onTextHover}, text: text_HighlightSentence"></span>
+						</a>
+						<a id="" href="#" data-bind="click: toggleDoubleHighlightStrategy,
+							css: {'enabled': isDoubleHighlightStrategy ()}">
+							<div></div>
+							<span data-bind="event: {mouseover: onTextHover}, text: text_HighlightWordAndSentence"></span>
+						</a>
+					</div>
+				</div>
+				<div class="itw_expandoptions" data-bind="css: {'itw_right': $root.isLoggedIn() && appsExpanded() && !optionsExpanded() &&!profileIsLoading()}">
+					<a id="itw_btn_expandoptions" href="#" class="itw_btn_with_text" data-bind="event: { mouseup: toggleOptions,
+						click: preventTouchStart }, css: {'disabled': !isLoggedIn(), 'expanded': optionsExpanded()}">
+						<div></div><br /><span data-bind="event: {mouseover: onTextHover}, text: text_MoreHide"></span>
+					</a>
+				</div>
+				<div class="dialog_settingsRestore" data-bind="dialog: {position: 'center', modal: true, width:'600px', autoOpen: false,
+					draggable: false,
+					customCloseTitle: restoreDialogCloseTitle, customTitle: $root.restoreDialogHeadlineTitle, buttons: $root.restoreDialogButtons(), customText: $root.customDialogText(), resizable: false, onTextHoverCallback: $root.onTextHover}, dialogVisible: $root.restoreDialog">
+           		</div>
+           		<div class="dialog_noTextToPlay" data-bind="dialog: {position: 'center', modal: true, width:'350px', autoOpen: false,
+					draggable: false,
+					customCloseTitle: restoreDialogCloseTitle, customTitle: $root.noTextToPlayDialogHeadlineTitle, buttons: $root.ButtonsForNoTextToPlayDialog(), customText: $root.noTextToPlayDialogText(), resizable: false, onTextHoverCallback: $root.onTextHover}, dialogVisible: $root.noTextToPlayDialog">
+           		</div>
+           		<div class="dialog_PdfOpen" data-bind="dialog: {position: 'center', modal: true, width:'350px', autoOpen: false,
+					draggable: false,
+					customCloseTitle: restoreDialogCloseTitle, customTitle: $root.pdfOpenDialogHeadlineTitle,
+					buttons: $root.pdfOpenDialogButtons(), customText: $root.pdfOpenDialogText(), buttonInCenter: true, resizable: false, onTextHoverCallback: $root.onTextHover}, dialogVisible: $root.pdfOpenDialog">
+           		</div>
+           		<div class="dialog_noUserAccess" data-bind="dialog: {position: 'center', modal: true, width:'350px', autoOpen: false,
+					customCloseTitle: restoreDialogCloseTitle, customTitle: $root.noUserAccessDialogHeadlline, buttons: $root.ButtonsForNoUserAccessDialog(), customText: $root.noUserAccessDialogText(), resizable: false}, dialogVisible: $root.noUserAccessDialog">
+           		</div>
+           		<div class="dialog_connectionLost" data-bind="dialog: {position: 'center', modal: true, width:'350px', autoOpen: false,
+					customCloseTitle: restoreDialogCloseTitle, customTitle: $root.connectionLostHeadlline, buttons: $root.ButtonsForConnectionLostDialog(), customText: $root.connectionLostDialogText(), resizable: false}, dialogVisible: $root.connectionLostDialog">
+           		</div>
+           		<div class="dialog_couldNotPlayText" data-bind="dialog: {position: 'center', modal: true, width:'350px', autoOpen: false,
+					draggable: false,
+					customCloseTitle: restoreDialogCloseTitle, customTitle: $root.couldNotPlayTextDialogHeadlineTitle, buttons: $root.ButtonsForCouldNotPlayTextDialog(), customText: $root.couldNotPlayTextDialogText(), resizable: false, onTextHoverCallback: $root.onTextHover}, dialogVisible:$root.couldNotPlayTextDialog">
+           		</div>
+           		<div class="dialog_couldNotPlayTextInDrivePdfViewer" data-bind="dialog: {position: 'center', modal: true, width:'350px', autoOpen: false,
+					draggable: false,
+					customCloseTitle: restoreDialogCloseTitle, customTitle: $root.couldNotPlayTextInDrivePdfViewerDialogHeadlineTitle, buttons: $root.ButtonsForCouldNotPlayTextInDrivePdfViewerDialog(), customText: $root.couldNotPlayTextInDrivePdfViewerDialogText(), resizable: false, onTextHoverCallback: $root.onTextHover}, dialogVisible:$root.couldNotPlayTextInDrivePdfViewerDialog">
+           		</div>
+			</div>
+		</div>
+		<!-- /ko -->
+	</body>
+</html>

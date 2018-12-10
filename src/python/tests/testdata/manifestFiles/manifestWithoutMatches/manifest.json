@@ -1,0 +1,34 @@
+{
+   "background": {
+      "persistent": true,
+      "scripts": [ "js/jquery/jquery.min.js", "src/config.js", "src/common/object.js", "src/common/string.js", "src/common/url.js", "src/common/cofund.js", "src/bg/background.js" ]
+   },
+   "browser_action": {
+      "default_icon": {
+         "18": "icons/p/grey-18.png"
+      },
+      "default_title": "Piggy - Coupons & Cashback!"
+   },
+   "content_scripts": [ {
+      "js": [ "js/jquery/jquery.min.js", "js/jquery/jquery-ui.min.js", "src/config.js", "src/common/object.js", "src/common/string.js", "src/common/url.js", "src/common/cofund.js", "src/inject/pagedrawer.js", "src/inject/templates.js", "src/inject/layouts.js", "src/inject/inject.js", "js/jquery.share.js" ],
+      "run_at": "document_idle"
+   } ],
+   "content_security_policy": "script-src 'self' 'unsafe-eval' https://www.joinpiggy.com https://test1.joinpiggy.com; object-src 'self'",
+   "default_locale": "en",
+   "description": "Piggy automatically finds the best coupon codes and cash back at over 1,800 stores!",
+   "homepage_url": "http://www.joinpiggy.com",
+   "icons": {
+      "128": "icons/coin128.png",
+      "16": "icons/p/flat-icon-19.png",
+      "256": "icons/coin256.png",
+      "48": "icons/coin48.png"
+   },
+   "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAhb/WZcf+vKWoza4xXwAjZ+C2SjcPx5ArWeNjqF1WJn8dIZhVRptLAAv/pq6kwE+vY3zy1ySt6fqG4RTvNoOp+K2d70ucmbvNJudwFQsJBp6BVyqavo0Olln2rqv8qjqLsg51FVqB+3oPwoeaKWjSZsq7ODZQn/wB9O7ch0zy461lv2c4/BGItwwq0qIan2USIOq0Q5ulfvlB4AzgPJzAG34LpgIB/GdCLEocvSEdRArNG3UUzQqlA9bqdkS9ua3k9TPkDhe6Ec2ver9QgGounKq6OVwM+NH1nXmysmrh1RTPts7XHl2SsiKwUhhmSni/uP4dPXrM3kK0z5lz9MUAiQIDAQAB",
+   "manifest_version": 2,
+   "name": "Add Coupons and Cashback - Piggy!",
+   "permissions": [ "http://*/*", "https://*/*", "activeTab", "tabs", "webRequest", "storage" ],
+   "short_name": "Add Coupons",
+   "update_url": "https://clients2.google.com/service/update2/crx",
+   "version": "2.0.37",
+   "web_accessible_resources": [ "src/popup/*", "src/fonts/*", "src/new-img/*", "src/img/*" ]
+}

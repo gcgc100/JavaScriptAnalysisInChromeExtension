@@ -1,0 +1,1 @@
+{"version":3,"sources":["chrome/src/common/string.js"],"names":["String","prototype","startsWith","text","this","substr","length"],"mappings":"AAGAA,OAAOC,UAAUC,WAAa,SAASC,GAGnC,MAAQC,MAAKC,OAAO,EAAGF,EAAKG,UAAYH","file":"chrome-minified/src/common/string.js"}

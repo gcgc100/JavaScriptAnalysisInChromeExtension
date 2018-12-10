@@ -1,0 +1,15 @@
+{
+  "appDesc": {
+    "message": "IntoWords til Google Chrome  - hurtig læse- og skrivehjælp", 
+    "description":"The description of the application, displayed in the web store."
+  },
+  "email": {
+	"message": "salg@mv-nordic.dk",
+	"description": "Email til salg"
+  },
+  "homepage": {
+	"message": "https://www.mv-nordic.com/dk/produkter/intowords",
+	"description": "Link til hjemmeside"
+  } 
+  
+}

@@ -1,0 +1,2 @@
+function ObjectTraverser(e){for(var r in e)this[r]=e[r]}ObjectTraverser.prototype.getChildNode=function(e){if(e instanceof String){var r=this,t=e.split(/\./);for(var n in t){if(!r.hasOwnProperty(t[n]))return!1;r=r[t[n]]}return r}},ObjectTraverser.prototype.replaceChildNode=function(nodeName,newValue){return eval('this["'+nodeName+'"] = '+JSON.stringify(newValue)+";"),this};
+//# sourceMappingURL=chrome-minified/src/common/object.js.map

@@ -1,0 +1,1028 @@
+div#itw_dictionarycontent, div#itw_dictionarymain div, div#itw_dictionarymain span {
+	font-family: Verdana, Geneva, sans-serif;
+}
+
+div#itw_dictionarymain {
+    color: #000;
+}
+
+div#itw_dictionarymain li.itw_dictionaryItem {
+    font-size: 10pt;
+}
+
+div#itw_dictionarycontent table {
+	border-collapse: collapse;
+	border-spacing: 0;
+	padding: inherit;
+	border: none;
+	margin-bottom: 0px;
+}
+
+div#itw_dictionarycontent table tbody {
+	border: none;
+}
+
+div#itw_dictionarycontent td,
+div#itw_dictionarycontent th {
+	border: none;
+	padding: inherit;
+	line-height: inherit;
+}
+
+div#itw_dictionarycontent tr {
+	background-color: transparent;
+}
+
+div#itw_dictionarycontent DIV#container {
+	background: #fff;
+	width: 550px;
+	text-align: left;
+}
+
+.circleBase {
+    border-radius: 50%;
+}
+
+.colorSignverbum {
+	width: 10px;
+    height: 10px;
+    background: #fe0000;
+    border: 1px solid black;
+}
+
+.colorSignsubstantiv {
+	width: 10px;
+    height: 10px;
+    background: #0071c1;
+    border: 1px solid black;
+}
+
+.colorSigninterjection {
+	width: 10px;
+    height: 10px;
+    background: #6b6bcf;
+    border: 1px solid black;
+}
+
+.colorSignpreposition {
+	width: 10px;
+    height: 10px;
+    background: #ffffff;
+    border: 1px solid black;
+}
+
+.colorSignpronoun {
+	width: 10px;
+    height: 10px;
+    background: #ffff67;
+    border: 1px solid black;
+}
+
+.colorSignnumeral {
+	width: 10px;
+    height: 10px;
+    background: #feb872;
+    border: 1px solid black;
+}
+
+.colorSignadjective {
+	width: 10px;
+    height: 10px;
+    background: #009900;
+    border: 1px solid black;
+}
+
+.colorSignarticle {
+	width: 10px;
+    height: 10px;
+    background: #8ac6ce;
+    border: 1px solid black;
+}
+
+.colorSignconjunction {
+	width: 10px;
+    height: 10px;
+    background: #b3b3b3;
+    border: 1px solid black;
+}
+
+.colorSignadverb {
+	width: 10px;
+    height: 10px;
+    background: #ff7c81;
+    border: 1px solid black;
+}
+
+.colorSignproprier {
+	width: 10px;
+    height: 10px;
+    background: #ffce34;
+    border: 1px solid black;
+}
+
+.colorSignEmpty {
+}
+
+a.lemmaElm {
+	font-size: 10pt;
+	line-height: 14pt;
+	color: navy;
+	-webkit-transition: background 1.0s linear;
+	-moz-transition: background 1.0s linear;
+	-ms-transition: background 1.0s linear;
+	-o-transition: background 1.0s linear;
+	transition: background 1.0s linear;
+    font-weight: initial;
+}
+
+a.lemmaElm:hover {
+	background-color: #ffea00;
+}
+
+a.super {
+	font-size:50%;
+	vertical-align: super;
+	line-height: 5pt;
+}
+
+td.paradigmeIcon {
+	vertical-align: middle;
+	width: 45px;
+	text-align:center;
+}
+
+span.super {
+	font-size:50%;
+	vertical-align: super;
+	line-height: 5pt;
+}
+
+a.lemmaElmNon {
+	font-family: Verdana, Geneva, sans-serif;
+	font-size: 10pt;
+	line-height: 14pt;
+	color: navy;
+}
+
+span.lemmaPos {
+	font-size: 10pt;
+	line-height: 14pt;
+	color: #000000;
+	cursor:default;
+	-webkit-transition: background 1.0s linear;
+	-moz-transition: background 1.0s linear;
+	-ms-transition: background 1.0s linear;
+	-o-transition: background 1.0s linear;
+	transition: background 1.0s linear;
+}
+
+span.lemmaPro {
+	font-size: 10pt;
+	line-height: 14pt;
+	color: #000000;
+	cursor:default;
+}
+
+span.lemmaPos:hover {
+	background-color: #ffea00;
+}
+
+span.lemmaPosNon {
+	font-family: Verdana, Geneva, sans-serif;
+	font-size: 10pt;
+	line-height: 14pt;
+	color: #000000;
+	cursor:default;
+}
+
+span.lemma {
+	color: #006299;
+	font-size: 16pt;
+	font-weight: bold;
+	cursor:default;
+	-webkit-transition: background 1.0s linear;
+	-moz-transition: background 1.0s linear;
+	-ms-transition: background 1.0s linear;
+	-o-transition: background 1.0s linear;
+	transition: background 1.0s linear;
+}
+
+span.lemma:hover {
+	background-color: #ffea00;
+}
+
+span.lemmaNon {
+	font-family: Verdana, Geneva, sans-serif;
+	color: #006299;
+	font-size: 16pt;
+	font-weight: bold;
+	cursor:default;
+}
+
+span.fastLemma {
+	color: #006299;
+	font-size: 12pt;
+	font-weight: bold;
+	cursor:default;
+	-webkit-transition: background 1.0s linear;
+	-moz-transition: background 1.0s linear;
+	-ms-transition: background 1.0s linear;
+	-o-transition: background 1.0s linear;
+	transition: background 1.0s linear;
+}
+
+span.fastLemma:hover {
+	background-color: #ffea00;
+}
+
+span.fastLemmaNon {
+	font-family: Verdana, Geneva, sans-serif;
+	color: #006299;
+	font-size: 12pt;
+	font-weight: bold;
+	cursor:default;
+}
+
+
+span.lemmaNr {
+	color: #006299;
+	font-size: 16pt;
+	letter-spacing: 1em;
+}
+
+span.lemmaGENDER {
+	color: #070707;
+	font-size:10pt;
+	line-height: 14pt;
+	cursor:default;
+	-webkit-transition: background 1.0s linear;
+	-moz-transition: background 1.0s linear;
+	-ms-transition: background 1.0s linear;
+	-o-transition: background 1.0s linear;
+	transition: background 1.0s linear;
+}
+
+span.lemmaGENDER:hover {
+	background-color: #ffea00;
+}
+
+span.lemmaGENDERNon {
+	font-family: Verdana, Geneva, sans-serif;
+	color: #070707;
+	font-size:10pt;
+	line-height: 14pt;
+	cursor:default;
+}
+
+span.form {
+	font-size: 10pt;
+	line-height: 14pt;
+	cursor:default;
+	-webkit-transition: background 1.0s linear;
+	-moz-transition: background 1.0s linear;
+	-ms-transition: background 1.0s linear;
+	-o-transition: background 1.0s linear;
+	transition: background 1.0s linear;
+	padding: initial;
+    background-color: initial;
+}
+
+span.form:hover {
+	background-color: #ffea00;
+}
+
+span.formNon {
+	font-family: Verdana, Geneva, sans-serif;
+	font-size: 10pt;
+	line-height: 14pt;
+	cursor:default;
+}
+
+span.grayText {
+	font-size: 10pt;
+	line-height: 14pt;
+	cursor:default;
+	color: gray;
+}
+
+span.etymText {
+	font-size: 10pt;
+	line-height: 14pt;
+	cursor:default;
+}
+
+span.specialText {
+	font-size: 10pt;
+	line-height: 14pt;
+	cursor:default;
+	color: gray;
+	-webkit-transition: background 1.0s linear;
+	-moz-transition: background 1.0s linear;
+	-ms-transition: background 1.0s linear;
+	-o-transition: background 1.0s linear;
+	transition: background 1.0s linear;
+}
+
+span.specialText:hover {
+	background-color: #ffea00;
+}
+
+span.specialTextNon {
+	font-family: Verdana, Geneva, sans-serif;
+	font-size: 10pt;
+	line-height: 14pt;
+	cursor:default;
+	color: gray;
+}
+
+span.domain {
+	font-size: 10pt;
+	font-variant: small-caps;
+	line-height: 14pt;
+	cursor:default;
+	color: gray;
+	-webkit-transition: background 1.0s linear;
+	-moz-transition: background 1.0s linear;
+	-ms-transition: background 1.0s linear;
+	-o-transition: background 1.0s linear;
+	transition: background 1.0s linear;
+}
+
+span.domain:hover {
+	background-color: #ffea00;
+}
+
+span.domainNon {
+	font-family: Verdana, Geneva, sans-serif;
+	font-size: 10pt;
+	line-height: 14pt;
+	cursor:default;
+	color: gray;
+}
+
+span.specialItalic {
+	font-size: 10pt;
+	line-height: 14pt;
+	cursor:default;
+	color: gray;
+	-webkit-transition: background 1.0s linear;
+	-moz-transition: background 1.0s linear;
+	-ms-transition: background 1.0s linear;
+	-o-transition: background 1.0s linear;
+	transition: background 1.0s linear;
+}
+
+span.specialItalic:hover {
+	background-color: #ffea00;
+}
+
+span.specialItalicNon {
+	font-family: Verdana, Geneva, sans-serif;
+	font-size: 10pt;
+	line-height: 14pt;
+	cursor:default;
+	color: gray;
+}
+
+span.specialPro {
+	font-size: 10pt;
+	line-height: 14pt;
+	cursor:default;
+	color: gray;
+	-webkit-transition: background 1.0s linear;
+	-moz-transition: background 1.0s linear;
+	-ms-transition: background 1.0s linear;
+	-o-transition: background 1.0s linear;
+	transition: background 1.0s linear;
+}
+
+span.specialPro:hover {
+	background-color: #ffea00;
+}
+
+span.specialPronounce {
+	font-size: 10pt;
+	line-height: 14pt;
+	cursor:default;
+	color: gray;
+}
+
+span.specialProNon {
+	font-family: Verdana, Geneva, sans-serif;
+	font-size: 10pt;
+	line-height: 14pt;
+	cursor:default;
+	color: gray;
+}
+
+span.specialB0 {
+	font-size: 10pt;
+	line-height: 14pt;
+	cursor:default;
+	-webkit-transition: background 1.0s linear;
+	-moz-transition: background 1.0s linear;
+	-ms-transition: background 1.0s linear;
+	-o-transition: background 1.0s linear;
+	transition: background 1.0s linear;
+}
+
+span.specialB0:hover {
+	background-color: #ffea00;
+}
+
+span.specialB0Non {
+	font-family: Verdana, Geneva, sans-serif;
+	font-size: 10pt;
+	line-height: 14pt;
+	cursor:default;
+}
+
+DIV.defsection {
+	font-size: 10pt;
+	line-height: 14pt;
+	color: #070707;
+}
+
+OL.defsection {
+	font-size: 10pt;
+	padding-left:1.5em;
+}
+
+UL.defsection {
+	font-size: 10pt;
+	padding-left:1.5em;
+} 
+
+span.def {
+	font-size: 10pt;
+	line-height: 14pt;
+	color: #070707;
+	cursor:default;
+	-webkit-transition: background 1.0s linear;
+	-moz-transition: background 1.0s linear;
+	-ms-transition: background 1.0s linear;
+	-o-transition: background 1.0s linear;
+	transition: background 1.0s linear;
+}
+
+span.def:hover {
+	background-color: #ffea00;
+}
+
+span.billingdef {
+	font-size: 10pt;
+	line-height: 14pt;
+	color: #006299;
+	cursor:default;
+	-webkit-transition: background 1.0s linear;
+	-moz-transition: background 1.0s linear;
+	-ms-transition: background 1.0s linear;
+	-o-transition: background 1.0s linear;
+	transition: background 1.0s linear;
+}
+
+span.billingdef:hover {
+	background-color: #ffea00;
+}
+
+span.defNon {
+	font-family: Verdana, Geneva, sans-serif;
+	font-size: 10pt;
+	line-height: 14pt;
+	color: #070707;
+	cursor:default;
+}
+
+span.transText {
+	font-size: 10pt;
+	line-height: 14pt;
+	color: #070707;
+	cursor:default;
+	-webkit-transition: background 1.0s linear;
+	-moz-transition: background 1.0s linear;
+	-ms-transition: background 1.0s linear;
+	-o-transition: background 1.0s linear;
+	transition: background 1.0s linear;
+}
+
+span.transText:hover {
+	background-color: #ffea00;
+}
+
+span.transTextNon {
+	font-family: Verdana, Geneva, sans-serif;
+	font-size: 10pt;
+	line-height: 14pt;
+	color: #070707;
+	cursor:default;
+}
+
+span.commen {
+	font-size: 10pt;
+	line-height: 14pt;
+	color: #070707;
+	cursor:default;
+}
+
+span.svDef {
+	font-size: 10pt;
+	line-height: 18pt;
+	color: #070707;
+	cursor:default;
+	-webkit-transition: background 1.0s linear;
+	-moz-transition: background 1.0s linear;
+	-ms-transition: background 1.0s linear;
+	-o-transition: background 1.0s linear;
+	transition: background 1.0s linear;
+}
+
+span.svDef:hover {
+	background-color: #ffea00;
+}
+
+span.svDefNon {
+	font-family: Verdana, Geneva, sans-serif;
+	font-size: 10pt;
+	line-height: 18pt;
+	color: #070707;
+	cursor:default;
+}
+
+span.sams {
+	font-size: 10pt;
+	line-height: 18pt;
+	color: #000000;
+	cursor:default;
+	-webkit-transition: background 1.0s linear;
+	-moz-transition: background 1.0s linear;
+	-ms-transition: background 1.0s linear;
+	-o-transition: background 1.0s linear;
+	transition: background 1.0s linear;
+}
+
+span.sams:hover {
+	background-color: #ffea00;
+}
+
+span.samsNon {
+	font-family: Verdana, Geneva, sans-serif;
+	font-size: 10pt;
+	line-height: 18pt;
+	color: #000000;
+	cursor:default;
+}
+
+span.samsSkiller {
+	font-size: 10pt;
+	line-height: 18pt;
+	color: #000000;
+	cursor:default;
+}
+
+span.Cit {
+	color: #000000;
+	font-size: 10pt;
+	font-style: normal;
+	margin-bottom: 18px;
+	cursor:default;
+	-webkit-transition: background 1.0s linear;
+	-moz-transition: background 1.0s linear;
+	-ms-transition: background 1.0s linear;
+	-o-transition: background 1.0s linear;
+	transition: background 1.0s linear;
+}
+
+span.Cit:hover {
+	background-color: #ffea00;
+}
+
+span.CitNon {
+	font-family: Verdana, Geneva, sans-serif;
+	color: #000000;
+	font-size: 10pt;
+	font-style: normal;
+	margin-bottom: 18px;
+	cursor:default;
+}
+
+span.synAnTyp {
+	color: #7F7F72;
+	font-size: 10pt;
+	font-weight: bold;
+	padding-right: 1em;
+	cursor:default;
+	-webkit-transition: background 1.0s linear;
+	-moz-transition: background 1.0s linear;
+	-ms-transition: background 1.0s linear;
+	-o-transition: background 1.0s linear;
+	transition: background 1.0s linear;
+}
+
+span.synAnTyp:hover {
+	background-color: #ffea00;
+}
+
+span.synAnTypNon {
+	font-family: Verdana, Geneva, sans-serif;
+	color: #7F7F72;
+	font-size: 10pt;
+	font-weight: bold;
+	padding-right: 1em;
+	cursor:default;
+}
+
+span.transLang {
+	color: #E30613;
+	font-size: 10pt;
+	font-weight: bold;
+	padding-right: 1em;
+	cursor:default;
+	-webkit-transition: background 1.0s linear;
+	-moz-transition: background 1.0s linear;
+	-ms-transition: background 1.0s linear;
+	-o-transition: background 1.0s linear;
+	transition: background 1.0s linear;
+}
+
+span.transLang:hover {
+	background-color: #ffea00;
+}
+
+span.transLangNon {
+	font-family: Verdana, Geneva, sans-serif;
+	color: #7F7F72;
+	font-size: 10pt;
+	font-weight: bold;
+	padding-right: 1em;
+	cursor:default;
+}
+
+div#itw_dictionarycontent td.CitTable  {
+	width: 100%;
+	background-color: #eaeaea;
+	border: 0px solid #FFFFE5;
+	padding: 8px 10px;
+	border-radius: 12px;
+	
+}
+
+div#itw_dictionarycontent td.GrayBG  {
+	width: 100%;
+	background-color: #eaeaea;
+	border: 0px solid #FFFFE5;
+	padding: 2px 3px;
+	border-radius: 4px;
+	
+}
+
+div#itw_dictionarycontent table.LListTb {
+	border: 0;
+	border-spacing: 5;
+}
+
+div#itw_dictionarycontent table.CitTable  {
+	border-spacing: 0;
+	padding-left: 0px;
+    padding-right: 0px;
+}
+
+div.LemmaList {
+	margin-bottom:10px;
+}
+
+span.LemmaListeElm {
+	text-decoration: none;
+	color: #000000;
+}
+
+span.SubDef {
+	font-size: 10pt;
+	color: #000000;
+	margin-bottom: 5px;
+	cursor:default;
+	-webkit-transition: background 1.0s linear;
+	-moz-transition: background 1.0s linear;
+	-ms-transition: background 1.0s linear;
+	-o-transition: background 1.0s linear;
+	transition: background 1.0s linear;
+}
+
+span.SubDef:hover {
+	background-color: #ffea00;
+}
+
+span.SubDefNon {
+	font-family: Verdana, Geneva, sans-serif;
+	font-size: 10pt;
+	color: #000000;
+	margin-bottom: 5px;
+	cursor:default;
+}
+
+span.SubDefNum {
+	font-size: 10pt;
+	color: #000000;
+	margin-bottom: 5px;
+}
+
+p.DictionaryEntry {
+	margin-left: 3.0mm;
+	text-indent: -3.0mm;
+	margin-right: 3.0mm;
+	font-family: "Arial";
+	font-size: 10pt;
+	font-style: normal;
+	font-weight: normal;
+	color: black;
+	margin-top: 0mm;
+	margin-bottom: 0mm;
+}
+
+span.Headword {
+	font-family: "Arial Unicode MS";
+	font-size: 14pt;
+	font-weight: bold;
+	font-style: normal;
+	color: navy;
+}
+
+span.PartOfSpeech {
+	font-family: "Times New Roman";
+	font-size: 10pt;
+	font-weight: normal;
+	font-style: italic;
+	color: green;
+}
+
+span.expandTitle {
+	position: absolute;
+	right: 2.9em;
+	font-size: 10pt;
+	font-weight: bold;
+	line-height: 0.9em;
+	color: #d4d4be;
+	height: 20px;
+	cursor:pointer;
+	-webkit-transition: background 1.0s linear;
+	-moz-transition: background 1.0s linear;
+	-ms-transition: background 1.0s linear;
+	-o-transition: background 1.0s linear;
+	transition: background 1.0s linear;
+}
+
+span.expandTitle:hover {
+	background-color: #ffea00;
+}
+
+span.expandTitleNon {
+	font-family: Verdana, Geneva, sans-serif;
+	position: absolute;
+	right: 2.9em;
+	font-size: 10pt;
+	font-weight: bold;
+	line-height: 0.9em;
+	color: #d4d4be;
+	height: 20px;
+	cursor:pointer;
+}
+
+span.betTitle {
+	position: absolute;
+	right: 2.9em;
+	font-size: 10pt;
+	font-weight: bold;
+	line-height: 0.9em;
+	color: #d4d4be;
+	height: 20px;
+	cursor:pointer;
+	-webkit-transition: background 1.0s linear;
+	-moz-transition: background 1.0s linear;
+	-ms-transition: background 1.0s linear;
+	-o-transition: background 1.0s linear;
+	transition: background 1.0s linear;
+}
+
+span.betTitle:hover {
+	background-color: #ffea00;
+}
+
+span.betTitleNon {
+	font-family: Verdana, Geneva, sans-serif;
+	position: absolute;
+	right: 2.9em;
+	font-size: 10pt;
+	font-weight: bold;
+	line-height: 0.9em;
+	color: #d4d4be;
+	height: 20px;
+	cursor:pointer;
+}
+
+span.formTitle {
+	position: absolute;
+	right: 2.9em;
+	font-size: 10pt;
+	font-weight: bold;
+	line-height: 0.9em;
+	color: #d4d4be;
+	height: 20px;
+	cursor:pointer;
+	-webkit-transition: background 1.0s linear;
+	-moz-transition: background 1.0s linear;
+	-ms-transition: background 1.0s linear;
+	-o-transition: background 1.0s linear;
+	transition: background 1.0s linear;
+}
+
+span.formTitle:hover {
+	background-color: #ffea00;
+}
+
+span.formTitleNon {
+	font-family: Verdana, Geneva, sans-serif;
+	position: absolute;
+	right: 2.9em;
+	font-size: 10pt;
+	font-weight: bold;
+	line-height: 0.9em;
+	color: #d4d4be;
+	height: 20px;
+	cursor:pointer;
+}
+
+span.moreTitle {
+	position: absolute;
+	right: 2.9em;
+	font-size: 10pt;
+	font-weight: bold;
+	line-height: 0.9em;
+	color: #d4d4be;
+	height: 20px;
+	cursor:pointer;
+	-webkit-transition: background 1.0s linear;
+	-moz-transition: background 1.0s linear;
+	-ms-transition: background 1.0s linear;
+	-o-transition: background 1.0s linear;
+	transition: background 1.0s linear;
+}
+
+span.moreTitle:hover {
+	background-color: #ffea00;
+}
+
+span.moreTitleNon {
+	font-family: Verdana, Geneva, sans-serif;
+	position: absolute;
+	right: 2.9em;
+	font-size: 10pt;
+	font-weight: bold;
+	line-height: 0.9em;
+	color: #d4d4be;
+	height: 20px;
+	cursor:pointer;
+}
+
+span.fastTitle {
+	position: absolute;
+	right: 2.9em;
+	font-size: 10pt;
+	font-weight: bold;
+	line-height: 0.9em;
+	color: #d4d4be;
+	height: 20px;
+	cursor:pointer;
+	-webkit-transition: background 1.0s linear;
+	-moz-transition: background 1.0s linear;
+	-ms-transition: background 1.0s linear;
+	-o-transition: background 1.0s linear;
+	transition: background 1.0s linear;
+}
+
+span.fastTitle:hover {
+	background-color: #ffea00;
+}
+
+span.fastTitleNon {
+	font-family: Verdana, Geneva, sans-serif;
+	position: absolute;
+	right: 2.9em;
+	font-size: 10pt;
+	font-weight: bold;
+	line-height: 0.9em;
+	color: #d4d4be;
+	height: 20px;
+	cursor:pointer;
+}
+
+span.wordTitle {
+	position: absolute;
+	right: 2.9em;
+	font-size: 10pt;
+	font-weight: bold;
+	line-height: 0.9em;
+	color: #d4d4be;
+	height: 20px;
+	cursor:pointer;
+	-webkit-transition: background 1.0s linear;
+	-moz-transition: background 1.0s linear;
+	-ms-transition: background 1.0s linear;
+	-o-transition: background 1.0s linear;
+	transition: background 1.0s linear;
+}
+
+span.wordTitle:hover {
+	background-color: #ffea00;
+}
+
+span.wordTitle2 {
+	position: absolute;
+	right: 0.8em;
+	font-size: 10pt;
+	font-weight: bold;
+	line-height: 0.9em;
+	color: #d4d4be;
+	height: 20px;
+	-webkit-transition: background 1.0s linear;
+	-moz-transition: background 1.0s linear;
+	-ms-transition: background 1.0s linear;
+	-o-transition: background 1.0s linear;
+	transition: background 1.0s linear;
+}
+
+span.wordTitle2:hover {
+	background-color: #ffea00;
+}
+
+span.wordTitleNon {
+	font-family: Verdana, Geneva, sans-serif;
+	position: absolute;
+	right: 2.9em;
+	font-size: 10pt;
+	font-weight: bold;
+	line-height: 0.9em;
+	color: #d4d4be;
+	height: 20px;
+	cursor:pointer;
+}
+
+span.Pronunciation {
+	font-family: "Arial Unicode MS";
+	font-size: 10pt;
+	font-weight: normal;
+	font-style: normal;
+	color: red;
+}
+
+span.SenseNumber {
+	font-family: "Arial";
+	font-size: 40pt;
+	font-weight: 900;
+	font-style: normal;
+	color: black;
+}
+
+span.link_design {
+	display: block;
+	height: 20px;
+	border-bottom: 2px solid #d4d4be;
+	padding: 0;
+	margin-top: 5px;
+}
+
+span.altlink_design {
+	display: block;
+	height: 20px;
+	padding: 0;
+	margin-top: 5px;
+}
+
+span.reallink_design {
+	display: block;
+	height: 20px;
+	border-bottom: 1px solid #000000;
+	padding: 0;
+	margin-top: -15px;
+	margin-bottom: -15px;
+}
+
+span.openCloseImage {
+	margin-top: -1px;
+	position: absolute;
+	margin-right: 3.0mm;
+	right: 0.5em;
+}
+
+span.openCloseImage img {
+	width: 15px;
+}
+
+span.vLemma { 	/* VED IKKE HVOR? */
+	  font-size: 16pt;
+	  color: #09c;
+}	
+
+ span.vComment {
+	  font-style: italic;
+	  font-size:"10pt;
+ }
+
