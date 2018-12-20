@@ -78,7 +78,8 @@ TABLE_LIST = {
             "userNum": ["INT"],
             "version": ["TEXT"],
             "size": ["TEXT"],
-            "language": ["TEXT"]
+            "language": ["TEXT"],
+            "downloadTime": ["DATE"]
         }
     },
     "PermissionTable": {

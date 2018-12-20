@@ -23,6 +23,7 @@ EOF
     tmpData=$BASEDIR/../../data/tmpData
     mkdir -p $tmpData
     cp -f $1 $tmpData/idList.json
+    python $BASEDIR/../python/bin/ExtensionTool.py addExtensionId $dbDir --extensionIdList $tmpData/idList.json --category $2
 
     TMPFILE="$(mktemp -t --suffix=.SUFFIX downloadCrx_sh.XXXXXX)"
     trap "rm -f '$TMPFILE'" 0               # EXIT
@@ -33,20 +34,27 @@ EOF
     ex_id=$(cat "$1" | python -c "import json, sys; print json.load(sys.stdin)[0]") || exit 1
     while [[ ! -z $ex_id ]]; do
         echo $ex_id
-        wget --output-document=$ex_id.crx "https://clients2.google.com/service/update2/crx?response=redirect&prodversion=49.0&x=id%3D"$ex_id"%26installsource%3Dondemand%26uc"
-        if [ $? != 0 ]; then
-            echo "Download $ex_id failed"
-            echo $ex_id >> $2DownloadError
-            rm -f $ex_id.crx
+        python $BASEDIR/../python/bin/ExtensionTool.py setDetail $dbDir --extensionId $ex_id
+        ret=$?
+        if [ $ret == 0 ]; then
+            wget --output-document=$ex_id.crx "https://clients2.google.com/service/update2/crx?response=redirect&prodversion=49.0&x=id%3D"$ex_id"%26installsource%3Dondemand%26uc"
+            if [ $? != 0 ]; then
+                echo "Download $ex_id failed"
+                echo $ex_id >> $2DownloadError
+                rm -f $ex_id.crx
+            else
+                mv $ex_id.crx ${outputDir}$2
+            fi
+        elif [ $ret == 1 ]; then
+            echo "Get extension detail failed"
         else
-            mv $ex_id.crx ${outputDir}$2
+            echo "Extension already the newest"
         fi
 
         cat "$1" | python -c "import json, sys; data=json.load(sys.stdin); s=json.dumps(data[1:]) if len(data)>0 else \"[]\"; print s;" | tee $TMPFILE 1>/dev/null
         mv -f $TMPFILE "$1"
         ex_id=$(cat "$1" | python -c "import json, sys; data=json.load(sys.stdin); ex_id=data[0] if len(data)>0 else ''; print ex_id;") || exit 1
     done
-    python $BASEDIR/../python/bin/AddExtensionId.py $dbDir $tmpData/idList.json $2
     rm -f $tmpData/idList.json
     mkdir -p ${outputDir}ErrorCrx/
     if [[ -f $2DownloadError ]]; then
@@ -55,28 +63,14 @@ EOF
     zip -r ${outputDir}$2.zip ${outputDir}$2
 }
 
-allJsonFiles=("accessibility.json"
-"blogging.json"
-"communication.json"
-"extensionList.json"
-"fun.json"
-"news.json"
-"photos.json"
-"productivity.json"
-"searchTool.json"
-"shopping.json"
-"sports.json"
-"webDevelopment.json")
-extensionIdList=$BASEDIR/../../data/extensionIdList/
+extensionIdList=$BASEDIR/../../data/cacheData/
 crxDir=$BASEDIR/../../data/crxFiles/
 database=$BASEDIR/../../data/data.db
 archive=$BASEDIR/../../data/archive/
 
 if [[ ! -z $1 ]]; then
     if [[ $1 = "test" ]]; then
-        allJsonFiles=("list1.json"
-        "list2.json")
-        extensionIdList=$BASEDIR/../../tests/shellTests/exIdList/
+        extensionIdList=$BASEDIR/../../tests/shellTests/cacheData/
         crxDir=$BASEDIR/../../tests/shellTests/crxFiles/
         database=$BASEDIR/../../tests/shellTests/test.db
         archive=$BASEDIR/../../tests/shellTests/archive/
@@ -86,13 +80,13 @@ if [[ ! -z $1 ]]; then
 fi
 
 mkdir -p ${archive}crx/
+
 for i in ${extensionIdList}*; do
     tmpData=$BASEDIR/../../data/tmpData
     mkdir -p $tmpData
-    cp -f $i $tmpData/tempidList.json
-    i=`basename $i`
-    echo $i
-    downloadCrx $tmpData/tempidList.json ${i//.json/} $crxDir $database
-    rm -f $tmpData/tempidList.json
+    category=`basename $i`
+    category=${category//.json/}
+    downloadCrx $i ${category} $crxDir $database
     mv ${crxDir}*.zip ${archive}crx/
+    rm -f $i
 done
