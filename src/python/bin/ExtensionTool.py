@@ -47,6 +47,8 @@ def main():
             sys.exit(exitCode)
         elif args.cmd == "addPermission":
             pass
+        elif args.cmd == "resetExtension":
+            ExtensionUtils.resetInfoForExtension(args.db, args.extensionId)
     except Exception as e:
         print e
         sys.exit(1)

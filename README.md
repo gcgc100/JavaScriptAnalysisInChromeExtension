@@ -3,6 +3,11 @@ The project is developed with python on ubuntu 16.04 LTS 64bit.
 The shell script is tested with bash.
 
 ##Usage:
+* Install dependency softwares:
+    * Chrome
+    * git
+    * python
+    * pip
 * Install selenium:
 ```
 pip install selenium

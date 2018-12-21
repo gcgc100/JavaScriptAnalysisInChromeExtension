@@ -22,13 +22,20 @@ EOF
     dbDir=$4
     tmpData=$BASEDIR/../../data/tmpData
     mkdir -p $tmpData
-    cp -f $1 $tmpData/idList.json
-    python $BASEDIR/../python/bin/ExtensionTool.py addExtensionId $dbDir --extensionIdList $tmpData/idList.json --category $2
+    python $BASEDIR/../python/bin/ExtensionTool.py addExtensionId $dbDir --extensionIdList $1 --category $2
 
     TMPFILE="$(mktemp -t --suffix=.SUFFIX downloadCrx_sh.XXXXXX)"
     trap "rm -f '$TMPFILE'" 0               # EXIT
-    trap "rm -f '$TMPFILE'; exit 1" 2       # INT
+    #trap "rm -f '$TMPFILE'; exit 1" 2       # INT
     trap "rm -f '$TMPFILE'; exit 1" 1 15    # HUP TERM
+
+    roll_back() {
+        rm -f '$TMPFILE'
+        rm -f $ex_id.crx
+        python $BASEDIR/../python/bin/ExtensionTool.py resetExtension $dbDir --extensionId $ex_id
+        exit 1
+    }
+    trap roll_back 2
 
     mkdir -p ${outputDir}$2
     ex_id=$(cat "$1" | python -c "import json, sys; print json.load(sys.stdin)[0]") || exit 1
@@ -55,11 +62,11 @@ EOF
         mv -f $TMPFILE "$1"
         ex_id=$(cat "$1" | python -c "import json, sys; data=json.load(sys.stdin); ex_id=data[0] if len(data)>0 else ''; print ex_id;") || exit 1
     done
-    rm -f $tmpData/idList.json
     mkdir -p ${outputDir}ErrorCrx/
     if [[ -f $2DownloadError ]]; then
         mv $2DownloadError ${outputDir}ErrorCrx/
     fi
+    trap "rm -f '$TMPFILE'; exit 1" 2       # INT
     zip -r ${outputDir}$2.zip ${outputDir}$2
 }
 

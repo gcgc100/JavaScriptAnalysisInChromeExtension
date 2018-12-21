@@ -147,6 +147,26 @@ def setExtensionDetailForOne(dbpath, eid):
 
     db.engine = None
     return ret
+
+def resetInfoForExtension(dbpath, eid):
+    """Reset the information of an extension in database
+
+    :dbpath: TODO
+    :eid: TODO
+    :returns: TODO
+
+    """
+    db.create_engine(dbpath)
+    db.update("update extensionTable set downloadTime = NULL where extensionId=?", eid)
+    db.update("update extensionTable set language = NULL where extensionId=?", eid)
+    db.update("update extensionTable set updateTime = NULL where extensionId=?", eid)
+    db.update("update extensionTable set ratedScore = NULL where extensionId=?", eid)
+    db.update("update extensionTable set size = NULL where extensionId=?", eid)
+    db.update("update extensionTable set userNum = NULL where extensionId=?", eid)
+    db.update("update extensionTable set version = NULL where extensionId=?", eid)
+    db.update("update extensionTable set numUserRated = NULL where extensionId=?", eid)
+    db._db_ctx.connection.cleanup()
+    db.engine = None
     
 
 
