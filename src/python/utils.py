@@ -362,13 +362,11 @@ class Utils(object):
         t = re.findall("Version:</span>&nbsp;<span class=\"[^\"]*\">[^0-9]*(\d+(\.\d+)*)", detailWebpage)
         if len(t) == 0:
             return None
-        logger.info(t)
         version = t[0][0]
         ret["version"] = version
         t = re.findall("Updated:</span>&nbsp;<span class=\"[^\"]*\">([^<]*)", detailWebpage)
         if len(t) == 0:
             return None
-        logger.info(t)
         updateTime = t[0]
         tmpDate = datetime.strptime(updateTime, "%B %d, %Y")
         updateTime = tmpDate.strftime("%Y-%m-%d")
@@ -376,12 +374,10 @@ class Utils(object):
         t = re.findall("Size:</span>&nbsp;<span class=\"[^\"]*\">([^<]*)", detailWebpage)
         if len(t) == 0:
             return None
-        logger.info(t)
         size = t[0]
         ret["size"] = size
         t = re.findall("Languages?:</span>&nbsp;<span class=\"[^\"]*\">([^<]*)", detailWebpage)
         if len(t) != 0:
-            logger.info(t)
             language = t[0].decode("utf8")
             ret["language"] = language
         return ret

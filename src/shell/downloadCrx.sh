@@ -87,13 +87,16 @@ if [[ ! -z $1 ]]; then
 fi
 
 mkdir -p ${archive}crx/
+tmpData=$BASEDIR/../../data/tmpData
+mkdir -p $tmpData
+python $BASEDIR/../python/bin/ExtensionTool.py allPack $database --extensionIdList $extensionIdList --crxDir $crxDir --archiveDir $archive
 
-for i in ${extensionIdList}*; do
-    tmpData=$BASEDIR/../../data/tmpData
-    mkdir -p $tmpData
-    category=`basename $i`
-    category=${category//.json/}
-    downloadCrx $i ${category} $crxDir $database
-    mv ${crxDir}*.zip ${archive}crx/
-    rm -f $i
-done
+#for i in ${extensionIdList}*; do
+#    tmpData=$BASEDIR/../../data/tmpData
+#    mkdir -p $tmpData
+#    category=`basename $i`
+#    category=${category//.json/}
+#    downloadCrx $i ${category} $crxDir $database
+#    mv ${crxDir}*.zip ${archive}crx/
+#    rm -f $i
+#done

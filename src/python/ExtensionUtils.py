@@ -13,12 +13,44 @@ logger = mylogging.logger
 
 import DatabaseConf
 
-def init_database(dbpath):
+def init_database(dbpath, extensionIdJson, category):
     """init database
     :returns: TODO
 
     """
     #check whether database exist
+    # if db.engine is None:
+    #     db.create_engine(dbpath)
+    # for table_name, table_define in DatabaseConf.TABLE_LIST.iteritems():
+    #     if table_name == "ExtensionIdTable":
+    #         continue
+    #     sql = "CREATE TABLE IF NOT EXISTS " + table_name + " ("
+    #     for column_name, attrs in table_define["columns"].iteritems():
+    #         sql = "{0} {1}".format(sql, column_name)
+    #         for attr in attrs:
+    #             sql = "{0} {1}".format(sql, attr)
+    #         sql = sql + ","
+    #     for constraint_name, attrs in \
+    #             table_define.get("constraints", {}).iteritems():
+    #         sql = "{0} {1}".format(sql, constraint_name)
+    #         for attr in attrs:
+    #             sql = "{0} {1}".format(sql, attr)
+    #         sql = sql + ","
+    #     sql = sql[:-1] + ")"
+    #     db.update(sql)
+    # db._db_ctx.connection.cleanup()
+    # db.engine = None
+    create_table_in_database(dbpath)
+    addExtensionId(dbpath, extensionIdJson, category)
+
+
+def create_table_in_database(dbpath):
+    """Create the tables in sqlite database
+
+    :dbpath: TODO
+    :returns: TODO
+
+    """
     if db.engine is None:
         db.create_engine(dbpath)
     for table_name, table_define in DatabaseConf.TABLE_LIST.iteritems():
@@ -66,8 +98,10 @@ def addExtensionId(dbpath, extensionIdJson, category):
             else:
                 logger.error(e)
                 logger.error("{0}:{1}".format(extensionId,category))
-    db._db_ctx.connection.commit()
-    db._db_ctx.connection.cleanup()
+    if len(extensionIdList) > 0:
+        # If never invoke insert, _db_ctx.connection will be None and cause error
+        db._db_ctx.connection.commit()
+        db._db_ctx.connection.cleanup()
     db.engine = None
 
 

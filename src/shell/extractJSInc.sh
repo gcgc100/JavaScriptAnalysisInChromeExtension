@@ -39,30 +39,60 @@ fi
 echo Start
 echo "time: $(date +%s)"
 mkdir -p ${scriptDir}
-for cate in ${extSrcDir}*; do
-    echo "Analysing extension in $cate"
-    bash $BASEDIR/fixExtensionSrcDirName.sh ${cate}/ || exit 1
-    let "total=$(ls -lh $cate | wc -l)-1"
-    count=0
-    python $BASEDIR/../python/bin/AddPermission.py ${database} ${cate}
-    for extension in ${cate}/*; do
+
+bash $BASEDIR/fixExtensionSrcDirName.sh ${extSrcDir} || exit 1
+echo "Analysing extension"
+let "total=$(ls -lh $cate | wc -l)-1"
+count=0
+python $BASEDIR/../python/bin/AddPermission.py ${database} ${extSrcDir}
+for extension in ${extSrcDir}*; do
         cat << EOF
 Analysing $extension
 EOF
         let "count=count+1"
         echo "$count/$total extensions done"
-        python $BASEDIR/../python/bin/extractJSInc.py $extension -o ${database} --script ${scriptDir} --crxPath ${crxDir}$(basename $cate)/$(basename $extension).crx
+        # dynamic method
+        python $BASEDIR/../python/bin/extractJSInc.py $extension -o ${database} --script ${scriptDir} --crxPath ${crxDir}$(basename $extension).crx
         if [[ $? -eq "2" ]]; then
             # if python code return 2, user want to stop unpacking and press ctrl-C
             break
         fi
         echo $(date +%s)
-        python $BASEDIR/../python/bin/extractJSInc.py $extension -o ${database} --script ${scriptDir} --crxPath ${crxDir}$(basename $cate)/$(basename $extension).crx --static
+        # static method
+        python $BASEDIR/../python/bin/extractJSInc.py $extension -o ${database} --script ${scriptDir} --crxPath ${crxDir}$(basename $extension).crx --static
         if [[ $? -eq "2" ]]; then
             # if python code return 2, user want to stop unpacking and press ctrl-C
             break
         fi
         echo $(date +%s)
-    done
 done
 echo $(date +%s)
+
+
+#for cate in ${extSrcDir}*; do
+#    echo "Analysing extension in $cate"
+#    bash $BASEDIR/fixExtensionSrcDirName.sh ${cate}/ || exit 1
+#    let "total=$(ls -lh $cate | wc -l)-1"
+#    count=0
+#    python $BASEDIR/../python/bin/AddPermission.py ${database} ${cate}
+#    for extension in ${cate}/*; do
+#        cat << EOF
+#Analysing $extension
+#EOF
+#        let "count=count+1"
+#        echo "$count/$total extensions done"
+#        python $BASEDIR/../python/bin/extractJSInc.py $extension -o ${database} --script ${scriptDir} --crxPath ${crxDir}$(basename $cate)/$(basename $extension).crx
+#        if [[ $? -eq "2" ]]; then
+#            # if python code return 2, user want to stop unpacking and press ctrl-C
+#            break
+#        fi
+#        echo $(date +%s)
+#        python $BASEDIR/../python/bin/extractJSInc.py $extension -o ${database} --script ${scriptDir} --crxPath ${crxDir}$(basename $cate)/$(basename $extension).crx --static
+#        if [[ $? -eq "2" ]]; then
+#            # if python code return 2, user want to stop unpacking and press ctrl-C
+#            break
+#        fi
+#        echo $(date +%s)
+#    done
+#done
+#echo $(date +%s)

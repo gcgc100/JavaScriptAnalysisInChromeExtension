@@ -60,7 +60,7 @@ def get_extension_src_path():
                 if len(extId) == 1:
                     src = os.path.join(profile_src, extId[0])
         else:
-            assert False, "multiple user profiles found"
+            assert False, "multiple user profiles found in /tmp/"
     else:
         src = None
     return src
@@ -81,7 +81,7 @@ def main():
 
     try:
         args = parser.parse_args()
-        unpack_extension(args.crx, "../data/extSrcFinal/")
+        unpack_extension(args.crx, "../data/extSrc/")
     except KeyboardInterrupt as e:
         # Not an error, user wants to stop unpacking.
         sys.exit(2)

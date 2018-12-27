@@ -8,11 +8,11 @@ The shell script is tested with bash.
     * git
     * python
     * pip
-* Install selenium:
+* Install python modules:
 ```
 pip install selenium
+pip install wget
 ```
-* Install dependency
 ```
 git clone https://github.com/gcgc100/mypythonlib.git
 cd mypythonlib

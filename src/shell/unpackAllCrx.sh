@@ -33,34 +33,54 @@ if [[ ! -z $1 ]]; then
     fi
 fi
 
-#for crx in ../../extCrxFiles/*; do
-for cate in ${crxDir}*; do
-    category=$(basename $cate)
-    if [[ $category == "ErrorCrx" ]]; then
-        continue
-    fi
-    cat << EOF
+echo "Start to unpack extensions"
+for crx in ${crxDir}*; do
+    echo "Unpacking extension:$crx"
+    eid=$(basename $crx)
+    outputdir=${extSrcDir}
+    mkdir -p $outputdir
 
-"Start to unpack category:$cate"
-
-EOF
-    for crx in $cate/*; do
-        echo "extension:$crx"
-        eid=$(basename $crx)
-        outputdir=${extSrcDir}${category}/
-        mkdir -p $outputdir
-
-        python $BASEDIR/../python/bin/unpackExtension.py "$crx" --output ${extSrcDir}${category}/
-        isfail=$?
-        if [ $isfail != 0 ]; then
-            echo "$crx" >> data/UnpackCrxError.log
-            if [[ "$isfail" -eq "2" ]]; then
-                # if python code return 2, user want to stop unpacking and press ctrl-C
-                break
-            else
-                rm -rf /tmp/.org.chromium.Chromium.*
-                continue
-            fi
+    python $BASEDIR/../python/bin/unpackExtension.py "$crx" --output $outputdir
+    isfail=$?
+    if [ $isfail != 0 ]; then
+        echo "$crx" >> data/UnpackCrxError.log
+        if [[ "$isfail" -eq "2" ]]; then
+            # if python code return 2, user want to stop unpacking and press ctrl-C
+            break
+        else
+            rm -rf /tmp/.org.chromium.Chromium.*
+            continue
         fi
-    done
+    fi
 done
+
+#for cate in ${crxDir}*; do
+#    category=$(basename $cate)
+#    if [[ $category == "ErrorCrx" ]]; then
+#        continue
+#    fi
+#    cat << EOF
+
+#"Start to unpack category:$cate"
+
+#EOF
+#    for crx in $cate/*; do
+#        echo "extension:$crx"
+#        eid=$(basename $crx)
+#        outputdir=${extSrcDir}${category}/
+#        mkdir -p $outputdir
+
+#        python $BASEDIR/../python/bin/unpackExtension.py "$crx" --output ${extSrcDir}${category}/
+#        isfail=$?
+#        if [ $isfail != 0 ]; then
+#            echo "$crx" >> data/UnpackCrxError.log
+#            if [[ "$isfail" -eq "2" ]]; then
+#                # if python code return 2, user want to stop unpacking and press ctrl-C
+#                break
+#            else
+#                rm -rf /tmp/.org.chromium.Chromium.*
+#                continue
+#            fi
+#        fi
+#    done
+#done

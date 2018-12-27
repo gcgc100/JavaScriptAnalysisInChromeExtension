@@ -30,7 +30,7 @@ def main():
     parser.add_argument("--static",
             default=False,
             action='store_true',
-            help="Whether user static method to extract info. Dyanmic method is more accurate but slower. By default:use dynamic method")
+            help="Whether use static method to extract info. Dyanmic method is more accurate but slower. By default:use dynamic method")
     parser.add_argument("--crxPath",
             default="",
             help="The crx file path. Must be set when dynamic extract info")
