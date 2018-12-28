@@ -70,14 +70,14 @@ EOF
     zip -r ${outputDir}$2.zip ${outputDir}$2
 }
 
-extensionIdList=$BASEDIR/../../data/cacheData/
+extensionIdList=$BASEDIR/../../data/extensionIdList/
 crxDir=$BASEDIR/../../data/crxFiles/
 database=$BASEDIR/../../data/data.db
 archive=$BASEDIR/../../data/archive/
 
 if [[ ! -z $1 ]]; then
     if [[ $1 = "test" ]]; then
-        extensionIdList=$BASEDIR/../../tests/shellTests/cacheData/
+        extensionIdList=$BASEDIR/../../tests/shellTests/exIdList/
         crxDir=$BASEDIR/../../tests/shellTests/crxFiles/
         database=$BASEDIR/../../tests/shellTests/test.db
         archive=$BASEDIR/../../tests/shellTests/archive/

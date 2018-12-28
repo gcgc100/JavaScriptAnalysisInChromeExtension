@@ -1,13 +1,13 @@
 .PHONY: cleanTest
 
-run: data/cacheData
+run: 
 	bash src/shell/downloadCrx.sh
 	bash src/shell/unpackAllCrx.sh
 	bash src/shell/extractJSInc.sh
 	bash src/shell/setLibVersion.sh
 
-data/cacheData:
-	cp -R data/extensionIdList data/cacheData
+#data/cacheData:
+#    cp -R data/extensionIdList data/cacheData
 
 
 clean:
@@ -25,8 +25,8 @@ testShell:
 	bash src/shell/extractJSInc.sh test
 	bash src/shell/setLibVersion.sh test
 
-tests/shellTests/cacheData:
-	cp -R tests/shellTests/exIdList/ tests/shellTests/cacheData
+#tests/shellTests/cacheData:
+#    cp -R tests/shellTests/exIdList/ tests/shellTests/cacheData
 
 cleanTest:
 	rm -rf tests/shellTests/archive
