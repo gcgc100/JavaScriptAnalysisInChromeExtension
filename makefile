@@ -6,10 +6,6 @@ run:
 	bash src/shell/extractJSInc.sh
 	bash src/shell/setLibVersion.sh
 
-#data/cacheData:
-#    cp -R data/extensionIdList data/cacheData
-
-
 clean:
 	rm -rf data/archive
 	rm -rf data/crxFiles
@@ -24,9 +20,6 @@ testShell:
 	bash src/shell/unpackAllCrx.sh test
 	bash src/shell/extractJSInc.sh test
 	bash src/shell/setLibVersion.sh test
-
-#tests/shellTests/cacheData:
-#    cp -R tests/shellTests/exIdList/ tests/shellTests/cacheData
 
 cleanTest:
 	rm -rf tests/shellTests/archive

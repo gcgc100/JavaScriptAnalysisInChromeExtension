@@ -83,7 +83,7 @@ class Analyser(object):
         db._db_ctx.connection.cleanup()
         db.engine = None
 
-    def analyse_extension(self, extension_path, script_folder, dynamic=False, crxPath=None):
+    def analyse_extension(self, extension_path, script_folder, type_enabled=[], crxPath=None):
         """Alanyser one extension
 
         :extension_path: TODO
@@ -98,10 +98,15 @@ class Analyser(object):
                     extension_path)
         try:
             extension_path = os.path.join(extension_path, version_dir[0])
-            cDataFound=self._analyse_content_scripts(extension_path, script_folder)
-            bDataFound=self._analyse_background_scripts(extension_path, script_folder)
-            hDataFound=self._analyse_jsinc_in_html(extension_path, script_folder, dynamic, crxPath)
-            if cDataFound or bDataFound or hDataFound:
+            if "ContentScript" in type_enabled:
+                cDataFound=self._analyse_content_scripts(extension_path, script_folder)
+            if "BackgroundScript" in type_enabled:
+                bDataFound=self._analyse_background_scripts(extension_path, script_folder)
+            if "static" in type_enabled:
+                hsDataFound=self._analyse_jsinc_in_html(extension_path, script_folder, False, crxPath)
+            if "dynamic" in type_enabled:
+                hdDataFound=self._analyse_jsinc_in_html(extension_path, script_folder, True, crxPath)
+            if cDataFound or bDataFound or hsDataFound or hdDataFound:
                 # The connection is lazy loaded. If no data in scripts, it will be None.
                 db._db_ctx.connection.commit()
         except Exception as e:

@@ -15,18 +15,13 @@ parent_dir = os.path.dirname(current_dir)
 sys.path.insert(0, parent_dir) 
 
 import ExtensionUtils
+import utils
 from analyser import Analyser
 
 from gClifford import sqliteDB as db
 from gClifford import mylogging
 logger = mylogging.logger
 
-def makedirsWithoutError(dirpath):
-    try:
-        os.makedirs(dirpath)
-    except OSError as e:
-        if e.errno != os.errno.EEXIST:
-            raise e
 
 def allPack(dbpath, extensionList, crxDir, archiveDir):
     """All things together
@@ -38,8 +33,8 @@ def allPack(dbpath, extensionList, crxDir, archiveDir):
     :returns: TODO
 
     """
-    makedirsWithoutError(crxDir)
-    makedirsWithoutError(archiveDir)
+    utils.makedirsWithoutError(crxDir)
+    utils.makedirsWithoutError(archiveDir)
     for d in os.listdir(extensionList):
         category = d.split(".")[0]
         ExtensionUtils.init_database(dbpath, os.path.join(extensionList, d), category)
@@ -73,7 +68,16 @@ def allPack(dbpath, extensionList, crxDir, archiveDir):
                 logger.error("Error return when set detail")
         except Exception as e:
             ExtensionUtils.resetInfoForExtension(dbpath, eid)
-            raise e
+            continue
+            # raise e
+    logger.info("Check the output crx files in {0}".format(crxDir))
+    checkCrxFiles = filter(lambda x: not x.endswith(".crx"), os.listdir(crxDir))
+    tmpFiles = filter(lambda x: x.endswith(".tmp"), checkCrxFiles)
+    for tmpFile in tmpFiles:
+        logger.info("Found tmp file in {0}, remove it.".format(crxDir))
+        os.remove(os.path.join(crxDir, tmpFile))
+    if len(checkCrxFiles) > len(tmpFiles):
+        logger.warning("Still contain other unexpected files in {0}. Chech them manually:\n{1}".format(crxDir, checkCrxFiles))
 
 def main():
     parser = argparse.ArgumentParser("Add extension id to sqlite database")
@@ -88,6 +92,8 @@ def main():
                         help="Used when setDetail. The extension id to be set detail.")
     parser.add_argument("--crxDir",
                         help="The directory to save crx files")
+    parser.add_argument("--extensionCollection",
+                        help="The directory which contains all source code of extensions")
     parser.add_argument("--archiveDir",
                         help="The directory to save the archived zip file")
     # parser.add_argument("--extensionExcluded",
@@ -100,11 +106,15 @@ def main():
             ExtensionUtils.init_database(args.db,
                     args.extensionIdList,
                     args.category)
-            # ExtensionUtils.addExtensionId(args.db, 
-            #         args.extensionIdList, 
-            #         args.category)
         elif args.cmd == "setDetail":
-            # ExtensionUtils.setExtensionDetail(args.db)
+            parametersToBeChecked = ["extensionId"]
+            ret = True
+            for p in parametersToBeChecked:
+                if getattr(args, p) is None:
+                    print "{0} can not be empty\n".format(p)
+                    ret = False
+            if not ret:
+                sys.exit(1)
             exitCode = ExtensionUtils.setExtensionDetailForOne(args.db, args.extensionId)
             if exitCode == 1:
                 exitCode = 0
@@ -112,8 +122,24 @@ def main():
                 exitCode = 1
             sys.exit(exitCode)
         elif args.cmd == "addPermission":
-            pass
+            parametersToBeChecked = ["extensionCollection"]
+            ret = True
+            for p in parametersToBeChecked:
+                if getattr(args, p) is None:
+                    print "{0} can not be empty\n".format(p)
+                    ret = False
+            if not ret:
+                sys.exit(1)
+            ExtensionUtils.setPermissionAllPack(args.db, args.extensionCollection)
         elif args.cmd == "resetExtension":
+            parametersToBeChecked = ["extensionId"]
+            ret = True
+            for p in parametersToBeChecked:
+                if getattr(args, p) is None:
+                    print "{0} can not be empty\n".format(p)
+                    ret = False
+            if not ret:
+                sys.exit(1)
             ExtensionUtils.resetInfoForExtension(args.db, args.extensionId)
         elif args.cmd == "allPack":
             parametersToBeChecked = ["extensionIdList", "crxDir", "archiveDir"]

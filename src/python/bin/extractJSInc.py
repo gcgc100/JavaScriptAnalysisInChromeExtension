@@ -30,7 +30,7 @@ def main():
     parser.add_argument("--static",
             default=False,
             action='store_true',
-            help="Whether use static method to extract info. Dyanmic method is more accurate but slower. By default:use dynamic method")
+            help="Static method only. Dyanmic method is more accurate but slower. By default:use both static and dynamic method")
     parser.add_argument("--crxPath",
             default="",
             help="The crx file path. Must be set when dynamic extract info")
@@ -38,10 +38,13 @@ def main():
 
     try:
         args = parser.parse_args()
+        types_collected = ["ContentScript", "Background", "static"]
         if args.static:
-            analyser.Analyser(args.output).analyse_jsinc_in_html(args.extension, args.script, False)
+            # analyser.Analyser(args.output).analyse_jsinc_in_html(args.extension, args.script, False)
+            pass
         else:
-            analyser.Analyser(args.output).analyse_extension(args.extension, args.script, not args.static,  args.crxPath)
+            types_collected.append("dynamic")
+        analyser.Analyser(args.output).analyse_extension(args.extension, args.script, types_collected,  args.crxPath)
     except KeyboardInterrupt as e:
         # Not an error, user wants to stop unpacking.
         sys.exit(2)
