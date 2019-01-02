@@ -19,6 +19,7 @@ cd mypythonlib
 pip install -e .
 ```
 This is my python utils. Use log and sqliteDB in this project.
+* [Set up chromedriver for selenium to control Chrome](http://chromedriver.chromium.org/getting-started)
 * Prepare extension id list. All the extension lists should be saved in json files in data/extensionIdList. The file name will be used as the category of the category.
 The default json files are used in my experiment.
 Some extension may be updated or unpublished from Chrome web store and my cause error during data collection.

@@ -31,7 +31,7 @@ def allPack(crxDir, outputDir):
         # if d.endswith(".tmp"):
         #     logger.warning("Found tmp file in crxDir, skip it")
         #     continue
-        if d.endswith(".crx"):
+        if not d.endswith(".crx"):
             logger.warning("{0} is not a crx file, skip it".format(d))
         eid = d.replace(".crx", "")
         assert re.match("[a-z]{32}", eid)
