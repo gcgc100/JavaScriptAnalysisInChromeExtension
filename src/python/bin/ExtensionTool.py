@@ -38,11 +38,9 @@ def allPack(dbpath, extensionList, crxDir, archiveDir):
     for d in os.listdir(extensionList):
         category = d.split(".")[0]
         ExtensionUtils.init_database(dbpath, os.path.join(extensionList, d), category)
-        jsonFile = os.path.join(extensionList, d)
-        # ExtensionUtils.addExtensionId(dbpath, jsonFile, category)
 
     db.create_engine(dbpath)
-    eList = db.select("select * from extensionTable")
+    eList = db.select("select * from extensionTable where downloadTime is null and (updateTime is null or updateTime !='404')")
     db._db_ctx.connection.cleanup()
     db.engine = None
     for extRow in eList:
@@ -58,7 +56,7 @@ def allPack(dbpath, extensionList, crxDir, archiveDir):
                     print "\n"
                     logger.info(fname)
                 except Exception as e:
-                    # __import__('pdb').set_trace()  # XXX BREAKPOINT
+                    logger.error(e)
                     raise e
             elif retCode == 0:
                 logger.info("Get extension detail failed")
@@ -68,6 +66,8 @@ def allPack(dbpath, extensionList, crxDir, archiveDir):
                 logger.error("Error return when set detail")
         except Exception as e:
             ExtensionUtils.resetInfoForExtension(dbpath, eid)
+            if e.args[0] == 'http error':
+                ExtensionUtils.setInfoForExtension(dbpath, eid, e.args[1])
             continue
             # raise e
     logger.info("Check the output crx files in {0}".format(crxDir))

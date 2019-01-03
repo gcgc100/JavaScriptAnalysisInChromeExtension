@@ -27,7 +27,7 @@ def allPack(crxDir, outputDir):
         logger.info("Unpacking extension: {0}".format(d))
         userProfiles = filter(lambda x: x.startswith(".org.chromium.Chromium"), os.listdir("/tmp/"))
         for up in userProfiles:
-            shutil.rmtree(os.path("/tmp", up))
+            shutil.rmtree(os.path.join("/tmp", up))
         # if d.endswith(".tmp"):
         #     logger.warning("Found tmp file in crxDir, skip it")
         #     continue

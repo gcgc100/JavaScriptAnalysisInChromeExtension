@@ -135,8 +135,11 @@ def setExtensionDetailForOne(dbpath, eid):
             curUpTime = None
         else:
             curUpTime = datetime.strptime(extensionData["updateTime"], dateFmtStr)
-        newUpTime = datetime.strptime(detail["updateTime"], dateFmtStr)
-        if  curUpTime is None or curUpTime < newUpTime:
+        if detail["updateTime"] == "404":
+            newUpTime = "404"
+        else:
+            newUpTime = datetime.strptime(detail["updateTime"], dateFmtStr)
+        if  curUpTime is None or newUpTime == "404" or curUpTime < newUpTime:
             detailKeys = detail.keys()
             sql = "update ExtensionTable set %s=?" % detailKeys[0]
             detailValues = [detail[detailKeys[0]]]
@@ -177,6 +180,20 @@ def resetInfoForExtension(dbpath, eid):
     db.update("update extensionTable set userNum = NULL where extensionId=?", eid)
     db.update("update extensionTable set version = NULL where extensionId=?", eid)
     db.update("update extensionTable set numUserRated = NULL where extensionId=?", eid)
+    db._db_ctx.connection.cleanup()
+    db.engine = None
+
+def setInfoForExtension(dbpath, eid, retCode):
+    """TODO: Docstring for setInfoForExtension.
+
+    :dbpath: TODO
+    :eid: extesion id
+    :retCode: ret code(40X) when download crx file
+    :returns: TODO
+
+    """
+    db.create_engine(dbpath)
+    db.update("update extensionTable set downloadTime = ? where extensionId=?", retCode, eid)
     db._db_ctx.connection.cleanup()
     db.engine = None
     
