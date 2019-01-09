@@ -12,6 +12,7 @@ from gClifford import mylogging
 logger = mylogging.logger
 
 import DatabaseConf
+from Extension import Extension
 
 def init_database(dbpath, extensionIdJson, category):
     """init database
@@ -198,31 +199,6 @@ def setInfoForExtension(dbpath, eid, retCode):
     db.engine = None
     
 
-
-def _setPermission(extension_id, extension_path):
-    """TODO: Docstring for setPermission.
-
-    :extensionId: TODO
-    :extensionPath: TODO
-    :returns: TODO
-
-    """
-    version_dir = os.listdir(extension_path)
-    assert len(version_dir) > 0, "version_dir not found"
-    if len(version_dir) > 1:
-        logger.warning("%s,warning: multiple version exists", 
-                extension_path)
-    try:
-        extension_path = os.path.join(extension_path, version_dir[0])
-        with open(os.path.join(extension_path, "manifest.json")) as f:
-            manifest = json.load(f)
-            permissions = manifest.get("permissions", [])
-        return permissions
-    except Exception as e:
-        logger.error("%s,error", e)
-        raise e
-
-
 def setPermissionAllPack(dbpath, extensionCollection):
     """TODO: Docstring for setPermissionAllPack.
 
@@ -237,7 +213,13 @@ def setPermissionAllPack(dbpath, extensionCollection):
 
     if os.path.isdir(extensionCollection):
         for eid in os.listdir(extensionCollection):
-            permissions = _setPermission(eid, os.path.join(extensionCollection, eid))
+            version_dir = os.listdir(os.path.join(extensionCollection, eid))
+            assert len(version_dir) > 0, "version_dir not found"
+            if len(version_dir) > 1:
+                logger.warning("%s,warning: multiple version exists", 
+                        extension_path)
+            extension = Extension(None, os.path.join(extensionCollection, eid, version_dir[0]))
+            permissions = extension.permissions
             for p in permissions:
                 db.insertNoCommit("PermissionTable", **{"extensionId": eid, "permission": "%s" % p})
     db._db_ctx.connection.commit()
