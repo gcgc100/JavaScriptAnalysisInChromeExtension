@@ -79,7 +79,8 @@ TABLE_LIST = {
             "version": ["TEXT"],
             "size": ["TEXT"],
             "language": ["TEXT"],
-            "downloadTime": ["DATE"]
+            "downloadTime": ["DATE"],
+            "downloadStatus": ["TEXT"]
         }
     },
     "PermissionTable": {

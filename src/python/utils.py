@@ -343,6 +343,7 @@ class Utils(object):
             urlObj = urllib.urlopen(exDetailUrl)
             if urlObj.getcode() != 200:
                 logger.error("Url error: %d, %s" % (urlObj.getcode(), exDetailUrl))
+                return None
                 return {"updateTime": "404"}
             detailWebpage = urlObj.read()
         except IOError as e:

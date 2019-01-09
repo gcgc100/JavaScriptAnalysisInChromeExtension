@@ -193,7 +193,7 @@ def setInfoForExtension(dbpath, eid, retCode):
 
     """
     db.create_engine(dbpath)
-    db.update("update extensionTable set downloadTime = ? where extensionId=?", retCode, eid)
+    db.update("update extensionTable set downloadStatus = ? where extensionId=?", retCode, eid)
     db._db_ctx.connection.cleanup()
     db.engine = None
     
