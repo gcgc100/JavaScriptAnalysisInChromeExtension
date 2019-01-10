@@ -16,7 +16,6 @@ sys.path.insert(0, parent_dir)
 
 import ExtensionUtils
 import utils
-from analyser import Analyser
 
 from gClifford import sqliteDB as db
 from gClifford import mylogging

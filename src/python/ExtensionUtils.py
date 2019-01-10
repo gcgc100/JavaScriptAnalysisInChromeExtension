@@ -6,7 +6,7 @@ import os
 import json
 from datetime import datetime
 
-from utils import Utils
+import utils
 from gClifford import sqliteDB as db
 from gClifford import mylogging
 logger = mylogging.logger
@@ -95,7 +95,7 @@ def setExtensionDetail(dbpath):
     for e in extensionArray:
         eid = e["extensionId"]
         logger.info("Start to get detail of %s(%s)" % (eid, e["id"]))
-        detail = Utils.getExtensionDetail(eid)
+        detail = utils.getExtensionDetail(eid)
         if detail is None:
             logger.error("Getting %s detail failed" % eid)
             continue
@@ -125,7 +125,7 @@ def setExtensionDetailForOne(dbpath, eid):
     """
     db.create_engine(dbpath)
     extensionData = db.select("select * from extensionTable where extensionId=?", eid)[0]
-    detail = Utils.getExtensionDetail(eid)
+    detail = utils.getExtensionDetail(eid)
     if detail is None:
         logger.error("Getting %s detail failed" % eid)
         ret = 0

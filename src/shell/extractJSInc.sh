@@ -42,18 +42,4 @@ echo "Analysing extension"
 let "total=$(ls -lh $cate | wc -l)-1"
 count=0
 python $BASEDIR/../python/bin/ExtensionTool.py addPermission ${database} --extensionCollection ${extSrcDir}
-for extension in ${extSrcDir}*; do
-        cat << EOF
-Analysing $extension
-EOF
-        let "count=count+1"
-        echo "$count/$total extensions done"
-        # dynamic method
-        python $BASEDIR/../python/bin/extractJSInc.py $extension -o ${database} --script ${scriptDir} --crxPath ${crxDir}$(basename $extension).crx
-        if [[ $? -eq "2" ]]; then
-            # if python code return 2, python get a ctrl-C, everything should be stop
-            break
-        fi
-        echo $(date +%s)
-done
-echo $(date +%s)
+python $BASEDIR/../python/bin/extractJSInc.py allPack ${database} ${scriptDir} --static --dynamic
