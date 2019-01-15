@@ -53,7 +53,7 @@ def insert(scripts, table_name):
         if table_name == "FileTable":
             script.dbFileId = lastid
 
-def allPack(script_folder, static, dynamic):
+def allPack(script_folder, static, dynamic, srcPath, crxPath):
     """TODO: Docstring for allPack.
 
     :db_path: TODO
@@ -61,11 +61,12 @@ def allPack(script_folder, static, dynamic):
     :returns: TODO
 
     """
+    # __import__('pdb').set_trace()  # XXX BREAKPOINT
     eList = db.select("select * from extensionTable where downloadTime is not null")
     for e in eList:
-        crxPath = os.path.join(current_dir, "../../../data/crxFiles", 
+        crxPath = os.path.join(crxPath, 
                 "{0}.crx".format(e["extensionId"]))
-        srcPath = os.path.join(current_dir, "../../../data/extSrc", e["extensionId"], "0_0_0")
+        srcPath = os.path.join(srcPath, e["extensionId"], "0_0_0")
         e["dbID"] = e.pop("id")
         ds = ["downloadStatus", "userNum"]
         for d in ds:
@@ -111,8 +112,10 @@ def main():
     try:
         args = parser.parse_args()
         db.create_engine(args.db)
+        srcPath = args.srcPath
+        crxPath = args.crxPath
         if args.cmd == "allPack":
-            allPack(args.script, args.static, args.dynamic)
+            allPack(args.script, args.static, args.dynamic, srcPath, crxPath)
         elif args.cmd == "oneExtension":
             if not srcPath.endswith("/"):
                 srcPath= srcPath + "/"

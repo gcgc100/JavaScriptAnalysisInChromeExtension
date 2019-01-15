@@ -42,4 +42,4 @@ echo "Analysing extension"
 let "total=$(ls -lh $cate | wc -l)-1"
 count=0
 python $BASEDIR/../python/bin/ExtensionTool.py addPermission ${database} --extensionCollection ${extSrcDir}
-python $BASEDIR/../python/bin/extractJSInc.py allPack ${database} ${scriptDir} --static --dynamic
+python $BASEDIR/../python/bin/extractJSInc.py allPack ${database} ${scriptDir} --static --dynamic --srcPath ${extSrcDir} --crxPath ${crxDir}

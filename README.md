@@ -50,7 +50,7 @@ data.db:
 
 ##Test
 ```
-make test
+make testShell
 ```
 Run the project with test data. The collected data will be saved into tests directory.
 

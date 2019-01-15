@@ -8,6 +8,8 @@ import argparse
 import inspect
 import json
 import time
+import thread
+
 import wget
 
 current_dir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
@@ -39,7 +41,7 @@ def allPack(dbpath, extensionList, crxDir, archiveDir):
         ExtensionUtils.init_database(dbpath, os.path.join(extensionList, d), category)
 
     db.create_engine(dbpath)
-    eList = db.select("select * from extensionTable where downloadTime is null and (updateTime is null or updateTime !='404')")
+    eList = db.select("select * from extensionTable where downloadStatus = 0 and (updateTime is null or updateTime !='404')")
     db._db_ctx.connection.cleanup()
     db.engine = None
     for extRow in eList:
@@ -50,10 +52,40 @@ def allPack(dbpath, extensionList, crxDir, archiveDir):
             if retCode == 1:
                 extensionDownloadUrl = "https://clients2.google.com/service/update2/crx?response=redirect&prodversion=49.0&x=id%3D{0}%26installsource%3Dondemand%26uc"
                 try:
-                    fname = wget.download(extensionDownloadUrl.format(eid), 
-                            out=os.path.join(crxDir,"{0}.crx".format(eid)))
+                    # fname = wget.download(, 
+                    #         out=os.path.join(crxDir,"{0}.crx".format(eid)))
+                    fname = [None]
+                    curFname = fname[0]
+                    startDownloadTime = time.time()
+                    timeout = False
+                    def wgetExtension(url, out):
+                        try:
+                            fname[0] = wget.download(url, out)
+                        except Exception as e:
+                            fname[0] = "error"
+                            logger.error("wget error: %s" % e)
+                    thread.start_new_thread(wgetExtension, 
+                            (extensionDownloadUrl.format(eid), 
+                                os.path.join(crxDir,"{0}.crx".format(eid))))
+                    while(True):
+                        if fname[0] == "error":
+                            fname[0] = None
+                            ExtensionUtils.resetInfoForExtension(dbpath, eid)
+                            break
+                        if curFname == fname[0]:
+                            logger.info(fname[0])
+                            break
+                        if time.time() - startDownloadTime > 120:
+                            timeout = True
+                            ExtensionUtils.resetInfoForExtension(dbpath, eid)
+                            logger.info("wget has not return for 2 minutes, skip it")
+                            break
+                        time.sleep(0.5)
                     print "\n"
-                    logger.info(fname)
+                    # if not timeout:
+                    #     logger.info(fname[0])
+                    # else:
+                    #     logger.info("wget has not return for 2 minutes, skip it")
                 except Exception as e:
                     logger.error(e)
                     raise e
@@ -157,4 +189,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-    
