@@ -80,7 +80,7 @@ TABLE_LIST = {
             "size": ["TEXT"],
             "language": ["TEXT"],
             "downloadTime": ["DATE"],
-            "downloadStatus": ["TEXT"]
+            "downloadStatus": ["INT"]
         }
     },
     "PermissionTable": {

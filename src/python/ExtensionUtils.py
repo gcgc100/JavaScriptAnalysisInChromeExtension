@@ -69,7 +69,7 @@ def addExtensionId(dbpath, extensionIdJson, category):
     for extensionId in extensionIdList:
         try:
             db.insertNoCommit("extensionTable", 
-                    **{"extensionId": extensionId, "category": category})
+                    **{"extensionId": extensionId, "category": category, "downloadStatus": 0})
         except Exception as e:
             if e.message.startswith("UNIQUE constraint failed"):
                 logger.warning(e)
@@ -151,6 +151,7 @@ def setExtensionDetailForOne(dbpath, eid):
             detailValues.append(eid)
             db.updateNoCommit(sql, *detailValues)
             db.updateNoCommit("update extensionTable set downloadTime = date('now') where extensionId=?", eid)
+            db.updateNoCommit("update extensionTable set downloadStatus = 1 where extensionId=?", eid)
             logger.info("End of getting detail of %s" % eid)
             db._db_ctx.connection.commit()
             db._db_ctx.connection.cleanup()
@@ -181,6 +182,7 @@ def resetInfoForExtension(dbpath, eid):
     db.update("update extensionTable set userNum = NULL where extensionId=?", eid)
     db.update("update extensionTable set version = NULL where extensionId=?", eid)
     db.update("update extensionTable set numUserRated = NULL where extensionId=?", eid)
+    db.update("update extensionTable set downloadStatus = 0 where extensionId=?", eid)
     db._db_ctx.connection.cleanup()
     db.engine = None
 
