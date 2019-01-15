@@ -72,7 +72,7 @@ def allPack(dbpath, extensionList, crxDir, archiveDir):
                             fname[0] = None
                             ExtensionUtils.resetInfoForExtension(dbpath, eid)
                             break
-                        if curFname == fname[0]:
+                        if curFname != fname[0]:
                             logger.info(fname[0])
                             break
                         if time.time() - startDownloadTime > 120:
