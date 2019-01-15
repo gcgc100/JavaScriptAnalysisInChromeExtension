@@ -16,6 +16,7 @@ import socket
 import sys
 import string
 import logging
+import subprocess
 
 from datetime import datetime
 
@@ -122,3 +123,23 @@ class MyHTMLParser(HTMLParser):
             self.tags[-1].append(data)
             self.tags[-1].append(self.seq)
             self.seq += 1
+
+def mitmproxy_start(mitmproxyPath="/home/gc/project/mitmproxy/"):
+    """Start the mitmproxy
+    :returns: TODO
+
+    """
+    curDir = os.getcwd()
+    os.chdir(mitmproxyPath)
+    p = subprocess.Popen(["./mitmdump"], stdout=subprocess.PIPE)
+    os.chdir(curDir)
+    return p
+
+def mitmproxy_stop(p):
+    """Stop mitmproxy
+
+    :arg1: TODO
+    :returns: TODO
+
+    """
+    p.send_signal(subprocess.signal.SIGTERM)
