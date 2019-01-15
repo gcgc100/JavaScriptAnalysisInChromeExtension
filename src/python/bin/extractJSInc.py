@@ -62,7 +62,7 @@ def allPack(script_folder, static, dynamic, srcPath, crxPath):
 
     """
     # __import__('pdb').set_trace()  # XXX BREAKPOINT
-    eList = db.select("select * from extensionTable where downloadTime is not null")
+    eList = db.select("select * from extensionTable where downloadStatus = 1 null")
     for e in eList:
         crxPath = os.path.join(crxPath, 
                 "{0}.crx".format(e["extensionId"]))
