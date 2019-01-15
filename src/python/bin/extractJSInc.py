@@ -94,11 +94,15 @@ def main():
     parser.add_argument("--static",
             default=False,
             action='store_true',
-            help="Static method only. Dyanmic method is more accurate but slower. By default:use both static and dynamic method")
+            help="Detect the JavaScript inclusions with static method. Dyanmic method is more accurate but slower.")
     parser.add_argument("--dynamic",
             default=False,
             action='store_true',
-            help="Static method only. Dyanmic method is more accurate but slower. By default:use both static and dynamic method")
+            help="Static method. Dyanmic method is more accurate but slower. By default:use both static and dynamic method")
+    parser.add_argument("--proxyDetection",
+            default=False,
+            action='store_true',
+            help="Detect the JavaScript incusions with proxy method")
     parser.add_argument("--crxPath",
             default="",
             help="The crx file path. Must be set when dynamic extract info")
@@ -124,6 +128,8 @@ def main():
                 Analyser.static_detect_javascript_in_html(extension, args.script)
             if args.dynamic:
                 Analyser.dynamic_detect_javascript_in_html(extension, args.script)
+            if args.proxyDetection:
+                Analyser.proxy_detect_javascript_in_html(extension, args.script)
             insert(extension.scripts, "FileTable")
             insert(filter(lambda e: e.filetype==Script.SCRIPT_WEBPAGE_SCRIPT, extension.scripts), "JavaScriptInHtmlTable")
             db._db_ctx.connection.commit()

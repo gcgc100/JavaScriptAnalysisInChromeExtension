@@ -55,6 +55,8 @@ make test
 Run the project with test data. The collected data will be saved into tests directory.
 
 The python tests code can be used with nosetests.
+The test_set_version.py and test_analyser.py is disabled in setup.cfg.
+test_set_version.py is very slow and test_analyser.py need to config proxy first.
 
 ##Other Things
 The library information will not be set automatically.
