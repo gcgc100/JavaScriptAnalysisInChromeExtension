@@ -218,8 +218,8 @@ def setPermissionAllPack(dbpath, extensionCollection):
             version_dir = os.listdir(os.path.join(extensionCollection, eid))
             assert len(version_dir) > 0, "version_dir not found"
             if len(version_dir) > 1:
-                logger.warning("%s,warning: multiple version exists", 
-                        extension_path)
+                logger.warning("For %s,warning: multiple version exists", 
+                        eid)
             extension = Extension(None, os.path.join(extensionCollection, eid, version_dir[0]))
             permissions = extension.permissions
             for p in permissions:

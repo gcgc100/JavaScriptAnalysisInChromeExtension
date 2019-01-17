@@ -58,27 +58,40 @@ def allPack(dbpath, extensionList, crxDir, archiveDir):
                     curFname = fname[0]
                     startDownloadTime = time.time()
                     timeout = False
-                    def wgetExtension(url, out):
+                    lock = thread.allocate_lock()
+                    def wgetExtension(url, out, lock):
+                        while lock.locked(): pass
+                        lock.acquire()
                         try:
                             fname[0] = wget.download(url, out)
+                            lock.release()
                         except Exception as e:
                             fname[0] = "error"
                             logger.error("wget error: %s" % e)
+                            lock.release()
                     thread.start_new_thread(wgetExtension, 
-                            (extensionDownloadUrl.format(eid), 
-                                os.path.join(crxDir,"{0}.crx".format(eid))))
+                            (
+                                extensionDownloadUrl.format(eid), 
+                                os.path.join(crxDir,"{0}.crx".format(eid)),
+                                lock
+                                )
+                            )
                     while(True):
                         if fname[0] == "error":
                             fname[0] = None
                             ExtensionUtils.resetInfoForExtension(dbpath, eid)
                             break
                         if curFname != fname[0]:
+                            while lock.locked(): pass
+                            lock.acquire()
                             logger.info(fname[0])
+                            lock.release()
                             break
                         if time.time() - startDownloadTime > 120:
                             timeout = True
                             ExtensionUtils.resetInfoForExtension(dbpath, eid)
                             logger.info("wget has not return for 2 minutes, skip it")
+                            lock.release()
                             break
                         time.sleep(0.5)
                     print "\n"
@@ -161,7 +174,9 @@ def main():
                     ret = False
             if not ret:
                 sys.exit(1)
+            logger.info("Set permission in sqlite databse for extensions")
             ExtensionUtils.setPermissionAllPack(args.db, args.extensionCollection)
+            logger.info("Permissions are all set in sqlite databse")
         elif args.cmd == "resetExtension":
             parametersToBeChecked = ["extensionId"]
             ret = True

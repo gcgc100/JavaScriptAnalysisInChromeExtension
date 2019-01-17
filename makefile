@@ -1,8 +1,8 @@
 .PHONY: cleanTest
 
 run: 
-	bash src/shell/downloadCrx.sh
-	bash src/shell/unpackAllCrx.sh
+	bash src/shell/downloadcrx.sh
+	bash src/shell/unpackallcrx.sh
 	bash src/shell/extractJSInc.sh
 	bash src/shell/setLibVersion.sh
 

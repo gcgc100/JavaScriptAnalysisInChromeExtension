@@ -24,7 +24,7 @@ This is my python utils. Use log and sqliteDB in this project.
 The default json files are used in my experiment.
 Some extension may be updated or unpublished from Chrome web store and my cause error during data collection.
 It is better to generate new json files.
-* Run the toot-set:
+* Run the toot-set (The 8000 port should be free. Is is needed when detecting version):
 ```
 make
 ```
@@ -56,7 +56,7 @@ Run the project with test data. The collected data will be saved into tests dire
 
 The python tests code can be used with nosetests.
 The test_set_version.py and test_analyser.py is disabled in setup.cfg.
-test_set_version.py is very slow and test_analyser.py need to config proxy first.
+test_set_version.py is very slow and test_analyser.py need to config proxy in advance.
 
 ##Other Things
 The library information will not be set automatically.
