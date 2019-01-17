@@ -19,6 +19,7 @@ if [[ ! -z $1 ]]; then
         fi
         database=${dataDir}test.db
         if [[ ! -d  "${dataDir}extSrc/" ]]; then
+            echo "aaaaaaaaaaaaaaaaa"
             cp -R ${dataDir}extsrcTestData/extSrc/ ${dataDir}extSrc/
         fi
         extSrcDir=${dataDir}extSrc/

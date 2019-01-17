@@ -53,7 +53,7 @@ def insert(scripts, table_name):
         if table_name == "FileTable":
             script.dbFileId = lastid
 
-def allPack(script_folder, static, dynamic, srcPath, crxPath):
+def allPack(script_folder, static, dynamic, srcBasePath, crxBasePath):
     """TODO: Docstring for allPack.
 
     :db_path: TODO
@@ -62,17 +62,21 @@ def allPack(script_folder, static, dynamic, srcPath, crxPath):
 
     """
     # __import__('pdb').set_trace()  # XXX BREAKPOINT
-    eList = db.select("select * from extensionTable where downloadStatus = 1 null")
+    eList = db.select("select * from extensionTable where downloadStatus = 1")
     for e in eList:
-        crxPath = os.path.join(crxPath, 
+        crxPath = os.path.join(crxBasePath, 
                 "{0}.crx".format(e["extensionId"]))
-        srcPath = os.path.join(srcPath, e["extensionId"], "0_0_0")
+        srcPath = os.path.join(srcBasePath, e["extensionId"], "0_0_0")
+        if not os.path.exists(srcPath):
+            logger.info("{0} extension src code not exists".format(srcPath))
+            continue
         e["dbID"] = e.pop("id")
         ds = ["downloadStatus", "userNum"]
         for d in ds:
             if e.has_key(d):
                 e.pop(d)
         extension = Extension.Extension(crxPath, srcPath, **e)
+        logger.info("Start to analyse extension{0}, dbId:{1}".format(e["extensionId"], e["dbID"]))
         Analyser.detect_background_scripts(extension)
         Analyser.detect_content_scripts(extension)
         if static:
@@ -82,6 +86,7 @@ def allPack(script_folder, static, dynamic, srcPath, crxPath):
         insert(extension.scripts, "FileTable")
         insert(filter(lambda e: e.filetype==Script.SCRIPT_WEBPAGE_SCRIPT, extension.scripts), "JavaScriptInHtmlTable")
         db._db_ctx.connection.commit()
+        logger.info("Extension{0} analysed".format(e["extensionId"]))
 
 def main():
     parser = argparse.ArgumentParser("Extract JavaScript Inclusion and save to sqlite database")
