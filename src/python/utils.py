@@ -53,12 +53,15 @@ def getExtensionDetail(extensionId):
     logger.info(exDetailUrl)
     ret = {}
     try:
-        urlObj = urllib.urlopen(exDetailUrl)
+        urlObj = urllib2.urlopen(exDetailUrl, timeout=30)
         if urlObj.getcode() != 200:
             logger.error("Url error: %d, %s" % (urlObj.getcode(), exDetailUrl))
-            return None
+            return urlObj.getcode()
             return {"updateTime": "404"}
         detailWebpage = urlObj.read()
+    except urllib2.HTTPError as e:
+        logger.error("Get extension detail error:%s" % s)
+        return e.getcode()
     except IOError as e:
         return None
     if len(re.findall("No user rated this item", detailWebpage)) > 0:

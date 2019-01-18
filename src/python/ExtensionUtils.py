@@ -129,6 +129,8 @@ def setExtensionDetailForOne(dbpath, eid):
     if detail is None:
         logger.error("Getting %s detail failed" % eid)
         ret = 0
+    elif type(detail) == int:
+        ret = detail
     else:
         dateFmtStr = "%Y-%m-%d"
         # __import__('pdb').set_trace()  # XXX BREAKPOINT
