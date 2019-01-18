@@ -4,8 +4,8 @@
 import sys
 import os
 import json
-import urllib2
-import urlparse
+from urllib.request import urlopen
+import urllib.parse as urlparse
 import re
 import socket
 import string
@@ -92,7 +92,7 @@ def script_from_src(src):
     """
     script_data = None
     try:
-        script_url_file = urllib2.urlopen(src, timeout=10)
+        script_url_file = urlopen(src, timeout=10)
         script_data = script_url_file.read()
     except (IOError, socket.error) as e:
         pprint(e)

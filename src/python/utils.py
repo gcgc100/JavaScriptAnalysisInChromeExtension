@@ -5,13 +5,11 @@
 Basic tools
 """
 
-from HTMLParser import HTMLParser
+from html.parser import HTMLParser
 import os
 import json
 import re
-import urlparse
-import urllib2
-import urllib
+from urllib.request import urlopen
 import socket
 import sys
 import string
@@ -53,7 +51,7 @@ def getExtensionDetail(extensionId):
     logger.info(exDetailUrl)
     ret = {}
     try:
-        urlObj = urllib.urlopen(exDetailUrl)
+        urlObj = urlopen(exDetailUrl)
         if urlObj.getcode() != 200:
             logger.error("Url error: %d, %s" % (urlObj.getcode(), exDetailUrl))
             return None
