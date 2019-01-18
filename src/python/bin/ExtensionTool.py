@@ -8,7 +8,7 @@ import argparse
 import inspect
 import json
 import time
-import thread
+import threading
 
 import wget
 
@@ -58,9 +58,9 @@ def allPack(dbpath, extensionList, crxDir, archiveDir):
                     curFname = fname[0]
                     startDownloadTime = time.time()
                     timeout = False
-                    lock = thread.allocate_lock()
+                    # lock = thread.allocate_lock()
+                    lock = threading.Lock()
                     def wgetExtension(url, out, lock):
-                        while lock.locked(): pass
                         lock.acquire()
                         try:
                             fname[0] = wget.download(url, out)
@@ -69,20 +69,20 @@ def allPack(dbpath, extensionList, crxDir, archiveDir):
                             fname[0] = "error"
                             logger.error("wget error: %s" % e)
                             lock.release()
-                    thread.start_new_thread(wgetExtension, 
+                    # thread.start_new_thread(wgetExtension, 
+                    threading.Thread(target=wgetExtension, args=
                             (
                                 extensionDownloadUrl.format(eid), 
                                 os.path.join(crxDir,"{0}.crx".format(eid)),
                                 lock
                                 )
-                            )
+                            ).start()
                     while(True):
                         if fname[0] == "error":
                             fname[0] = None
                             ExtensionUtils.resetInfoForExtension(dbpath, eid)
                             break
                         if curFname != fname[0]:
-                            while lock.locked(): pass
                             lock.acquire()
                             logger.info(fname[0])
                             lock.release()
@@ -94,7 +94,7 @@ def allPack(dbpath, extensionList, crxDir, archiveDir):
                             lock.release()
                             break
                         time.sleep(0.5)
-                    print "\n"
+                    print("\n")
                     # if not timeout:
                     #     logger.info(fname[0])
                     # else:
@@ -115,8 +115,8 @@ def allPack(dbpath, extensionList, crxDir, archiveDir):
             continue
             # raise e
     logger.info("Check the output crx files in {0}".format(crxDir))
-    checkCrxFiles = filter(lambda x: not x.endswith(".crx"), os.listdir(crxDir))
-    tmpFiles = filter(lambda x: x.endswith(".tmp"), checkCrxFiles)
+    checkCrxFiles = list(filter(lambda x: not x.endswith(".crx"), os.listdir(crxDir)))
+    tmpFiles = list(filter(lambda x: x.endswith(".tmp"), checkCrxFiles))
     for tmpFile in tmpFiles:
         logger.info("Found tmp file in {0}, remove it.".format(crxDir))
         os.remove(os.path.join(crxDir, tmpFile))
@@ -155,7 +155,7 @@ def main():
             ret = True
             for p in parametersToBeChecked:
                 if getattr(args, p) is None:
-                    print "{0} can not be empty\n".format(p)
+                    print("{0} can not be empty\n".format(p))
                     ret = False
             if not ret:
                 sys.exit(1)
@@ -170,7 +170,7 @@ def main():
             ret = True
             for p in parametersToBeChecked:
                 if getattr(args, p) is None:
-                    print "{0} can not be empty\n".format(p)
+                    print("{0} can not be empty\n".format(p))
                     ret = False
             if not ret:
                 sys.exit(1)
@@ -182,7 +182,7 @@ def main():
             ret = True
             for p in parametersToBeChecked:
                 if getattr(args, p) is None:
-                    print "{0} can not be empty\n".format(p)
+                    print("{0} can not be empty\n".format(p))
                     ret = False
             if not ret:
                 sys.exit(1)
@@ -192,13 +192,13 @@ def main():
             ret = True
             for p in parametersToBeChecked:
                 if getattr(args, p) is None:
-                    print "{0} can not be empty\n".format(p)
+                    print("{0} can not be empty\n".format(p))
                     ret = False
             if not ret:
                 sys.exit(1)
             allPack(args.db, args.extensionIdList, args.crxDir, args.archiveDir)
     except Exception as e:
-        print e
+        print(e)
         sys.exit(1)
 
 

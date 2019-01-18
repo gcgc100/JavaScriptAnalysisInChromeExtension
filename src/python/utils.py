@@ -56,7 +56,7 @@ def getExtensionDetail(extensionId):
             logger.error("Url error: %d, %s" % (urlObj.getcode(), exDetailUrl))
             return None
             return {"updateTime": "404"}
-        detailWebpage = urlObj.read()
+        detailWebpage = urlObj.read().decode()
     except IOError as e:
         return None
     if len(re.findall("No user rated this item", detailWebpage)) > 0:
@@ -96,7 +96,7 @@ def getExtensionDetail(extensionId):
     ret["size"] = size
     t = re.findall("Languages?:</span>&nbsp;<span class=\"[^\"]*\">([^<]*)", detailWebpage)
     if len(t) != 0:
-        language = t[0].decode("utf8")
+        language = t[0]
         ret["language"] = language
     return ret
 

@@ -32,17 +32,17 @@ def create_table_in_database(dbpath):
     """
     if db.engine is None:
         db.create_engine(dbpath)
-    for table_name, table_define in DatabaseConf.TABLE_LIST.iteritems():
+    for table_name, table_define in DatabaseConf.TABLE_LIST.items():
         if table_name == "ExtensionIdTable":
             continue
         sql = "CREATE TABLE IF NOT EXISTS " + table_name + " ("
-        for column_name, attrs in table_define["columns"].iteritems():
+        for column_name, attrs in table_define["columns"].items():
             sql = "{0} {1}".format(sql, column_name)
             for attr in attrs:
                 sql = "{0} {1}".format(sql, attr)
             sql = sql + ","
         for constraint_name, attrs in \
-                table_define.get("constraints", {}).iteritems():
+                table_define.get("constraints", {}).items():
             sql = "{0} {1}".format(sql, constraint_name)
             for attr in attrs:
                 sql = "{0} {1}".format(sql, attr)
@@ -142,11 +142,20 @@ def setExtensionDetailForOne(dbpath, eid):
             newUpTime = datetime.strptime(detail["updateTime"], dateFmtStr)
         if  curUpTime is None or newUpTime == "404" or curUpTime < newUpTime:
             detailKeys = detail.keys()
-            sql = "update ExtensionTable set %s=?" % detailKeys[0]
-            detailValues = [detail[detailKeys[0]]]
-            for k in detailKeys[1:]:
-                sql = "%s,%s=?" % (sql, k)
+            # sql = "update ExtensionTable set %s=?" % detailKeys[0]
+            # detailValues = [detail[detailKeys[0]]]
+            sqlSet = None
+            detailValues = []
+            for k in detailKeys:
+                if sqlSet is None:
+                    sqlSet = k+"=?"
+                else:
+                    sqlSet = sqlSet + "," + k + "=?"
                 detailValues.append(detail[k])
+            sql = "update ExtensionTable set %s" % sqlSet
+            # for k in detailKeys[1:]:
+            #     sql = "%s,%s=?" % (sql, k)
+            #     detailValues.append(detail[k])
             sql = "%s where extensionId=?" % sql
             detailValues.append(eid)
             db.updateNoCommit(sql, *detailValues)

@@ -7,16 +7,18 @@ The shell script is tested with bash.
     * Chrome
     * git
     * python
-    * pip
+    * pip3
 * Install python modules:
 ```
-pip install selenium
-pip install wget
+pip3 install selenium
+<!--pip install wget-->
+pip3 install python3-wget
 ```
 ```
 git clone https://github.com/gcgc100/mypythonlib.git
 cd mypythonlib
-pip install -e .
+git co python2
+pip3 install -e .
 ```
 This is my python utils. Use log and sqliteDB in this project.
 * [Set up chromedriver for selenium to control Chrome](http://chromedriver.chromium.org/getting-started)

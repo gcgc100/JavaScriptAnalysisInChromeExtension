@@ -12,6 +12,7 @@ EOF
 shopt -s nullglob
 
 BASEDIR=$(dirname "$BASH_SOURCE")
+PYTHON=python3
 
 crxDir=$BASEDIR/../../data/crxFiles/
 extSrcDir=$BASEDIR/../../data/extSrc/
@@ -31,4 +32,4 @@ fi
 
 rm -rf /tmp/.org.chromium.Chromium.*
 echo "Start to unpack extensions"
-python $BASEDIR/../python/bin/unpackExtension.py allPack --crx ${crxDir} --output $extSrcDir
+$PYTHON $BASEDIR/../python/bin/unpackExtension.py allPack --crx ${crxDir} --output $extSrcDir
