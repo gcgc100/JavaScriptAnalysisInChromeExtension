@@ -1,6 +1,7 @@
 #!/bin/bash
 
 
+PYTHON=python3
 BASEDIR=$(dirname "$BASH_SOURCE")
 
 database=$BASEDIR/../../data/data.db
@@ -14,4 +15,4 @@ if [[ ! -z $1 ]]; then
     fi
 fi
 
-python $BASEDIR/../python/bin/setVersion.py $database
+$PYTHON $BASEDIR/../python/bin/setVersion.py $database
