@@ -23,6 +23,7 @@ from gClifford import sqliteDB as db
 from gClifford import mylogging
 logger = mylogging.logger
 
+gc_timeout = False
 
 def allPack(dbpath, extensionList, crxDir, archiveDir):
     """All things together
@@ -44,6 +45,16 @@ def allPack(dbpath, extensionList, crxDir, archiveDir):
     eList = db.select("select * from extensionTable where downloadStatus = 0 and (updateTime is null or updateTime !='404')")
     db._db_ctx.connection.cleanup()
     db.engine = None
+    ocallback = wget.callback_progress
+    global gc_timeout
+    def call_back(blocks, block_size, total_size, bar_function):
+        global gc_timeout
+        if gc_timeout:
+            raise Exception("Wget extension for two minutes. Set timeout and stop the thread")
+        gc_timeout = False
+        ocallback(blocks, block_size, total_size, bar_function)
+
+    wget.callback_progress = call_back
     for extRow in eList:
         category = extRow["category"]
         eid = extRow["extensionId"]
@@ -57,7 +68,6 @@ def allPack(dbpath, extensionList, crxDir, archiveDir):
                     fname = [None]
                     curFname = fname[0]
                     startDownloadTime = time.time()
-                    timeout = False
                     # lock = thread.allocate_lock()
                     lock = threading.Lock()
                     def wgetExtension(url, out, lock):
@@ -88,17 +98,12 @@ def allPack(dbpath, extensionList, crxDir, archiveDir):
                             lock.release()
                             break
                         if time.time() - startDownloadTime > 120:
-                            timeout = True
+                            gc_timeout = True
                             ExtensionUtils.resetInfoForExtension(dbpath, eid)
                             logger.info("wget has not return for 2 minutes, skip it")
-                            lock.release()
                             break
                         time.sleep(0.5)
                     print("\n")
-                    # if not timeout:
-                    #     logger.info(fname[0])
-                    # else:
-                    #     logger.info("wget has not return for 2 minutes, skip it")
                 except Exception as e:
                     logger.error(e)
                     raise e
@@ -124,6 +129,7 @@ def allPack(dbpath, extensionList, crxDir, archiveDir):
         os.remove(os.path.join(crxDir, tmpFile))
     if len(checkCrxFiles) > len(tmpFiles):
         logger.warning("Still contain other unexpected files in {0}. Chech them manually:\n{1}".format(crxDir, checkCrxFiles))
+    wget.callback_progress =  ocallback
 
 def main():
     parser = argparse.ArgumentParser("Add extension id to sqlite database")
