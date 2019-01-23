@@ -88,7 +88,8 @@ def allPack(script_folder, static, dynamic, srcBasePath, crxBasePath):
             Analyser.dynamic_detect_javascript_in_html(extension, script_folder)
         insert(extension.scripts, "FileTable")
         insert(filter(lambda e: e.filetype==Script.SCRIPT_WEBPAGE_SCRIPT, extension.scripts), "JavaScriptInHtmlTable")
-        db._db_ctx.connection.commit()
+        if db._db_ctx.connection is not None:
+            db._db_ctx.connection.commit()
         logger.info("Extension{0} analysed".format(e["extensionId"]))
 
 def main():
@@ -143,7 +144,8 @@ def main():
                 Analyser.proxy_detect_javascript_in_html(extension, args.script)
             insert(extension.scripts, "FileTable")
             insert(filter(lambda e: e.filetype==Script.SCRIPT_WEBPAGE_SCRIPT, extension.scripts), "JavaScriptInHtmlTable")
-            db._db_ctx.connection.commit()
+            if db._db_ctx.connection is not None:
+                db._db_ctx.connection.commit()
         if db._db_ctx.connection is not None:
             db._db_ctx.connection.cleanup()
         db.engine = None

@@ -106,6 +106,8 @@ def allPack(dbpath, extensionList, crxDir, archiveDir):
                 logger.info("Get extension detail failed")
             elif retCode == 2:
                 logger.info("Extension already the newest")
+            elif retCode == 404:
+                ExtensionUtils.setInfoForExtension(dbpath, eid, retCode)
             else:
                 logger.error("Error return when set detail")
         except Exception as e:

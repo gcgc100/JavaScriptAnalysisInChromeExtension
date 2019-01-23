@@ -9,6 +9,7 @@ from html.parser import HTMLParser
 import os
 import json
 import re
+import urllib
 from urllib.request import urlopen
 import socket
 import sys
@@ -51,12 +52,17 @@ def getExtensionDetail(extensionId):
     logger.info(exDetailUrl)
     ret = {}
     try:
-        urlObj = urlopen(exDetailUrl)
+        urlObj = urlopen(exDetailUrl, timeout=30)
         if urlObj.getcode() != 200:
             logger.error("Url error: %d, %s" % (urlObj.getcode(), exDetailUrl))
-            return None
-            return {"updateTime": "404"}
+            return urlObj.getcode()
         detailWebpage = urlObj.read().decode()
+    except urllib.error.HTTPError as e:
+        logger.error("Get extension detail error:%s" % e)
+        return e.getcode()
+    except urllib.error.URLError as e:
+        logger.error("Get extension detail url error: %s" %e)
+        return None
     except IOError as e:
         return None
     if len(re.findall("No user rated this item", detailWebpage)) > 0:
