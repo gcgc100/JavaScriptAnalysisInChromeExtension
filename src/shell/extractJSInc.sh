@@ -2,6 +2,7 @@
 
 shopt -s nullglob
 
+PYTHON=python3
 BASEDIR=$(dirname "$BASH_SOURCE")
 
 dataDir=$BASEDIR/../../data/
@@ -19,7 +20,6 @@ if [[ ! -z $1 ]]; then
         fi
         database=${dataDir}test.db
         if [[ ! -d  "${dataDir}extSrc/" ]]; then
-            echo "aaaaaaaaaaaaaaaaa"
             cp -R ${dataDir}extsrcTestData/extSrc/ ${dataDir}extSrc/
         fi
         extSrcDir=${dataDir}extSrc/
@@ -42,5 +42,5 @@ bash $BASEDIR/fixExtensionSrcDirName.sh ${extSrcDir} || exit 1
 echo "Analysing extension"
 let "total=$(ls -lh $cate | wc -l)-1"
 count=0
-python $BASEDIR/../python/bin/ExtensionTool.py addPermission ${database} --extensionCollection ${extSrcDir}
-python $BASEDIR/../python/bin/extractJSInc.py allPack ${database} ${scriptDir} --static --dynamic --srcPath ${extSrcDir} --crxPath ${crxDir}
+$PYTHON $BASEDIR/../python/bin/ExtensionTool.py addPermission ${database} --extensionCollection ${extSrcDir}
+$PYTHON $BASEDIR/../python/bin/extractJSInc.py allPack ${database} ${scriptDir} --static --dynamic --srcPath ${extSrcDir} --crxPath ${crxDir}

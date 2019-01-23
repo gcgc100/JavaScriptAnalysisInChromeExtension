@@ -9,7 +9,8 @@ import shutil
 import argparse
 import time
 import platform
-from urlparse import urlparse
+# from urlparse import urlparse
+import urllib.parse as urlparse
 from selenium import webdriver
 from selenium.common import exceptions
 from selenium.webdriver.common.keys import Keys
@@ -86,7 +87,7 @@ def main():
         # Not an error, user wants to stop unpacking.
         sys.exit(2)
     except Exception as e:
-        print e
+        print(e)
         sys.exit(1)
 
 if __name__ == "__main__":

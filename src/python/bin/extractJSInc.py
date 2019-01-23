@@ -8,6 +8,7 @@ import inspect
 import json
 import shutil
 import hashlib
+import re
 
 current_dir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 parent_dir = os.path.dirname(current_dir)
@@ -31,9 +32,8 @@ def insert(scripts, table_name):
     :returns: TODO
 
     """
-    logger.info("%s items to be insert", len(scripts))
+    scriptLen = 0
     for script in scripts:
-
         script_file = {}
         for key in DatabaseConf.\
                 TABLE_LIST[table_name]["columns"].keys():
@@ -45,13 +45,15 @@ def insert(scripts, table_name):
             if os.path.isfile(getattr(script, "filepath", None)):
                 with open(getattr(script, "filepath", None)) as fp:
                     hasher = hashlib.md5()
-                    hasher.update(fp.read())
+                    hasher.update(fp.read().encode('utf-8'))
                     hashStr = hasher.hexdigest()
                 script_file["hash"] = hashStr
         lastid = db.insertNoCommit(table_name, **script_file)[1]
+        scriptLen += 1
         # set fileid
         if table_name == "FileTable":
             script.dbFileId = lastid
+    logger.info("%s items inserted", scriptLen)
 
 def allPack(script_folder, static, dynamic, srcBasePath, crxBasePath):
     """TODO: Docstring for allPack.
@@ -73,7 +75,8 @@ def allPack(script_folder, static, dynamic, srcBasePath, crxBasePath):
         e["dbID"] = e.pop("id")
         ds = ["downloadStatus", "userNum"]
         for d in ds:
-            if e.has_key(d):
+            # if e.has_key(d):
+            if d in e:
                 e.pop(d)
         extension = Extension.Extension(crxPath, srcPath, **e)
         logger.info("Start to analyse extension{0}, dbId:{1}".format(e["extensionId"], e["dbID"]))
@@ -85,7 +88,8 @@ def allPack(script_folder, static, dynamic, srcBasePath, crxBasePath):
             Analyser.dynamic_detect_javascript_in_html(extension, script_folder)
         insert(extension.scripts, "FileTable")
         insert(filter(lambda e: e.filetype==Script.SCRIPT_WEBPAGE_SCRIPT, extension.scripts), "JavaScriptInHtmlTable")
-        db._db_ctx.connection.commit()
+        if db._db_ctx.connection is not None:
+            db._db_ctx.connection.commit()
         logger.info("Extension{0} analysed".format(e["extensionId"]))
 
 def main():
@@ -140,8 +144,10 @@ def main():
                 Analyser.proxy_detect_javascript_in_html(extension, args.script)
             insert(extension.scripts, "FileTable")
             insert(filter(lambda e: e.filetype==Script.SCRIPT_WEBPAGE_SCRIPT, extension.scripts), "JavaScriptInHtmlTable")
-            db._db_ctx.connection.commit()
-        db._db_ctx.connection.cleanup()
+            if db._db_ctx.connection is not None:
+                db._db_ctx.connection.commit()
+        if db._db_ctx.connection is not None:
+            db._db_ctx.connection.cleanup()
         db.engine = None
     except KeyboardInterrupt as e:
         # Not an error, user wants to stop unpacking.

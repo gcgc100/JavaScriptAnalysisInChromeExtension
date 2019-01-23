@@ -46,7 +46,7 @@ def allPack(crxDir, outputDir):
             # Not an error, user wants to stop unpacking.
             sys.exit(2)
         except Exception as e:
-            print e
+            print(e)
             with open("UnpackCrxError.log", 'a') as f:
                 f.write("\n{0}\n".format(eid));
             continue
@@ -77,7 +77,7 @@ def main():
         # Not an error, user wants to stop unpacking.
         sys.exit(2)
     except Exception as e:
-        print e
+        print(e)
         sys.exit(1)
 
 if __name__ == "__main__":

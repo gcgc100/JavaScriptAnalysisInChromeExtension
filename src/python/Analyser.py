@@ -4,14 +4,14 @@
 import sys
 import os
 import json
-import urllib2
-import urlparse
+from urllib.request import urlopen
+import urllib.parse as urlparse
 import re
 import socket
 import string
 import time
-import Queue
-import thread
+import queue
+import threading
 import copy
 
 from selenium import webdriver
@@ -92,7 +92,7 @@ def script_from_src(src):
     """
     script_data = None
     try:
-        script_url_file = urllib2.urlopen(src, timeout=10)
+        script_url_file = urlopen(src, timeout=10)
         script_data = script_url_file.read()
     except (IOError, socket.error) as e:
         pprint(e)
@@ -326,13 +326,14 @@ def proxy_detect_javascript_in_html(extension, script_folder):
 
     """
     p = utils.mitmproxy_start()
-    logData = Queue.Queue()
+    logData = queue.Queue()
     def read_proxy_output():
         l = True
         while(l):
             l = p.stdout.readline()
             logData.put(l)
-    thread.start_new_thread(read_proxy_output, ())
+    # thread.start_new_thread(read_proxy_output, ())
+    threading.Thread(target=read_proxy_output).start()
     time.sleep(0.5)
     extension_id = extension.extensionId
     chrome_options = Options()

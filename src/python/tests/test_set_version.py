@@ -38,7 +38,7 @@ class TestSetVersion(unittest.TestCase):
             ret = SetVersion.selenium_get_version1(libSrc,
                     driver,
                     lib_type_array = ["jquery", "Underscore"])
-            print ret
+            print(ret)
         SetVersion.shutdownChrome(driver)
         httpd = httpd.get("httpd", None)
         httpd.shutdown()
@@ -53,12 +53,12 @@ class TestSetVersion(unittest.TestCase):
         jqueryFileArray = sorted(jqueryFileArray)
         httpd = SetVersion.simple_server()
         for f in jqueryFileArray:
-            print f
+            print(f)
             version = SetVersion.selenium_get_verion( 
                     os.path.join(jquerySrcDir, f),
                     blockRun=True
                     )
-            print "version:%s" % version
+            print("version:%s" % version)
         httpd["httpd"].shutdown()
 
     def test_jquery_version(self):
@@ -69,10 +69,10 @@ class TestSetVersion(unittest.TestCase):
         version = SetVersion.set_jquery_version_for_one_file("tests/testdata/notjquery.js")
         self.assertIsNone(version)
         for f in os.listdir(jquerySrcDir):
-            print f
+            print(f)
             version = SetVersion.set_jquery_version_for_one_file(
                     os.path.join(jquerySrcDir, f))
-            print "version:%s" % version
+            print("version:%s" % version)
 
 
     def test_jquery_all(self):

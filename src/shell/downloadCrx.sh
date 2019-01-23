@@ -3,6 +3,7 @@
 shopt -s nullglob
 
 BASEDIR=$(dirname "$BASH_SOURCE")
+PYTHON=python3
 
 downloadCrx() {
     if [[ ! -n $1 || ! -n $2 || ! -n $3 || ! -n $4 ]]; then
@@ -22,7 +23,7 @@ EOF
     dbDir=$4
     tmpData=$BASEDIR/../../data/tmpData
     mkdir -p $tmpData
-    python $BASEDIR/../python/bin/ExtensionTool.py addExtensionId $dbDir --extensionIdList $1 --category $2
+    $PYTHON $BASEDIR/../python/bin/ExtensionTool.py addExtensionId $dbDir --extensionIdList $1 --category $2
 
     TMPFILE="$(mktemp -t --suffix=.SUFFIX downloadCrx_sh.XXXXXX)"
     trap "rm -f '$TMPFILE'" 0               # EXIT
@@ -32,7 +33,7 @@ EOF
     roll_back() {
         rm -f '$TMPFILE'
         rm -f $ex_id.crx
-        python $BASEDIR/../python/bin/ExtensionTool.py resetExtension $dbDir --extensionId $ex_id
+        $PYTHON $BASEDIR/../python/bin/ExtensionTool.py resetExtension $dbDir --extensionId $ex_id
         exit 1
     }
     trap roll_back 2
@@ -41,7 +42,7 @@ EOF
     ex_id=$(cat "$1" | python -c "import json, sys; print json.load(sys.stdin)[0]") || exit 1
     while [[ ! -z $ex_id ]]; do
         echo $ex_id
-        python $BASEDIR/../python/bin/ExtensionTool.py setDetail $dbDir --extensionId $ex_id
+        $PYTHON $BASEDIR/../python/bin/ExtensionTool.py setDetail $dbDir --extensionId $ex_id
         ret=$?
         if [ $ret == 0 ]; then
             wget --output-document=$ex_id.crx "https://clients2.google.com/service/update2/crx?response=redirect&prodversion=49.0&x=id%3D"$ex_id"%26installsource%3Dondemand%26uc"
@@ -58,9 +59,9 @@ EOF
             echo "Extension already the newest"
         fi
 
-        cat "$1" | python -c "import json, sys; data=json.load(sys.stdin); s=json.dumps(data[1:]) if len(data)>0 else \"[]\"; print s;" | tee $TMPFILE 1>/dev/null
+        cat "$1" | $PYTHON -c "import json, sys; data=json.load(sys.stdin); s=json.dumps(data[1:]) if len(data)>0 else \"[]\"; print s;" | tee $TMPFILE 1>/dev/null
         mv -f $TMPFILE "$1"
-        ex_id=$(cat "$1" | python -c "import json, sys; data=json.load(sys.stdin); ex_id=data[0] if len(data)>0 else ''; print ex_id;") || exit 1
+        ex_id=$(cat "$1" | $PYTHON -c "import json, sys; data=json.load(sys.stdin); ex_id=data[0] if len(data)>0 else ''; print ex_id;") || exit 1
     done
     mkdir -p ${outputDir}ErrorCrx/
     if [[ -f $2DownloadError ]]; then
@@ -89,7 +90,7 @@ fi
 mkdir -p ${archive}crx/
 tmpData=$BASEDIR/../../data/tmpData
 mkdir -p $tmpData
-python $BASEDIR/../python/bin/ExtensionTool.py allPack $database --extensionIdList $extensionIdList --crxDir $crxDir --archiveDir $archive
+$PYTHON $BASEDIR/../python/bin/ExtensionTool.py allPack $database --extensionIdList $extensionIdList --crxDir $crxDir --archiveDir $archive
 
 #for i in ${extensionIdList}*; do
 #    tmpData=$BASEDIR/../../data/tmpData

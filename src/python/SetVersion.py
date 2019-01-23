@@ -18,8 +18,8 @@ from gClifford import sqliteDB as db
 from gClifford import mylogging
 logger = mylogging.logger
 
-import SocketServer
-import SimpleHTTPServer
+import socketserver
+import http.server as SimpleHTTPServer
 
 
 js_get_version_dict = {"jquery": "return $.fn.jquery", 
@@ -45,14 +45,14 @@ def simple_server():
         while True:
             try:
                 Handler = SimpleHTTPServer.SimpleHTTPRequestHandler
-                httpd = SocketServer.TCPServer(("", PORT), Handler)
-                print "serving at port", PORT
+                httpd = socketserver.TCPServer(("", PORT), Handler)
+                print("serving at port %s" % PORT)
                 ret["httpd"] = httpd
                 httpd.serve_forever()
                 break
             except Exception as e:
-                print e
-                print "sleep 3 seconds and try again"
+                print(e)
+                print("sleep 3 seconds and try again")
                 import time
                 time.sleep(3)
     t = Thread(target=run_server)
@@ -133,9 +133,9 @@ def selenium_get_version1(filedir, driver, blockRun=False, lib_type_array=None):
         js_get_version = js_get_version_dict[lib_type]
         try:
             version = driver.execute_script(js_get_version)
-            print "%s version:%s" % (lib_type, version)
+            print("%s version:%s" % (lib_type, version))
         except Exception as e:
-            print "%s version not found" % lib_type
+            print("%s version not found" % lib_type)
             version = None
         retDict[lib_type] = version
     return retDict
@@ -187,9 +187,9 @@ def selenium_get_version(filedir, blockRun=False, lib_type_array=None, js_get_ve
         js_get_version = js_get_version_dict[lib_type]
         try:
             version = driver.execute_script(js_get_version)
-            print "%s version:%s" % (lib_type, version)
+            print("%s version:%s" % (lib_type, version))
         except Exception as e:
-            print "%s version not found" % lib_type
+            print("%s version not found" % lib_type)
             version = None
         retDict[lib_type] = version
     driver.close()
@@ -238,7 +238,7 @@ def set_all_version(library_type=None, database="../data/data.db"):
         # exist_libs = db.select("select * from LibraryTable where fileId = ?", f["id"])
         current_libs = {}
         for lib in js_get_version_dict.keys():
-            exist_lib = filter(lambda x: x["libname"]==lib, exist_libs)
+            exist_lib = list(filter(lambda x: x["libname"]==lib, exist_libs))
             assert len(exist_lib) < 2, "multi version for one file?"
             if len(exist_lib) == 1:
                 current_libs[lib] = exist_lib[0]["version"]
@@ -247,7 +247,7 @@ def set_all_version(library_type=None, database="../data/data.db"):
         if None not in [current_libs[x] for x in lib_type_array]:
             logger.info("Version already been set. Skip this file")
             continue
-        lib_type_array_todo = filter(lambda x: current_libs[x] is None, lib_type_array)
+        lib_type_array_todo = list(filter(lambda x: current_libs[x] is None, lib_type_array))
         try:
             logger.info("id:%s, filename:%s", f["id"], f["filename"])
             lib_array = selenium_get_version1(f["filepath"], driver, blockRun=True,

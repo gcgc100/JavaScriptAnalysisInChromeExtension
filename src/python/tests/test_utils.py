@@ -32,7 +32,7 @@ class TestUtils(unittest.TestCase):
         time.sleep(2)
         utils.mitmproxy_stop(p)
         s = p.stdout.readline()
-        print s
+        print(s)
 
 
 class TestHtmlParser(unittest.TestCase):

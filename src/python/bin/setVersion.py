@@ -33,7 +33,7 @@ def main():
     except Exception as e:
         if os.path.exists("jqueryServer"):
             shutil.rmtree("jqueryServer")
-        print e
+        print(e)
         sys.exit(1)
 
 if __name__ == "__main__":
