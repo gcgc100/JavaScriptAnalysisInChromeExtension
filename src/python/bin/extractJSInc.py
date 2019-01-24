@@ -48,7 +48,7 @@ def insert(scripts, table_name):
                     hasher.update(fp.read().encode('utf-8'))
                     hashStr = hasher.hexdigest()
                 script_file["hash"] = hashStr
-        lastid = db.insertNoCommit(table_name, **script_file)[1]
+        lastid = db.insert(table_name, commit=False, **script_file)[1]
         scriptLen += 1
         # set fileid
         if table_name == "FileTable":

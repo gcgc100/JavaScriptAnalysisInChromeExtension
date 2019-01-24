@@ -68,7 +68,8 @@ def addExtensionId(dbpath, extensionIdJson, category):
     db.create_engine(dbpath)
     for extensionId in extensionIdList:
         try:
-            db.insertNoCommit("extensionTable", 
+            db.insert("extensionTable",
+                    commit=False,
                     **{"extensionId": extensionId, "category": category, "downloadStatus": 0})
         except Exception as e:
             if e.message.startswith("UNIQUE constraint failed"):
@@ -107,8 +108,8 @@ def setExtensionDetail(dbpath):
             detailValues.append(detail[k])
         sql = "%s where extensionId=?" % sql
         detailValues.append(eid)
-        db.updateNoCommit(sql, *detailValues)
-        db.updateNoCommit("update extensionTable set downloadTime = date('now') where extensionId=?", extensionId)
+        db.update(sql, *detailValues, commit=False)
+        db.update("update extensionTable set downloadTime = date('now') where extensionId=?", extensionId, commit=False)
         logger.info("End of getting detail of %s" % eid)
 
     db._db_ctx.connection.commit()
@@ -160,9 +161,9 @@ def setExtensionDetailForOne(dbpath, eid):
             #     detailValues.append(detail[k])
             sql = "%s where extensionId=?" % sql
             detailValues.append(eid)
-            db.updateNoCommit(sql, *detailValues)
-            db.updateNoCommit("update extensionTable set downloadTime = date('now') where extensionId=?", eid)
-            db.updateNoCommit("update extensionTable set downloadStatus = 1 where extensionId=?", eid)
+            db.update(sql, *detailValues, commit=False)
+            db.update("update extensionTable set downloadTime = date('now') where extensionId=?", eid, commit=False)
+            db.update("update extensionTable set downloadStatus = 1 where extensionId=?", eid, commit=False)
             logger.info("End of getting detail of %s" % eid)
             db._db_ctx.connection.commit()
             db._db_ctx.connection.cleanup()
@@ -234,7 +235,7 @@ def setPermissionAllPack(dbpath, extensionCollection):
             extension = Extension(None, os.path.join(extensionCollection, eid, version_dir[0]))
             permissions = extension.permissions
             for p in permissions:
-                db.insertNoCommit("PermissionTable", **{"extensionId": eid, "permission": "%s" % p})
+                db.insert("PermissionTable", commit=False, **{"extensionId": eid, "permission": "%s" % p})
     db._db_ctx.connection.commit()
     db._db_ctx.connection.cleanup()
     db.engine = None

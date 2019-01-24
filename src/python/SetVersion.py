@@ -256,7 +256,7 @@ def set_all_version(library_type=None, database="../data/data.db"):
                 # sql = "update FileTable set {0} = ? where id = ?".format(version)
                 libInfo = db.select("select * from LibraryInfoTable where libname=? and version=?", lib, "%s" % lib_array[lib])
                 if len(libInfo)==0:
-                    libId = db.insertNoCommit("LibraryInfoTable", **{"version": "%s" % lib_array[lib], "libname": lib})[1]
+                    libId = db.insert("LibraryInfoTable", commit=False, **{"version": "%s" % lib_array[lib], "libname": lib})[1]
                 else:
                     libId = libInfo[0]["id"]
                 row_data = {"fileId": f["id"], 
@@ -264,7 +264,7 @@ def set_all_version(library_type=None, database="../data/data.db"):
                         # "libname": lib,
                         # "version": "%s" % lib_array[lib]
                         }
-                db.insertNoCommit("LibraryTable", **row_data)
+                db.insert("LibraryTable", commit=False, **row_data)
             db._db_ctx.connection.commit()
         except exceptions.UnexpectedAlertPresentException as e:
             shutdownChrome(driver)
