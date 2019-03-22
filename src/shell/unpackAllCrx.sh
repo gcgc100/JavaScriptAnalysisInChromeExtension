@@ -16,6 +16,7 @@ PYTHON=python3
 
 crxDir=$BASEDIR/../../data/crxFiles/
 extSrcDir=$BASEDIR/../../data/extSrc/
+database=$BASEDIR/../../data/data.db
 
 
 if [[ ! -z $1 ]]; then
@@ -25,6 +26,7 @@ if [[ ! -z $1 ]]; then
         fi
         crxDir=$BASEDIR/../../tests/shellTests/crxFiles/
         extSrcDir=$BASEDIR/../../tests/shellTests/extSrc/
+        database=$BASEDIR/../../tests/shellTests/test.db
     else
         source $1
     fi
@@ -32,4 +34,4 @@ fi
 
 rm -rf /tmp/.org.chromium.Chromium.*
 echo "Start to unpack extensions"
-$PYTHON $BASEDIR/../python/bin/unpackExtension.py allPack --crx ${crxDir} --output $extSrcDir
+$PYTHON $BASEDIR/../python/bin/unpackExtension.py allPack --db ${database} --output $extSrcDir

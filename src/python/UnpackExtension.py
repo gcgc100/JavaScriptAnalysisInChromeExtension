@@ -31,20 +31,18 @@ def unpack_extension(crx_filepath, src_dir):
     chrome_options = Options()
     crx_filepath = os.path.abspath(crx_filepath)
     chrome_options.add_extension(crx_filepath)
-    userProfilePath = os.path.abspath("../Default")
-    chrome_options.add_argument("user-data-dir=%s" % userProfilePath) #Path to your chrome profile
     # chrome_options.add_argument(
     #     "user-data-dir=../data/ChromeProfile")
     driver = webdriver.Chrome(chrome_options=chrome_options)
     time.sleep(2)
     extension_path = get_extension_src_path()
-    __import__('pdb').set_trace()  # XXX BREAKPOINT
-    shutil.copytree(extension_path, os.path.join(src_dir,
-        os.path.basename(extension_path)))
+    target_path = os.path.join(src_dir, os.path.basename(extension_path))
+    shutil.copytree(extension_path, target_path)
     driver.close()
     driver.quit()
 
     clear_user_profile(extension_path)
+    return target_path
 
 def get_extension_src_path():
     """Return the path of extension source code

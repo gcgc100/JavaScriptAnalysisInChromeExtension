@@ -117,11 +117,6 @@ def setPermissionAllPack(extensionCollection):
     # Unknow error if without this line. 'NoneType' object has no attribute 'cursor'
     if os.path.isdir(extensionCollection):
         for eid in os.listdir(extensionCollection):
-            version_dir = os.listdir(os.path.join(extensionCollection, eid))
-            assert len(version_dir) > 0, "version_dir not found"
-            if len(version_dir) > 1:
-                logger.warning("For %s,warning: multiple version exists", 
-                        eid)
             extension = Extension.get(extensionId=eid)
             permissions = extension.getPermissions()
             for p in permissions:
