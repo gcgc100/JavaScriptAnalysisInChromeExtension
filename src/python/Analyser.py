@@ -21,8 +21,7 @@ from selenium.webdriver.chrome.options import Options
 from gClifford import mylogging
 logger = mylogging.logger
 
-from Extension import Extension
-import Script
+from OrmDatabase import *
 import utils
 
 def detect_background_scripts(extension):
@@ -31,19 +30,20 @@ def detect_background_scripts(extension):
     :extension: Must be Extension object
 
     """
+    scripts = []
     for background_script in extension.manifest.get("background", {}).get("scripts", []):
-        script = Script.Script()
         if background_script.startswith("/"):
             # absolute path to extension
-            script.filepath = os.path.join(extension.srcPath, background_script[1:])
+            filepath = os.path.join(extension.srcPath, background_script[1:])
         else:
-            script.filepath = os.path.join(extension.srcPath, background_script)
-        script.filetype = Script.SCRIPT_BACKGROUND
-        script.filename = os.path.basename(background_script)
-        assert script.filename.endswith(".js"), "Background script without .js ext"
-        script.extensionId = extension.extensionId
-        script.filepath = os.path.abspath(script.filepath)
-        extension.scripts.append(script)
+            filepath = os.path.join(extension.srcPath, background_script)
+        filepath = os.path.abspath(filepath)
+        script = BackgroundScript(extension = extension,
+                filepath = filepath,
+                detectMethod = DetectMethod.Static.value)
+        script.hash = script.setHash()
+        scripts.append(script)
+    return scripts
 
 def detect_content_scripts(extension):
     """Detect all ContentScripts in extension and set the scripts property in extension
@@ -51,26 +51,28 @@ def detect_content_scripts(extension):
     :extension: Must be Extension object
 
     """
+    scripts = []
     for content_scripts in extension.manifest.get("content_scripts", []):
         for content_script in content_scripts.get("js", []):
-            script = Script.Script()
             try:
-                script.matches = json.dumps(content_scripts["matches"])
-                script.runAt = content_scripts.get("run_at", None)
+                matches = json.dumps(content_scripts["matches"])
+                runAt = content_scripts.get("run_at", None)
                 if content_script.startswith("/"):
                     # absolute path to extension
-                    script.filepath = os.path.join(extension.srcPath, content_script[1:])
+                    filepath = os.path.join(extension.srcPath, content_script[1:])
                 else:
-                    script.filepath = os.path.join(extension.srcPath, content_script)
+                    filepath = os.path.join(extension.srcPath, content_script)
             except KeyError as e:
                 logger.error(e)
                 raise e
-            script.filename = os.path.basename(content_script)
-            assert script.filename.endswith(".js")
-            script.extensionId = extension.extensionId
-            script.filetype = Script.SCRIPT_CONTENTSCRIPT
-            script.filepath = os.path.abspath(script.filepath)
-            extension.scripts.append(script)
+            filepath = os.path.abspath(filepath)
+            script = ContentScript(extension = extension,
+                    filepath = filepath,
+                    detectMethod = DetectMethod.Static.value,
+                    matches = matches,
+                    runAt = runAt)
+            script.hash = script.setHash()
+            scripts.append(script)
 
 def detect_javascript_in_html(extension, script_folder):
     """Detect all JavaScripts in html webpages and set the scripts property in extension
@@ -91,11 +93,13 @@ def script_from_src(src):
 
     """
     script_data = None
+    if src.startswith("//"):
+        src = "https:{0}".format(src)
     try:
         script_url_file = urlopen(src, timeout=10)
         script_data = script_url_file.read()
     except (IOError, socket.error) as e:
-        pprint(e)
+        logger.error(e)
     return script_data
 
 def format_filename(s):
@@ -136,7 +140,6 @@ def static_detect_javascript_in_html(extension, script_folder):
         temp_scripts = scripts
         for temp_script in temp_scripts:
             logger.info("script %s found and to be processed", temp_script)
-            script = Script.Script()
             src = [x for x in temp_script[1] if x[0] == "src"]
             if len(src) == 1:
                 src = src[0][1]
@@ -150,14 +153,17 @@ def static_detect_javascript_in_html(extension, script_folder):
                 if script_data is None:
                     # filepath will be changed to abspath in future, 
                     # add '/' so that it will not be extended
-                    script.filepath = "/error"
-                    script.filename = os.path.basename(
-                            urlparse.urlparse(src).path)
+                    filepath = "/{0}".format(os.path.basename(
+                            urlparse.urlparse(src).path))
                 else:
+                    script_data = str(script_data)
+                    filename = os.path.basename(
+                            urlparse.urlparse(src).path)
                     filepath = os.path.join(script_data_path, 
                             extension.extensionId,
                             format_filename(html_file),
-                            format_filename(src))
+                            format_filename(src),
+                            filename)
                     filepath = os.path.abspath(filepath)
                     if not os.path.exists(
                             os.path.dirname(filepath)):
@@ -166,42 +172,41 @@ def static_detect_javascript_in_html(extension, script_folder):
                     if not os.path.isfile(filepath):
                         with open(filepath, 'w') as script_file:
                             script_file.write(script_data)
-                    script.filepath = filepath
-                    script.filename = os.path.basename(
-                            urlparse.urlparse(src).path)
             else:
-                script.filename = os.path.basename(src)
+                filename = os.path.basename(src)
                 if src.startswith("/"):
                     # absolute path to extension
-                    script.filepath = os.path.join(extension.srcPath, src[1:])
+                    filepath = os.path.join(extension.srcPath, src[1:])
                 elif src == "":
                     # inline script
                     if len(temp_script) >= 4:
-                        script.filename = "inline.js"
+                        filename = "inline.js"
                         filepath = os.path.join(script_folder, 
                             extension.extensionId,
                             format_filename(html_file),
-                            "{0}{1}".format(temp_script[3], ".js"))
+                            "{0}".format(temp_script[3]),
+                            "inline.js")
                         if not os.path.exists(
                                 os.path.dirname(filepath)):
                             os.makedirs(os.path.dirname(filepath))
                         with open(filepath, "w") as f:
                             f.write(temp_script[2])
-                        script.filepath = filepath
+                        filepath = filepath
                     else:
-                        script.filename = os.path.basename(filepath)
+                        filepath = "/inline.js"
                 else:
                     # General relative path javascript
-                    script.filepath = os.path.join(os.path.dirname(html_file), src)
-            script.src = src
-            script.extensionId = extension.extensionId
-            script.htmlPath = html_file
-            script.filetype = Script.SCRIPT_WEBPAGE_SCRIPT
+                    filepath = os.path.join(os.path.dirname(html_file), src)
             # use abspath to remove .. component
             # Otherwise, aa/bb/../cc and aa/cc would be treated 
             # as different filepath
-            script.filepath = os.path.abspath(script.filepath)
-            extension.scripts.append(script)
+            filepath = os.path.abspath(filepath)
+            script = ExtensionWebpageScript(extension = extension,
+                    filepath = filepath,
+                    detectMethod = DetectMethod.Static.value,
+                    htmlPath = html_file)
+            script.hash = script.setHash()
+            script.url = src
 
 def dynamic_detect_javascript_in_html(extension, script_folder):
     """Detect all JavaScripts in html webpages with dynamic method and set the scripts property in extension
@@ -246,7 +251,6 @@ def dynamic_detect_javascript_in_html(extension, script_folder):
         temp_scripts = retScripts
         for temp_script in temp_scripts:
             logger.info("script %s found and to be processed", temp_script)
-            script = Script.Script()
             src = [x for x in temp_script[1] if x[0] == "src"]
             if len(src) == 1:
                 src = src[0][1]
@@ -261,14 +265,17 @@ def dynamic_detect_javascript_in_html(extension, script_folder):
                 if script_data is None:
                     # filepath will be changed to abspath in future, 
                     # add '/' so that it will not be extended
-                    script.filepath = "/error"
-                    script.filename = os.path.basename(
+                    filename = os.path.basename(
                             urlparse.urlparse(src).path)
+                    filepath = "/{0}".format(filename)
                 else:
+                    filename = os.path.basename(
+                            urlparse.urlparse(src).path)
                     filepath = os.path.join(script_data_path, 
                             extension.extensionId,
                             format_filename(html_file),
-                            format_filename(src))
+                            format_filename(src),
+                            filename)
                     filepath = os.path.abspath(filepath)
                     if not os.path.exists(
                             os.path.dirname(filepath)):
@@ -276,43 +283,41 @@ def dynamic_detect_javascript_in_html(extension, script_folder):
                     if not os.path.isfile(filepath):
                         with open(filepath, 'w') as script_file:
                             script_file.write(script_data)
-                    script.filepath = filepath
-                    script.filename = os.path.basename(
-                            urlparse.urlparse(src).path)
             else:
-                script.filename = os.path.basename(src)
+                filename = os.path.basename(src)
                 if src.startswith("/"):
                     # absolute path to extension
-                    script.filepath = os.path.join(extension.srcPath, src[1:])
+                    filepath = os.path.join(extension.srcPath, src[1:])
                 elif src == "":
                     # inline script
                     if len(temp_script) >= 4:
-                        script.filename = "inline.js"
+                        filename = "inline.js"
                         filepath = os.path.join(script_folder, 
                             extension.extensionId,
                             format_filename(html_file),
-                            "{0}{1}".format(temp_script[3], ".js"))
+                            "{0}".format(temp_script[3]),
+                            "inline.js")
                         if not os.path.exists(
                                 os.path.dirname(filepath)):
                             os.makedirs(os.path.dirname(filepath))
                         with open(filepath, "w") as f:
                             f.write(temp_script[2])
-                        script.filepath = filepath
+                        filepath = filepath
                     else:
-                        script.filename = os.path.basename(filepath)
+                        filepath = "/{0}".format(os.path.basename(filepath))
                 else:
                     # General relative path javascript
-                    script.filepath = os.path.join(os.path.dirname(html_file), src)
-            script.src = src
-            script.extensionId = extension.extensionId
-            script.htmlPath = html_file
-            script.filetype = Script.SCRIPT_WEBPAGE_SCRIPT
-            script.method = "D"
+                    filepath = os.path.join(os.path.dirname(html_file), src)
             # use abspath to remove .. component
             # Otherwise, aa/bb/../cc and aa/cc would be treated 
             # as different filepath
-            script.filepath = os.path.abspath(script.filepath)
-            extension.scripts.append(script)
+            filepath = os.path.abspath(filepath)
+            script = ExtensionWebpageScript(extension = extension,
+                    filepath = filepath,
+                    detectMethod = DetectMethod.Dynamic.value,
+                    htmlPath = html_file)
+            script.url = src
+            script.hash = script.setHash()
     if driver is not None:
         driver.close()
         driver.quit()

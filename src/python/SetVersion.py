@@ -13,8 +13,8 @@ from selenium import webdriver
 from selenium.common import exceptions
 from selenium.webdriver.chrome.options import Options
 
+from OrmDatabase import *
 
-from gClifford import sqliteDB as db
 from gClifford import mylogging
 logger = mylogging.logger
 
@@ -62,14 +62,6 @@ def simple_server():
     while "httpd" not in ret.keys():
         pass
     return ret
-
-def _createEngine(func):
-    @functools.wraps(func)
-    def _wrapper(*args, **kw):
-        if db.engine is None:
-            db.create_engine("../data/data.db")
-        return func(*args, **kw)
-    return _wrapper
 
 def prepareSelenium():
     """Open the headless chrome with selenium"
@@ -208,7 +200,6 @@ def set_all_version(library_type=None, database="../data/data.db"):
     """Set the jquery version for all javascript files in sqlite db
     :returns: TODO 
     """
-    db.create_engine(database)
     global js_get_version_dict
     if library_type is None:
         lib_type_array = js_get_version_dict.keys()
@@ -217,7 +208,9 @@ def set_all_version(library_type=None, database="../data/data.db"):
             assert False, "Unknown library type"
         lib_type_array = [library_type]
     # skip the files whose version has been set
-    allFiles = db.select("Select * from filetable where id not in (select fileid from (Select count(*) as c,fileid from LibraryTable group by fileid) where c=10)")
+    # allFiles = db.select("Select * from filetable where id not in (select fileid from (Select count(*) as c,fileid from LibraryTable group by fileid) where c=10)")
+    # allFiles = select(jinc for jinc in JavaScriptInclusion for l in jinc.libraries if count(l)!=10)
+    allFiles = JavaScriptInclusion.select()
     # allFiles = db.select("select * from filetable where id in (select fileid from LibraryTable where version = '100')")
     i = 10
     current_dir = os.path.abspath(inspect.getfile(inspect.currentframe()))
@@ -231,17 +224,13 @@ def set_all_version(library_type=None, database="../data/data.db"):
     httpd = simple_server()
     driver = prepareSelenium()
     for f in allFiles:
-        # if f["jquery"] is not None:
-        #     continue
-        db.update("delete from LibraryTable where fileId = ?", f["id"])
-        exist_libs = []
-        # exist_libs = db.select("select * from LibraryTable where fileId = ?", f["id"])
+        exist_libs = f.libraries
         current_libs = {}
         for lib in js_get_version_dict.keys():
-            exist_lib = list(filter(lambda x: x["libname"]==lib, exist_libs))
+            exist_lib = list(filter(lambda x: x.libname.==lib, exist_libs))
             assert len(exist_lib) < 2, "multi version for one file?"
             if len(exist_lib) == 1:
-                current_libs[lib] = exist_lib[0]["version"]
+                current_libs[lib] = exist_lib[0].version
             else:
                 current_libs[lib] = None
         if None not in [current_libs[x] for x in lib_type_array]:
