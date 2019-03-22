@@ -38,9 +38,6 @@ echo Start
 echo "time: $(date +%s)"
 mkdir -p ${scriptDir}
 
-#bash $BASEDIR/fixExtensionSrcDirName.sh ${extSrcDir} || exit 1
 echo "Analysing extension"
-let "total=$(ls -lh $cate | wc -l)-1"
-count=0
 $PYTHON $BASEDIR/../python/bin/ExtensionTool.py addPermission ${database} --extensionCollection ${extSrcDir}
 $PYTHON $BASEDIR/../python/bin/extractJSInc.py allPack ${database} ${scriptDir} --static --dynamic --srcPath ${extSrcDir} --crxPath ${crxDir}

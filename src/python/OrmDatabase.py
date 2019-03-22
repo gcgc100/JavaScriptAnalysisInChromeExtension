@@ -85,6 +85,21 @@ class Extension(db.Entity):
         """
         return self.manifest.get("permissions",[])
 
+    def reset(self):
+        """Reset to raw
+        :returns: TODO
+
+        """
+        self.downloadTime = None
+        self.language = ""
+        self.updateTime = None
+        self.ratedScore = ""
+        self.size = ""
+        self.userNum = -1 
+        self.version = "" 
+        self.numUserRated =  -1
+        self.downloadStatus = 0
+
 class ExtensionPermission(db.Entity):
 
     """Docstring for ExtensionPermission. """

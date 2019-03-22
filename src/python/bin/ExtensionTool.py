@@ -36,8 +36,8 @@ def allPack(dbpath, extensionList, crxDir, archiveDir):
     :returns: TODO
 
     """
-    utils.makedirsWithoutError(crxDir)
-    utils.makedirsWithoutError(archiveDir)
+    os.makedirs(crxDir, exist_ok=True)
+    os.makedirs(archiveDir, exist_ok=True)
     for d in os.listdir(extensionList):
         category = d.split(".")[0]
         ExtensionUtils.init_database(os.path.join(extensionList, d), category)
@@ -89,7 +89,7 @@ def allPack(dbpath, extensionList, crxDir, archiveDir):
                     while(True):
                         if fname[0] == "error":
                             fname[0] = None
-                            ExtensionUtils.resetInfoForExtension(extension)
+                            extension.reset()
                             break
                         if curFname != fname[0]:
                             lock.acquire()
@@ -98,7 +98,7 @@ def allPack(dbpath, extensionList, crxDir, archiveDir):
                             break
                         if time.time() - startDownloadTime > 120:
                             gc_timeout = True
-                            ExtensionUtils.resetInfoForExtension(extension)
+                            extension.reset()
                             logger.info("wget has not return for 2 minutes, skip it")
                             break
                         time.sleep(0.5)
@@ -117,7 +117,7 @@ def allPack(dbpath, extensionList, crxDir, archiveDir):
                 logger.error("Unexpected return when set detail:%s" % retCode)
         except Exception as e:
             logger.error("Get detail failed. Error:%s" % e)
-            ExtensionUtils.resetInfoForExtension(extension)
+            extension.reset()
             if e.args[0] == 'http error':
                 extension.downloadStatus = e.args[1]
             continue
@@ -203,7 +203,7 @@ def main():
             sys.exit(1)
         with db_session:
             extension = Extension.get(extensionId=args.extensionId)
-        ExtensionUtils.resetInfoForExtension(extension)
+        extension.reset()
     elif args.cmd == "allPack":
         parametersToBeChecked = ["extensionIdList", "crxDir", "archiveDir"]
         ret = True

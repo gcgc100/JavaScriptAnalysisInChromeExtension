@@ -35,7 +35,7 @@ class TestSetVersion(unittest.TestCase):
                 os.path.join(jquerySrcDir, "jquery-2.2.4.js"),
                 os.path.join(underscoreSrcDir, "underscore.js")]
         for libSrc in libSrcList:
-            ret = SetVersion.selenium_get_version1(libSrc,
+            ret = SetVersion.selenium_get_version(libSrc,
                     driver,
                     lib_type_array = ["jquery", "Underscore"])
             print(ret)
@@ -43,23 +43,7 @@ class TestSetVersion(unittest.TestCase):
         httpd = httpd.get("httpd", None)
         httpd.shutdown()
         httpd.server_close()
-        # jquerySrcDir = "tests/testdata/jquerySrc/"
-        # ret = SetVersion.selenium_get_version(
-        #         os.path.join(jquerySrcDir, "jquery-3.2.1.js"),
-        #         lib_type_array = ["jquery"])
-        # self.assertEqual(ret["jquery"], '3.2.1')
         return
-        jqueryFileArray = os.listdir(jquerySrcDir)
-        jqueryFileArray = sorted(jqueryFileArray)
-        httpd = SetVersion.simple_server()
-        for f in jqueryFileArray:
-            print(f)
-            version = SetVersion.selenium_get_verion( 
-                    os.path.join(jquerySrcDir, f),
-                    blockRun=True
-                    )
-            print("version:%s" % version)
-        httpd["httpd"].shutdown()
 
     def test_jquery_version(self):
         return

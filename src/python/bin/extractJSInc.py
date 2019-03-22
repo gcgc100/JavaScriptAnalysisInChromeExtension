@@ -21,38 +21,6 @@ logger = mylogging.logger
 import Analyser
 from OrmDatabase import *
 
-
-def insert(scripts, table_name):
-    """Insert scripts into table based on the keys
-
-    :scripts: TODO
-    :table_name: TODO
-    :returns: TODO
-
-    """
-    scriptLen = 0
-    for script in scripts:
-        script_file = {}
-        for key in DatabaseConf.\
-                TABLE_LIST[table_name]["columns"].keys():
-            if key == "fileId":
-                script_file[key] = script.dbFileId
-            else:
-                script_file[key] = getattr(script, key, None)
-        if table_name == "FileTable":
-            if os.path.isfile(getattr(script, "filepath", None)):
-                with open(getattr(script, "filepath", None)) as fp:
-                    hasher = hashlib.md5()
-                    hasher.update(fp.read().encode('utf-8'))
-                    hashStr = hasher.hexdigest()
-                script_file["hash"] = hashStr
-        lastid = db.insert(table_name, commit=False, **script_file)[1]
-        scriptLen += 1
-        # set fileid
-        if table_name == "FileTable":
-            script.dbFileId = lastid
-    logger.info("%s items inserted", scriptLen)
-
 @db_session
 def allPack(script_folder, static, dynamic, srcBasePath, crxBasePath):
     """TODO: Docstring for allPack.

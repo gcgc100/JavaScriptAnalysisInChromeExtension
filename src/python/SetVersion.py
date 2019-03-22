@@ -84,7 +84,7 @@ def shutdownChrome(driver):
     driver.close()
     driver.quit()
 
-def selenium_get_version1(filedir, driver, blockRun=False, lib_type_array=None):
+def selenium_get_version(filedir, driver, blockRun=False, lib_type_array=None):
     """Get version with selenium
      Need a localhost server to cooperate.
      The server serves a index.html file, this html file include 
@@ -130,70 +130,6 @@ def selenium_get_version1(filedir, driver, blockRun=False, lib_type_array=None):
             # print("%s version not found" % lib_type)
             version = None
         retDict[lib_type] = version
-    return retDict
-
-def selenium_get_version(filedir, blockRun=False, lib_type_array=None, js_get_version="return $.fn.jquery"):
-    """Get version with selenium
-     Need a localhost server to cooperate.
-     The server serves a index.html file, this html file include 
-     the script.js
-     selenium will replace the script.js with target filedir javascript
-     file and load index.html.
-     Then execute "return $.fn.jquery" to get the version.
-     Use simple_server function to start the server.
-
-     ERROR: The server will not be close immediately, the port will 
-     be in used for another few seconds, reason unknown
-
-
-    :filedir: the target javascript file dir
-    :blockRun: if False, run httpserver inside the function
-               if True, need to run the httpserver independently,
-               this function could be invoked multiple times without
-               open and shutdown the httpserver every time.
-    :lib_type_array: The name array of javascript lib
-    :js_get_version: the javascript code used to get version, default jquery code.
-    :returns: dict of version, key:lib name, value:version(None if not found)
-
-    """
-    global js_get_version_dict
-    retDict = {}
-    if lib_type_array is None:
-        lib_type_array = js_get_version_dict.keys()
-    if not os.path.isfile(filedir):
-        # if file not exits, set all version to 100
-        return dict([(x, "100") for x in lib_type_array])
-    if not blockRun:
-        httpd = simple_server()
-    real_server_dir = "jqueryServer"
-    scriptFile = os.path.join(real_server_dir, "script.js")
-    if os.path.isfile(scriptFile):
-        os.remove(scriptFile)
-    shutil.copy(filedir, scriptFile)
-    chrome_options = Options()
-    chrome_options.add_argument("--headless")
-    chrome_options.add_argument("--window-size=1920x1080")
-    driver = webdriver.Chrome(chrome_options=chrome_options)
-    driver.get("http://localhost:8000/jqueryServer/index.html?ram=1")
-    for lib_type in lib_type_array:
-        js_get_version = js_get_version_dict[lib_type]
-        try:
-            version = driver.execute_script(js_get_version)
-            print("%s version:%s" % (lib_type, version))
-        except Exception as e:
-            print("%s version not found" % lib_type)
-            version = None
-        retDict[lib_type] = version
-    driver.close()
-    driver.quit()
-    if not blockRun:
-        httpd = httpd.get("httpd", None)
-        if httpd is not None:
-            logger.info("shutdown server")
-            httpd.shutdown()
-            httpd.server_close()
-        else:
-            logger.error("httpd not set")
     return retDict
 
 def set_all_version(library_type=None, database="../data/data.db"):
@@ -249,7 +185,7 @@ def set_all_version(library_type=None, database="../data/data.db"):
             try:
                 logger.info("id:%s, filename:%s", f.id, f.filename)
                 print(f.filename)
-                lib_array = selenium_get_version1(f.filepath, driver, blockRun=True,
+                lib_array = selenium_get_version(f.filepath, driver, blockRun=True,
                         lib_type_array=lib_type_array_todo)
                 for lib in lib_array:
                     # sql = "update FileTable set {0} = ? where id = ?".format(version)

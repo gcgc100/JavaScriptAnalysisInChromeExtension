@@ -11,7 +11,6 @@ from OrmDatabase import *
 from gClifford import mylogging
 logger = mylogging.logger
 
-import DatabaseConf
 
 def init_database(extensionIdJson, category):
     """init database
@@ -76,35 +75,6 @@ def setExtensionDetailForOne(extension):
             ret = 0
 
     return ret
-
-def resetInfoForExtension(extension):
-    """Reset the information of an extension in database
-
-    :dbpath: TODO
-    :eid: TODO
-    :returns: TODO
-
-    """
-    extension.downloadTime = None
-    extension.language = ""
-    extension.updateTime = None
-    extension.ratedScore = ""
-    extension.size = ""
-    extension.userNum = -1 
-    extension.version = "" 
-    extension.numUserRated =  -1
-    extension.downloadStatus = 0
-
-def setInfoForExtension(extension, retCode):
-    """TODO: Docstring for setInfoForExtension.
-
-    :dbpath: TODO
-    :eid: extesion id
-    :retCode: ret code(40X) when download crx file
-    :returns: TODO
-
-    """
-    extension.downloadStatus = retCode
 
 @db_session
 def setPermissionAllPack(extensionCollection):
