@@ -29,18 +29,20 @@ def unpack_extension(crx_filepath, src_dir):
     """
     default_src = "/tmp/.org.chromium.Chromium.52KIq3/" # TODO default src
     chrome_options = Options()
+    crx_filepath = os.path.abspath(crx_filepath)
     chrome_options.add_extension(crx_filepath)
     # chrome_options.add_argument(
     #     "user-data-dir=../data/ChromeProfile")
     driver = webdriver.Chrome(chrome_options=chrome_options)
     time.sleep(2)
     extension_path = get_extension_src_path()
-    shutil.copytree(extension_path, os.path.join(src_dir,
-        os.path.basename(extension_path)))
+    target_path = os.path.join(src_dir, os.path.basename(extension_path))
+    shutil.copytree(extension_path, target_path)
     driver.close()
     driver.quit()
 
     clear_user_profile(extension_path)
+    return target_path
 
 def get_extension_src_path():
     """Return the path of extension source code

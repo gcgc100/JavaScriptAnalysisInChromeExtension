@@ -29,13 +29,6 @@ from gClifford import mylogging
 logger = mylogging.logger
 # logger.setLevel(logging.WARNING)
 
-def makedirsWithoutError(dirpath):
-    try:
-        os.makedirs(dirpath)
-    except OSError as e:
-        if e.errno != os.errno.EEXIST:
-            raise e
-
 def getExtensionDetail(extensionId):
     """TODO: Docstring for getExtensionDetail.
 

@@ -18,13 +18,14 @@ sys.path.insert(0, parent_dir)
 
 import ExtensionUtils
 import utils
+from OrmDatabase import *
 
-from gClifford import sqliteDB as db
 from gClifford import mylogging
 logger = mylogging.logger
 
 gc_timeout = False
 
+@db_session
 def allPack(dbpath, extensionList, crxDir, archiveDir):
     """All things together
 
@@ -35,16 +36,14 @@ def allPack(dbpath, extensionList, crxDir, archiveDir):
     :returns: TODO
 
     """
-    utils.makedirsWithoutError(crxDir)
-    utils.makedirsWithoutError(archiveDir)
+    os.makedirs(crxDir, exist_ok=True)
+    os.makedirs(archiveDir, exist_ok=True)
     for d in os.listdir(extensionList):
         category = d.split(".")[0]
-        ExtensionUtils.init_database(dbpath, os.path.join(extensionList, d), category)
+        ExtensionUtils.init_database(os.path.join(extensionList, d), category)
 
-    db.create_engine(dbpath)
-    eList = db.select("select * from extensionTable where downloadStatus = 0 and (updateTime is null or updateTime !='404')")
-    db._db_ctx.connection.cleanup()
-    db.engine = None
+    # eList = select(extension for extension in Extension if Extension.downloadStatus==0 and (Extension.updateTime is None or Extension.updateTime!="404"))
+    eList = select(extension for extension in Extension if extension.downloadStatus==0 and extension.updateTime is None)
     ocallback = wget.callback_progress
     global gc_timeout
     def call_back(blocks, block_size, total_size, bar_function):
@@ -55,11 +54,11 @@ def allPack(dbpath, extensionList, crxDir, archiveDir):
         ocallback(blocks, block_size, total_size, bar_function)
 
     wget.callback_progress = call_back
-    for extRow in eList:
-        category = extRow["category"]
-        eid = extRow["extensionId"]
+    for extension in eList:
+        category = extension.category
+        eid = extension.extensionId
         try:
-            retCode = ExtensionUtils.setExtensionDetailForOne(dbpath, eid)
+            retCode = ExtensionUtils.setExtensionDetailForOne(extension)
             if retCode == 1:
                 extensionDownloadUrl = "https://clients2.google.com/service/update2/crx?response=redirect&prodversion=49.0&x=id%3D{0}%26installsource%3Dondemand%26uc"
                 try:
@@ -90,7 +89,7 @@ def allPack(dbpath, extensionList, crxDir, archiveDir):
                     while(True):
                         if fname[0] == "error":
                             fname[0] = None
-                            ExtensionUtils.resetInfoForExtension(dbpath, eid)
+                            extension.reset()
                             break
                         if curFname != fname[0]:
                             lock.acquire()
@@ -99,10 +98,11 @@ def allPack(dbpath, extensionList, crxDir, archiveDir):
                             break
                         if time.time() - startDownloadTime > 120:
                             gc_timeout = True
-                            ExtensionUtils.resetInfoForExtension(dbpath, eid)
+                            extension.reset()
                             logger.info("wget has not return for 2 minutes, skip it")
                             break
                         time.sleep(0.5)
+                    extension.crxPath = os.path.join(crxDir,"{0}.crx".format(eid))
                     print("\n")
                 except Exception as e:
                     logger.error(e)
@@ -112,13 +112,14 @@ def allPack(dbpath, extensionList, crxDir, archiveDir):
             elif retCode == 2:
                 logger.info("Extension already the newest")
             elif retCode == 404:
-                ExtensionUtils.setInfoForExtension(dbpath, eid, retCode)
+                extension.downloadStatus = retCode
             else:
                 logger.error("Unexpected return when set detail:%s" % retCode)
         except Exception as e:
-            ExtensionUtils.resetInfoForExtension(dbpath, eid)
+            logger.error("Get detail failed. Error:%s" % e)
+            extension.reset()
             if e.args[0] == 'http error':
-                ExtensionUtils.setInfoForExtension(dbpath, eid, e.args[1])
+                extension.downloadStatus = e.args[1]
             continue
             # raise e
     logger.info("Check the output crx files in {0}".format(crxDir))
@@ -152,62 +153,68 @@ def main():
     #                     help="The extensions excluded")
 
 
+    args = parser.parse_args()
     try:
-        args = parser.parse_args()
-        if args.cmd == "addExtensionId":
-            ExtensionUtils.init_database(args.db,
-                    args.extensionIdList,
-                    args.category)
-        elif args.cmd == "setDetail":
-            parametersToBeChecked = ["extensionId"]
-            ret = True
-            for p in parametersToBeChecked:
-                if getattr(args, p) is None:
-                    print("{0} can not be empty\n".format(p))
-                    ret = False
-            if not ret:
-                sys.exit(1)
-            exitCode = ExtensionUtils.setExtensionDetailForOne(args.db, args.extensionId)
-            if exitCode == 1:
-                exitCode = 0
-            elif exitCode == 0:
-                exitCode = 1
-            sys.exit(exitCode)
-        elif args.cmd == "addPermission":
-            parametersToBeChecked = ["extensionCollection"]
-            ret = True
-            for p in parametersToBeChecked:
-                if getattr(args, p) is None:
-                    print("{0} can not be empty\n".format(p))
-                    ret = False
-            if not ret:
-                sys.exit(1)
-            logger.info("Set permission in sqlite databse for extensions")
-            ExtensionUtils.setPermissionAllPack(args.db, args.extensionCollection)
-            logger.info("Permissions are all set in sqlite databse")
-        elif args.cmd == "resetExtension":
-            parametersToBeChecked = ["extensionId"]
-            ret = True
-            for p in parametersToBeChecked:
-                if getattr(args, p) is None:
-                    print("{0} can not be empty\n".format(p))
-                    ret = False
-            if not ret:
-                sys.exit(1)
-            ExtensionUtils.resetInfoForExtension(args.db, args.extensionId)
-        elif args.cmd == "allPack":
-            parametersToBeChecked = ["extensionIdList", "crxDir", "archiveDir"]
-            ret = True
-            for p in parametersToBeChecked:
-                if getattr(args, p) is None:
-                    print("{0} can not be empty\n".format(p))
-                    ret = False
-            if not ret:
-                sys.exit(1)
-            allPack(args.db, args.extensionIdList, args.crxDir, args.archiveDir)
-    except Exception as e:
-        print(e)
-        sys.exit(1)
+        dbpath = os.path.abspath(args.db)
+        db.bind(provider='sqlite', filename=dbpath, create_db=True)
+        db.generate_mapping(create_tables=True)
+    except BindingError as e:
+        if e.args[0] != "Database object was already bound to SQLite provider":
+            raise e
+    if args.cmd == "addExtensionId":
+        ExtensionUtils.init_database(args.db,
+                args.extensionIdList,
+                args.category)
+    elif args.cmd == "setDetail":
+        parametersToBeChecked = ["extensionId"]
+        ret = True
+        for p in parametersToBeChecked:
+            if getattr(args, p) is None:
+                print("{0} can not be empty\n".format(p))
+                ret = False
+        if not ret:
+            sys.exit(1)
+        exitCode = ExtensionUtils.setExtensionDetailForOne(args.db, args.extensionId)
+        if exitCode == 1:
+            exitCode = 0
+        elif exitCode == 0:
+            exitCode = 1
+        sys.exit(exitCode)
+    elif args.cmd == "addPermission":
+        parametersToBeChecked = ["extensionCollection"]
+        ret = True
+        for p in parametersToBeChecked:
+            if getattr(args, p) is None:
+                print("{0} can not be empty\n".format(p))
+                ret = False
+        if not ret:
+            sys.exit(1)
+        logger.info("Set permission in sqlite databse for extensions")
+        ExtensionUtils.setPermissionAllPack(args.extensionCollection)
+        logger.info("Permissions are all set in sqlite databse")
+    elif args.cmd == "resetExtension":
+        parametersToBeChecked = ["extensionId"]
+        ret = True
+        for p in parametersToBeChecked:
+            if getattr(args, p) is None:
+                print("{0} can not be empty\n".format(p))
+                ret = False
+        if not ret:
+            sys.exit(1)
+        with db_session:
+            extension = Extension.get(extensionId=args.extensionId)
+        extension.reset()
+    elif args.cmd == "allPack":
+        parametersToBeChecked = ["extensionIdList", "crxDir", "archiveDir"]
+        ret = True
+        for p in parametersToBeChecked:
+            if getattr(args, p) is None:
+                print("{0} can not be empty\n".format(p))
+                ret = False
+        if not ret:
+            sys.exit(1)
+            
+        allPack(args.db, args.extensionIdList, args.crxDir, args.archiveDir)
 
 
 if __name__ == "__main__":

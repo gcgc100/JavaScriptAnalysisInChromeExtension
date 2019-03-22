@@ -7,52 +7,19 @@ import json
 from datetime import datetime
 
 import utils
-from gClifford import sqliteDB as db
+from OrmDatabase import *
 from gClifford import mylogging
 logger = mylogging.logger
 
-import DatabaseConf
-from Extension import Extension
 
-def init_database(dbpath, extensionIdJson, category):
+def init_database(extensionIdJson, category):
     """init database
     :returns: TODO
 
     """
-    create_table_in_database(dbpath)
-    addExtensionId(dbpath, extensionIdJson, category)
+    addExtensionId(extensionIdJson, category)
 
-
-def create_table_in_database(dbpath):
-    """Create the tables in sqlite database
-
-    :dbpath: TODO
-    :returns: TODO
-
-    """
-    if db.engine is None:
-        db.create_engine(dbpath)
-    for table_name, table_define in DatabaseConf.TABLE_LIST.items():
-        if table_name == "ExtensionIdTable":
-            continue
-        sql = "CREATE TABLE IF NOT EXISTS " + table_name + " ("
-        for column_name, attrs in table_define["columns"].items():
-            sql = "{0} {1}".format(sql, column_name)
-            for attr in attrs:
-                sql = "{0} {1}".format(sql, attr)
-            sql = sql + ","
-        for constraint_name, attrs in \
-                table_define.get("constraints", {}).items():
-            sql = "{0} {1}".format(sql, constraint_name)
-            for attr in attrs:
-                sql = "{0} {1}".format(sql, attr)
-            sql = sql + ","
-        sql = sql[:-1] + ")"
-        db.update(sql)
-    db._db_ctx.connection.cleanup()
-    db.engine = None
-
-def addExtensionId(dbpath, extensionIdJson, category):
+def addExtensionId(extensionIdJson, category):
     """Add the extension id in extensionIdJson file to sqlite database,
     if the extension id is in extensionIdExcluded, it will be ignored
 
@@ -64,68 +31,18 @@ def addExtensionId(dbpath, extensionIdJson, category):
     """
     with open(extensionIdJson) as f:
         extensionIdList = json.load(f)
-    assert db.engine is None, "database in use"
-    db.create_engine(dbpath)
-    for extensionId in extensionIdList:
-        try:
-            db.insert("extensionTable",
-                    commit=False,
-                    **{"extensionId": extensionId, "category": category, "downloadStatus": 0})
-        except Exception as e:
-            if e.message.startswith("UNIQUE constraint failed"):
-                logger.warning(e)
-                logger.warning("{0}:{1}".format(extensionId,category))
-            else:
-                logger.error(e)
-                logger.error("{0}:{1}".format(extensionId,category))
-    if len(extensionIdList) > 0:
-        # If never invoke insert, _db_ctx.connection will be None and cause error
-        db._db_ctx.connection.commit()
-        db._db_ctx.connection.cleanup()
-    db.engine = None
+    with db_session:
+        for extensionId in extensionIdList:
+            extension = Extension(extensionId=extensionId, category=category, downloadStatus=0)
 
+def setExtensionDetailForOne(extension):
+    """Set the detail information for extension
 
-def setExtensionDetail(dbpath):
-    """TODO: Docstring for setExtensionDetail.
-
-    :returns: TODO
-
-    """
-    db.create_engine(dbpath)
-    extensionArray = db.select("select * from extensionTable where version is null and updateTime is not '404' order by id")
-    for e in extensionArray:
-        eid = e["extensionId"]
-        logger.info("Start to get detail of %s(%s)" % (eid, e["id"]))
-        detail = utils.getExtensionDetail(eid)
-        if detail is None:
-            logger.error("Getting %s detail failed" % eid)
-            continue
-        detailKeys = detail.keys()
-        sql = "update ExtensionTable set %s=?" % detailKeys[0]
-        detailValues = [detail[detailKeys[0]]]
-        for k in detailKeys[1:]:
-            sql = "%s,%s=?" % (sql, k)
-            detailValues.append(detail[k])
-        sql = "%s where extensionId=?" % sql
-        detailValues.append(eid)
-        db.update(sql, *detailValues, commit=False)
-        db.update("update extensionTable set downloadTime = date('now') where extensionId=?", extensionId, commit=False)
-        logger.info("End of getting detail of %s" % eid)
-
-    db._db_ctx.connection.commit()
-    db._db_ctx.connection.cleanup()
-    db.engine = None
-
-def setExtensionDetailForOne(dbpath, eid):
-    """Set the detail information for extension with eid in dbpath database
-
-    :dbpath: TODO
     :eid: TODO
     :returns: TODO
 
     """
-    db.create_engine(dbpath)
-    extensionData = db.select("select * from extensionTable where extensionId=?", eid)[0]
+    eid = extension.extensionId
     detail = utils.getExtensionDetail(eid)
     if detail is None:
         logger.error("Getting %s detail failed" % eid)
@@ -135,38 +52,21 @@ def setExtensionDetailForOne(dbpath, eid):
     else:
         dateFmtStr = "%Y-%m-%d"
         # __import__('pdb').set_trace()  # XXX BREAKPOINT
-        if extensionData["updateTime"] is None:
+        if extension.updateTime is None:
             curUpTime = None
         else:
-            curUpTime = datetime.strptime(extensionData["updateTime"], dateFmtStr)
+            curUpTime = extension.updateTime
+            # curUpTime = datetime.strptime(extension.updateTime, dateFmtStr)
         if detail["updateTime"] == "404":
             newUpTime = "404"
         else:
-            newUpTime = datetime.strptime(detail["updateTime"], dateFmtStr)
+            newUpTime = datetime.datetime.strptime(detail["updateTime"], dateFmtStr)
         if  curUpTime is None or newUpTime == "404" or curUpTime < newUpTime:
-            detailKeys = detail.keys()
-            # sql = "update ExtensionTable set %s=?" % detailKeys[0]
-            # detailValues = [detail[detailKeys[0]]]
-            sqlSet = None
-            detailValues = []
-            for k in detailKeys:
-                if sqlSet is None:
-                    sqlSet = k+"=?"
-                else:
-                    sqlSet = sqlSet + "," + k + "=?"
-                detailValues.append(detail[k])
-            sql = "update ExtensionTable set %s" % sqlSet
-            # for k in detailKeys[1:]:
-            #     sql = "%s,%s=?" % (sql, k)
-            #     detailValues.append(detail[k])
-            sql = "%s where extensionId=?" % sql
-            detailValues.append(eid)
-            db.update(sql, *detailValues, commit=False)
-            db.update("update extensionTable set downloadTime = date('now') where extensionId=?", eid, commit=False)
-            db.update("update extensionTable set downloadStatus = 1 where extensionId=?", eid, commit=False)
+            detail["updateTime"] = datetime.datetime.strptime(detail["updateTime"], dateFmtStr)
+            extension.set(**detail)
+            extension.downloadTime = datetime.datetime.now()
+            extension.downloadStatus = 1
             logger.info("End of getting detail of %s" % eid)
-            db._db_ctx.connection.commit()
-            db._db_ctx.connection.cleanup()
             ret = 1
         elif curUpTime == newUpTime:
             ret = 2
@@ -174,68 +74,20 @@ def setExtensionDetailForOne(dbpath, eid):
             logger.warning("The updatetime in database is inconsistence.")
             ret = 0
 
-    db.engine = None
     return ret
 
-def resetInfoForExtension(dbpath, eid):
-    """Reset the information of an extension in database
-
-    :dbpath: TODO
-    :eid: TODO
-    :returns: TODO
-
-    """
-    db.create_engine(dbpath)
-    db.update("update extensionTable set downloadTime = NULL where extensionId=?", eid)
-    db.update("update extensionTable set language = NULL where extensionId=?", eid)
-    db.update("update extensionTable set updateTime = NULL where extensionId=?", eid)
-    db.update("update extensionTable set ratedScore = NULL where extensionId=?", eid)
-    db.update("update extensionTable set size = NULL where extensionId=?", eid)
-    db.update("update extensionTable set userNum = NULL where extensionId=?", eid)
-    db.update("update extensionTable set version = NULL where extensionId=?", eid)
-    db.update("update extensionTable set numUserRated = NULL where extensionId=?", eid)
-    db.update("update extensionTable set downloadStatus = 0 where extensionId=?", eid)
-    db._db_ctx.connection.cleanup()
-    db.engine = None
-
-def setInfoForExtension(dbpath, eid, retCode):
-    """TODO: Docstring for setInfoForExtension.
-
-    :dbpath: TODO
-    :eid: extesion id
-    :retCode: ret code(40X) when download crx file
-    :returns: TODO
-
-    """
-    db.create_engine(dbpath)
-    db.update("update extensionTable set downloadStatus = ? where extensionId=?", retCode, eid)
-    db._db_ctx.connection.cleanup()
-    db.engine = None
-    
-
-def setPermissionAllPack(dbpath, extensionCollection):
+@db_session
+def setPermissionAllPack(extensionCollection):
     """TODO: Docstring for setPermissionAllPack.
 
     :extensionCollection: TODO
     :returns: TODO
 
     """
-    db.create_engine(dbpath)
-
     # Unknow error if without this line. 'NoneType' object has no attribute 'cursor'
-    d = db.select("select * from extensionTable")
-
     if os.path.isdir(extensionCollection):
         for eid in os.listdir(extensionCollection):
-            version_dir = os.listdir(os.path.join(extensionCollection, eid))
-            assert len(version_dir) > 0, "version_dir not found"
-            if len(version_dir) > 1:
-                logger.warning("For %s,warning: multiple version exists", 
-                        eid)
-            extension = Extension(None, os.path.join(extensionCollection, eid, version_dir[0]))
-            permissions = extension.permissions
+            extension = Extension.get(extensionId=eid)
+            permissions = extension.getPermissions()
             for p in permissions:
-                db.insert("PermissionTable", commit=False, **{"extensionId": eid, "permission": "%s" % p})
-    db._db_ctx.connection.commit()
-    db._db_ctx.connection.cleanup()
-    db.engine = None
+                permission= ExtensionPermission(permission = p, extension = extension)
