@@ -13,11 +13,11 @@ The shell script is tested with bash.
 pip3 install selenium
 <!--pip install wget-->
 pip3 install python3-wget
+pip3 install pony
 ```
 ```
 git clone https://github.com/gcgc100/mypythonlib.git
 cd mypythonlib
-git co python2
 pip3 install -e .
 ```
 This is my python utils. Use log and sqliteDB in this project.
