@@ -8,7 +8,8 @@ import platform
 
 # This test is disabled, because the /tmp directory issue can not be handled
 # The /tmp 
-from python import UnpackExtension
+import UnpackExtension
+
 class TestUnpackExtension(unittest.TestCase): 
     """test UnpackExtension module"""
 

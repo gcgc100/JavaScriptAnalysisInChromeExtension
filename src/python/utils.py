@@ -25,7 +25,7 @@ from selenium.webdriver.chrome.options import Options
 
 from pprint import pprint
 
-from gClifford import mylogging
+import mylogging
 logger = mylogging.logger
 # logger.setLevel(logging.WARNING)
 

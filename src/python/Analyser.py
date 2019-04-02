@@ -18,7 +18,7 @@ from selenium import webdriver
 from selenium.common import exceptions
 from selenium.webdriver.chrome.options import Options
 
-from gClifford import mylogging
+import mylogging
 logger = mylogging.logger
 
 from OrmDatabase import *

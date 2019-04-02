@@ -15,7 +15,7 @@ from selenium.webdriver.chrome.options import Options
 
 from OrmDatabase import *
 
-from gClifford import mylogging
+import mylogging
 logger = mylogging.logger
 
 import socketserver

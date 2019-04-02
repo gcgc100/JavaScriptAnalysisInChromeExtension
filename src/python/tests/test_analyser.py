@@ -11,11 +11,13 @@ current_dir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentfra
 parent_dir = os.path.dirname(current_dir)
 sys.path.insert(0, parent_dir) 
 
-from gClifford import sqliteDB as db
+# from python import Analyser
+# from python import Extension
+# from python import Script
 
-from python import Analyser
-from python import Extension
-from python import Script
+import Analyser
+import Extension
+import Script
 
 class TestAnalyser(unittest.TestCase):
 

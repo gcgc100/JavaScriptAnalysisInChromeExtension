@@ -20,7 +20,7 @@ import ExtensionUtils
 import utils
 from OrmDatabase import *
 
-from gClifford import mylogging
+import mylogging
 logger = mylogging.logger
 
 gc_timeout = False

@@ -16,7 +16,7 @@ from selenium.common import exceptions
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.chrome.options import Options
 
-from gClifford.mylogging import logger
+from mylogging import logger
 
 
 def unpack_extension(crx_filepath, src_dir):
