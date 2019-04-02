@@ -15,12 +15,6 @@ pip3 install selenium
 pip3 install python3-wget
 pip3 install pony
 ```
-```
-git clone https://github.com/gcgc100/mypythonlib.git
-cd mypythonlib
-pip3 install -e .
-```
-This is my python utils. Use log and sqliteDB in this project.
 * [Set up chromedriver for selenium to control Chrome](http://chromedriver.chromium.org/getting-started)
 * Prepare extension id list. All the extension lists should be saved in json files in data/extensionIdList. The file name will be used as the category of the category.
 The default json files are used in my experiment.
@@ -38,25 +32,13 @@ make
     * data.db: the sqlite database file.
 
 
-###Data
-data.db:
-* Tables:
-    * ExtensionTable: The basic information of the Chrome extensions.
-    * FileTable: Basic information of the JavaScript inclusions.
-    * ContentScriptTable: ContentScript specific information.
-    * JavaScriptInHtmlTable: Specific infomation of JavaScritp inclusions in Chrome extension webpages.
-    * PermissionTable: Chrome extension permissions.
-    * LibraryInfoTable: The information of different libraries.
-    * LibraryTable: The map relation between library and JavaScript includions.
-
-
 ##Test
 ```
 make testShell
 ```
 Run the project with test data. The collected data will be saved into tests directory.
 
-The python tests code can be used with nosetests.
+Run nosetests under src/python directory to test python code.
 The test_set_version.py and test_analyser.py is disabled in setup.cfg.
 test_set_version.py is very slow and test_analyser.py need to config proxy in advance.
 
