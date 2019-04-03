@@ -2,7 +2,7 @@ This project is used to download Chrome extensions and extract the JavaScript In
 The project is developed with python on ubuntu 16.04 LTS 64bit.
 The shell script is tested with bash.
 
-##Usage:
+## Usage:
 * Install dependency softwares:
     * Chrome
     * git
@@ -10,10 +10,8 @@ The shell script is tested with bash.
     * pip3
 * Install python modules:
 ```
-pip3 install selenium
-<!--pip install wget-->
-pip3 install python3-wget
-pip3 install pony
+cd src/python
+pip3 install -r requirements.txt
 ```
 * [Set up chromedriver for selenium to control Chrome](http://chromedriver.chromium.org/getting-started)
 * Prepare extension id list. All the extension lists should be saved in json files in data/extensionIdList. The file name will be used as the category of the category.
@@ -32,7 +30,7 @@ make
     * data.db: the sqlite database file.
 
 
-##Test
+## Test
 ```
 make testShell
 ```
@@ -42,7 +40,7 @@ Run nosetests under src/python directory to test python code.
 The test_set_version.py and test_analyser.py is disabled in setup.cfg.
 test_set_version.py is very slow and test_analyser.py need to config proxy in advance.
 
-##Other Things
+## Other Things
 The library information will not be set automatically.
 setTimeForjqueryVersion.sh is used to get the release time of different version of jquery.
 getVul.sh is used to tag the vulnerable version of a library.
