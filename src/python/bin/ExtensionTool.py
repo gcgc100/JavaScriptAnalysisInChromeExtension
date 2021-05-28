@@ -162,7 +162,7 @@ def main():
         if e.args[0] != "Database object was already bound to SQLite provider":
             raise e
     if args.cmd == "addExtensionId":
-        ExtensionUtils.init_database(args.db,
+        ExtensionUtils.init_database(
                 args.extensionIdList,
                 args.category)
     elif args.cmd == "setDetail":

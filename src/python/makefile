@@ -18,3 +18,9 @@ test:
 
 temptest:
 	ehco temptest
+
+SampleDBUtil:
+	rm -f ../../data/data.db
+	cp ../../data/data1.db ../../data/data.db
+	python3 temp/SampleDBUtil.py
+

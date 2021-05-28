@@ -103,7 +103,7 @@ class Extension(db.Entity):
 class ExtensionPermission(db.Entity):
 
     """Docstring for ExtensionPermission. """
-    extension = Required(Extension)
+    extensions = Set("Extension")
     permission = Required(str)
         
 
@@ -112,7 +112,7 @@ class JavaScriptInclusion(db.Entity):
     """Docstring for JavaScriptInclusion. """
 
     size = Optional(int)
-    detectMethod = Required(int)
+    detectMethod = Optional(int)
     filepath = Required(str)
     extension = Required(Extension)
     hash = Optional(str)

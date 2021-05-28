@@ -1,16 +1,53 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 import sys
 import os
 import json
 from datetime import datetime
+import urllib
+import urllib.request
 
 import utils
 from OrmDatabase import *
 import mylogging
 logger = mylogging.logger
 
+
+def downloadExt(id, name="", save_path="../../data/extensionsInCrx"):
+    ext_id = id
+    if name == "":
+        save_name = ext_id
+    else:
+        save_name = name
+    save_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), save_path)
+    # os.makedirs(save_path, exist_ok=True)
+    save_path = save_path + "/" + save_name + ".crx"
+    logger.debug("Downloader says: save_path is " + save_path)
+    # new download URL, issue #13
+    dl_url = "https://clients2.google.com/service/update2/crx?response=redirect&os=win&arch=x86-64&os_arch=x86-64&nacl_arch=x86-64&prod=chromecrx&prodchannel=unknown&prodversion=81.0.4044.138&acceptformat=crx2,crx3&x=id%3D" + ext_id + "%26uc"
+    print("Download URL: " + dl_url)
+
+    try:
+        urllib.request.urlretrieve(dl_url, save_path)
+        logger.debug("Extension downloaded successfully: " + save_path)
+        return save_name
+    except urllib.error.HTTPError as e:
+        if e.reason == 'error-invalidAppId':
+            __import__('pdb').set_trace()  # XXX BREAKPOINT
+            with open(os.path.dirname(save_path)+"/unexistExt.md", 'a') as f: 
+                f.write(ext_id + "\n")
+        else:
+            logger.debug("urllib error")
+            logger.debug(e)
+    except Exception as e:
+        logger.debug("Error in downloader.py")
+        logger.debug(e)
+        return False
+
+def downloadExtList(extList, save_path=""):
+    for ext in extList:
+        downloadExt(ext)
 
 def init_database(extensionIdJson, category):
     """init database
