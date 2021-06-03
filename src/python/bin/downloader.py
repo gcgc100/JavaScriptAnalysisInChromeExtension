@@ -16,40 +16,15 @@ sys.path.insert(0, parent_dir)
 from mylogging import logger
 from ExtensionUtils import downloadExt
 from ExtensionUtils import downloadExtList
+from ExtensionUtils import unpackExtension
 
-# def download(id, name="", save_path="../../data/extensionsInCrx"):
-#     ext_id = id
-#     if name == "":
-#         save_name = ext_id
-#     else:
-#         save_name = name
-#     print('__file__:    ', )
-#     save_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), save_path)
-#     # os.makedirs(save_path, exist_ok=True)
-#     save_path = save_path + "/" + save_name + ".crx"
-#     logger.debug("Downloader says: save_path is " + save_path)
-#     # new download URL, issue #13
-#     dl_url = "https://clients2.google.com/service/update2/crx?response=redirect&os=win&arch=x86-64&os_arch=x86-64&nacl_arch=x86-64&prod=chromecrx&prodchannel=unknown&prodversion=81.0.4044.138&acceptformat=crx2,crx3&x=id%3D" + ext_id + "%26uc"
-#     print("Download URL: " + dl_url)
-
-#     try:
-#         urllib.request.urlretrieve(dl_url, save_path)
-#         logger.debug("Extension downloaded successfully: " + save_path)
-#         return save_name
-#     except Exception as e:
-#         logger.debug("Error in downloader.py")
-#         print(e)
-#         return False
-
-# def downloadExtList(extList, save_path=""):
-#     for ext in extList:
-#         download(ext)
 
 def main():
     parser = argparse.ArgumentParser(
             "Download Chrome extension")
     parser.add_argument("--id", help="Extension id")
     parser.add_argument("--extList", help="Extension id list in a jsonfile")
+    parser.add_argument("--unpack")
 
     try:
         args = parser.parse_args()
@@ -59,6 +34,9 @@ def main():
             with open(args.extList) as f:
                 extensionIdList = json.load(f)
             downloadExtList(extensionIdList)
+        if args.unpack is not None:
+            os.makedirs("./ext", exist_ok=True)
+            unpackExtension(args.unpack, "./ext")
     except KeyboardInterrupt as e:
         # Not an error, user wants to stop unpacking.
         sys.exit(2)

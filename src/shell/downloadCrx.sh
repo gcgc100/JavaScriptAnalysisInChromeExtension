@@ -71,7 +71,8 @@ EOF
     zip -r ${outputDir}$2.zip ${outputDir}$2
 }
 
-extensionIdList=$BASEDIR/../../data/extensionIdList/
+#extensionIdList=$BASEDIR/../../data/extensionIdList/
+extensionIdList=$BASEDIR/../../data/extensionIdListSample10/
 crxDir=$BASEDIR/../../data/crxFiles/
 database=$BASEDIR/../../data/data.db
 archive=$BASEDIR/../../data/archive/

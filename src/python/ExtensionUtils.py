@@ -7,6 +7,7 @@ import json
 from datetime import datetime
 import urllib
 import urllib.request
+import zipfile
 
 import utils
 from OrmDatabase import *
@@ -14,13 +15,14 @@ import mylogging
 logger = mylogging.logger
 
 
-def downloadExt(id, name="", save_path="../../data/extensionsInCrx"):
+def downloadExt(id, name="", save_path=""):
     ext_id = id
     if name == "":
         save_name = ext_id
     else:
         save_name = name
-    save_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), save_path)
+    if save_path == "":
+        save_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "../../data/extensionsInCrx")
     # os.makedirs(save_path, exist_ok=True)
     save_path = save_path + "/" + save_name + ".crx"
     logger.debug("Downloader says: save_path is " + save_path)
@@ -48,6 +50,30 @@ def downloadExt(id, name="", save_path="../../data/extensionsInCrx"):
 def downloadExtList(extList, save_path=""):
     for ext in extList:
         downloadExt(ext)
+
+def unpackExtAndFilldb(eid, crxPath, extSrcPath):
+    """TODO: Docstring for unpackExtAndFilldb.
+
+    :database: TODO
+    :returns: TODO
+
+    """
+    with db_session:
+        e = Extension.get(extensionId = eid)
+        e.srcPath = extSrcPath
+        unpackExtension(crxPath, extSrcPath)
+
+def unpackExtension(crxPath, extSrcPath):
+    """TODO: Docstring for unpackExtension.
+
+    :eid: TODO
+    :crxPath: TODO
+    :returns: TODO
+
+    """
+    zip_contents = zipfile.ZipFile(crxPath, 'r')
+    zip_contents.extractall(extSrcPath)
+    zip_contents.close()
 
 def init_database(extensionIdJson, category):
     """init database

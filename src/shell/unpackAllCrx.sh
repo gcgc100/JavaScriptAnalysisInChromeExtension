@@ -6,7 +6,8 @@ cat << EOF
 Unpack extension and save the source code to ../data/extSrc.
 The extension which is failed to unpack will be listed in UnpackCrxError.log
 
-Requirement: make sure in /tmp, there is no directory named .org.chromium.Chromium.*
+Requirement: 
+unneeded: make sure in /tmp, there is no directory named .org.chromium.Chromium.*
 EOF
 
 shopt -s nullglob
@@ -34,4 +35,5 @@ fi
 
 rm -rf /tmp/.org.chromium.Chromium.*
 echo "Start to unpack extensions"
-$PYTHON $BASEDIR/../python/bin/unpackExtension.py allPack --db ${database} --output $extSrcDir
+#$PYTHON $BASEDIR/../python/bin/unpackExtension.py allPack --db ${database} --output $extSrcDir
+$PYTHON $BASEDIR/../python/bin/ExtensionTool.py unpack ${database} --crxDir ${crxDir} --extSrcDir $extSrcDir

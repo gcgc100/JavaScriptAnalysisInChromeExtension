@@ -12,9 +12,14 @@ sys.path.insert(0, parent_dir)
 
 from OrmDatabase import *
 
-dbpath = os.path.join(parent_dir, "../../data/data.db")
+import mylogging
+logger = mylogging.logger
+
+dbpath = os.path.join(parent_dir, "../../data/dataV1-1.db")
 db.bind(provider='sqlite', filename=dbpath, create_db=True)
 db.generate_mapping(create_tables=True)
+
+exit()
 
 
 set_sql_debug(True)
@@ -25,19 +30,13 @@ exts = []
 files = []
 
 with db_session:
-    for eid in ext10:
-        es = db.select("select * from extensionTable where extensionId == '" + eid + "'")
-        exts += es
+    # for eid in ext10:
+    #     es = db.select("select * from extensionTable where extensionId == '" + eid + "'")
+    #     exts += es
 
-
-# __import__('pdb').set_trace()  # XXX BREAKPOINT
-
-# db.disconnect()
-# db.provider = db.schema = None
-# db.bind(provider='sqlite', filename="temp.db", create_db=True)
-# db.generate_mapping(create_tables=True)
-
-# __import__('pdb').set_trace()  # XXX BREAKPOINT
+    # exts = db.select("select * from extensionTable where id = 21")
+    exts = db.select("select * from extensionTable where id < 500")
+    # exts = db.select("select * from extensionTable where id >= 500 and id < 1000")
 
 # SCRIPT_BACKGROUND = 2
 # SCRIPT_CONTENTSCRIPT = 0
@@ -61,20 +60,31 @@ with db_session:
             if pp is None:
                 extP = ExtensionPermission(permission = p)
     pass
-# sys.exit()
+# # sys.exit()
 
 with db_session:
     for e in exts:
+        updateTime = e[1]
+        if updateTime == 404:
+            updateTime = "1000-1-1"
+        logger.debug(e)
         extension = Extension(category=e[0], 
-                updateTime=datetime.datetime.strptime(e[1], "%Y-%m-%d").date(),
+                updateTime=datetime.datetime.strptime(updateTime, "%Y-%m-%d").date(),
                 extensionId=e[2],
                 id=e[3],
-                ratedScore=e[4],
-                version=e[5],
-                size=e[6],
-                language=e[7],
-                numUserRated=e[8],
-                userNum=e[9])
+                downloadTime=datetime.datetime.strptime("2018-6", "%Y-%m"))
+        if e[4] is not None:
+            extension.ratedScore = e[4]
+        if e[5] is not None:
+            extension.version = e[5]
+        if e[6] is not None:
+            extension.size = e[6]
+        if e[7] is not None:
+            extension.language = e[7]
+        if e[8] is not None:
+            extension.numUserRated = e[8]
+        if e[9] is not None:
+            extension.userNum = e[9]
         ps = db.select("select * from PermissionTable where extensionId = '" + e[2] + "'")
         for p in ps:
             print(p[2])
@@ -82,7 +92,6 @@ with db_session:
             extension.permissions.add(extP)
             extP.extensions.add(extension)
         fs = db.select("select * from fileTable where extensionId = '" + e[2] + "'")
-        assert(len(fs)>0)
         for f in fs:
             if f[5] is None:
                 hash = " "
@@ -122,15 +131,15 @@ with db_session:
                 jsInc.libraries.add(lib)
                         
 
-db.drop_table("ExtensionTable", if_exists=True, with_all_data=True)
-db.drop_table("ContentScriptTable", if_exists=True, with_all_data=True)
-db.drop_table("JavaScriptInHtmlTable", if_exists=True, with_all_data=True)
-db.drop_table("PermissionTable", if_exists=True, with_all_data=True)
-db.drop_table("FileTable", if_exists=True, with_all_data=True)
-db.drop_table("SampleExtensionIdTable", if_exists=True, with_all_data=True)
-db.drop_table("JavaScriptIncViaContentScriptTable", if_exists=True, with_all_data=True)
-db.drop_table("libraryInfoTable", if_exists=True, with_all_data=True)
-db.drop_table("LibraryTable", if_exists=True, with_all_data=True)
-db.drop_table("efTable", if_exists=True, with_all_data=True)
-db.drop_table("eflTable", if_exists=True, with_all_data=True)
-db.drop_table("multiLibInclusion", if_exists=True, with_all_data=True)
+# db.drop_table("ExtensionTable", if_exists=True, with_all_data=True)
+# db.drop_table("ContentScriptTable", if_exists=True, with_all_data=True)
+# db.drop_table("JavaScriptInHtmlTable", if_exists=True, with_all_data=True)
+# db.drop_table("PermissionTable", if_exists=True, with_all_data=True)
+# db.drop_table("FileTable", if_exists=True, with_all_data=True)
+# db.drop_table("SampleExtensionIdTable", if_exists=True, with_all_data=True)
+# db.drop_table("JavaScriptIncViaContentScriptTable", if_exists=True, with_all_data=True)
+# db.drop_table("libraryInfoTable", if_exists=True, with_all_data=True)
+# db.drop_table("LibraryTable", if_exists=True, with_all_data=True)
+# db.drop_table("efTable", if_exists=True, with_all_data=True)
+# db.drop_table("eflTable", if_exists=True, with_all_data=True)
+# db.drop_table("multiLibInclusion", if_exists=True, with_all_data=True)
