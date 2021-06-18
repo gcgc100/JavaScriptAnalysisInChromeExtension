@@ -35,5 +35,4 @@ fi
 
 rm -rf /tmp/.org.chromium.Chromium.*
 echo "Start to unpack extensions"
-#$PYTHON $BASEDIR/../python/bin/unpackExtension.py allPack --db ${database} --output $extSrcDir
 $PYTHON $BASEDIR/../python/bin/ExtensionTool.py unpack ${database} --crxDir ${crxDir} --extSrcDir $extSrcDir

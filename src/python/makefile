@@ -1,13 +1,6 @@
 
-.PHONY: run ../data/extSrc/extensionSource/* test temptest
+.PHONY: test
 
-run: ../data/extSrc/extensionSource/*
-
-../data/extSrc/extensionSource/*:
-	python analyser.py -a $@
-
-saveExtensionIdToDB:
-	python MysqlManager.py --idList ../data/extensionList.json
 
 clean:
 	rm -rf ../data/scripts
@@ -15,9 +8,6 @@ clean:
 
 test:
 	nosetests -s --pdb
-
-temptest:
-	ehco temptest
 
 SampleDBUtil:
 	rm -f ../../data/dataV1.db
