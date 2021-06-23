@@ -59,7 +59,8 @@ def unpackExtAndFilldb(eid, crxPath, extSrcPath):
 
     """
     with db_session:
-        e = Extension.get(extensionId = eid)
+        e = Extension.get(extensionId = eid, crxPath=crxPath)
+        assert(e is not None)
         e.srcPath = extSrcPath
         unpackExtension(crxPath, extSrcPath)
 
@@ -150,7 +151,12 @@ def setPermissionAllPack(extensionCollection):
     # Unknow error if without this line. 'NoneType' object has no attribute 'cursor'
     if os.path.isdir(extensionCollection):
         for eid in os.listdir(extensionCollection):
-            extension = Extension.get(extensionId=eid)
+            extPath = os.path.join(extensionCollection, eid)
+            extension = Extension.get(extensionId=eid, srcPath=extPath)
             permissions = extension.getPermissions()
             for p in permissions:
-                permission= ExtensionPermission(permission = p, extension = extension)
+                permission = ExtensionPermission.get(permission = p)
+                if permission is None:
+                    permission= ExtensionPermission(permission = p)
+                permission.extensions.add(extension)
+                extension.permissions.add(permission)

@@ -72,7 +72,7 @@ def getExtensionDetail(extensionId):
     ret["ratedScore"] = ratedScore
     ret["numUserRated"] = numUserRated
 
-    t = re.findall("<span class=\"[^\"]*\" title=\"([0-9]{1,3}(,[0-9]{3})*) users", detailWebpage)
+    t = re.findall("<span class=\"[^\"]*\" title=\"([0-9]{1,3}(,[0-9]{3})*)(\+)+ users", detailWebpage)
     if len(t) != 0:
         userNum = int(t[0][0].replace(",", ""))
         ret["userNum"] = userNum

@@ -34,8 +34,11 @@ def allPack(script_folder, static, dynamic, srcBasePath, crxBasePath):
     # eList = db.select("select * from extensionTable where downloadStatus = 1")
     eList = select(e for e in Extension if e.downloadStatus==1)
     for e in eList:
-        crxPath = os.path.join(crxBasePath, 
-                "{0}.crx".format(e.extensionId))
+        if not e.crxPath.startswith(crxBasePath):
+            continue
+        crxPath = e.crxPath
+        # crxPath = os.path.join(crxBasePath, 
+        #         "{0}.crx".format(e.extensionId))
         if not os.path.exists(e.srcPath):
             logger.info("{0} extension src code not exists".format(e.srcPath))
             continue

@@ -100,7 +100,14 @@ def script_from_src(src):
         script_data = script_url_file.read()
     except (IOError, socket.error) as e:
         logger.error(e)
-    return script_data
+        raise(e)
+    # if src == "https://funnytabs.mystartcdn.com/new-tab/funnyemojis/newtab/js/index.js":
+    #     pass
+    #     __import__('pdb').set_trace()  # XXX BREAKPOINT
+    if type(script_data) == bytes:
+        return script_data.decode("utf-8")
+    else:
+        return script_data
 
 def format_filename(s):
     """Take a string and return a valid filename constructed from 
@@ -146,15 +153,30 @@ def static_detect_javascript_in_html(extension, script_folder):
             else:
                 assert len(src) == 0, "script with more than one src"
                 src = ""
-            if re.match("[a-zA-Z]+://.*", src) is not None or src.startswith("//"):
+            if src.startswith("//"):
+                # [2:] remove // 
+                filepath = os.path.join(extension.srcPath, src[2:])
+                if not os.path.exists(filepath):
+                    logger.info("Local script not found")
+                    filepath = "/error"
+                else:
+                    pass
+                pass
+            # if re.match("[a-zA-Z]+://.*", src) is not None or src.startswith("//"):
+            elif re.match("[a-zA-Z]+://.*", src) is not None:
                 # the src is a url or no protocol url
-                script_data = script_from_src(src)
+                try:
+                    script_data = script_from_src(src)
+                except socket.error as e:
+                    script_data = None
+                    err = e
                 script_data_path = script_folder
                 if script_data is None:
                     # filepath will be changed to abspath in future, 
                     # add '/' so that it will not be extended
-                    filepath = "/{0}".format(os.path.basename(
-                            urlparse.urlparse(src).path))
+                    # filepath = "/{0}".format(os.path.basename(
+                            # urlparse.urlparse(src).path))
+                    filepath = "/error:{0}".format(err)
                 else:
                     script_data = str(script_data)
                     filename = os.path.basename(
@@ -234,12 +256,15 @@ def dynamic_detect_javascript_in_html(extension, script_folder):
             driver.switch_to.window(driver.window_handles[0])
         driver.get(html_url)
         scripts = driver.execute_script(js_code)
+        logger.debug(scripts)
         seq = 0
         for script in scripts:
             src = script.get_attribute("src")
+            logger.debug(src)
             if src.startswith("chrome-extension://"):
                 # remove the extension root path from src
                 # e.g. chrome-extension://abcdabcdabcdabcdabcdabcdabcdabcd/a.js -> a.js
+                # 32: the len of extensionId
                 src = src[len("chrome-extension://") + 32:]
             code = script.get_attribute("innerText")
             retScript = ['script']
@@ -257,17 +282,29 @@ def dynamic_detect_javascript_in_html(extension, script_folder):
             else:
                 assert len(src) == 0, "script with more than one src"
                 src = ""
-            if re.match("[a-zA-Z]+://.*", src) is not None or src.startswith("//"):
+            if src.startswith("//"):
+                # [2:] remove // 
+                filepath = os.path.join(extension.srcPath, src[2:])
+                if not os.path.exists(filepath):
+                    logger.info("Local script not found")
+                    filepath = "/error"
+                else:
+                    pass
+                pass
+            elif re.match("[a-zA-Z]+://.*", src) is not None or src.startswith("//"):
                 # the src is a url or no protocol url
-                # script_data = script_from_src(src)
-                script_data = None
+                try:
+                    script_data = script_from_src(src)
+                except socket.error as e:
+                    err = e
+                # script_data = None
                 script_data_path = script_folder
                 if script_data is None:
                     # filepath will be changed to abspath in future, 
                     # add '/' so that it will not be extended
-                    filename = os.path.basename(
-                            urlparse.urlparse(src).path)
-                    filepath = "/{0}".format(filename)
+                    # filename = os.path.basename(
+                    #         urlparse.urlparse(src).path)
+                    filepath = "/error:{0}".format(err)
                 else:
                     filename = os.path.basename(
                             urlparse.urlparse(src).path)

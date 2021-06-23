@@ -28,6 +28,16 @@ logger = mylogging.logger
 gc_timeout = False
 
 @db_session
+def downloadNewVersion(arg1):
+    """TODO: Docstring for downloadNewVersion.
+
+    :arg1: TODO
+    :returns: TODO
+
+    """
+    pass
+
+@db_session
 def allPack(dbpath, extensionList, crxDir, archiveDir):
     """All things together
 
@@ -66,6 +76,46 @@ def allPack(dbpath, extensionList, crxDir, archiveDir):
         except Exception as e:
             logger.error(e)
             extension.reset()
+            if e.args[0] == 'http error':
+                extension.downloadStatus = e.args[1]
+            continue
+
+@db_session
+def downloadNewVersion(crxDir, archiveDir):
+    """TODO: Docstring for downloadNewVersion.
+
+    :arg1: TODO
+    :returns: TODO
+
+    """
+    os.makedirs(crxDir, exist_ok=True)
+    os.makedirs(archiveDir, exist_ok=True)
+    eList = select(extension for extension in Extension)
+    #TODO: Should select the extensions without repeat. Now there are no repeat in db now, so no need to filter.
+    for e in eList:
+        eid = e.extensionId
+        extension = Extension(extensionId=eid, category=e.category, downloadStatus=0)
+        try:
+            retCode = ExtensionUtils.setExtensionDetailForOne(extension)
+            if retCode == 1:
+                try:
+                    downloadExt(eid, save_path=crxDir)
+                    extension.crxPath = os.path.join(crxDir, "{0}.crx".format(eid))
+                except Exception as e:
+                    logger.error(e)
+                    raise e
+            elif retCode == 0:
+                logger.info("Get extension detail failed")
+            elif retCode == 2:
+                logger.info("Extension already the newest")
+            elif retCode == 404:
+                extension.downloadStatus = retCode
+            else:
+                logger.error("Unexpected return when set detail:%s" % retCode)
+        except Exception as e:
+            logger.error(e)
+            extension.reset()
+            #TODO: The extension row should be removed instead of reset here
             if e.args[0] == 'http error':
                 extension.downloadStatus = e.args[1]
             continue
@@ -175,6 +225,16 @@ def main():
                 os.makedirs(extSrcDir, exist_ok=True)
                 ExtensionUtils.unpackExtAndFilldb(eid, os.path.join(crxDir, crx),
                         extSrcDir)
+    elif args.cmd == "NewVersionDownload":
+        parametersToBeChecked = ["crxDir", "archiveDir"]
+        ret = True
+        for p in parametersToBeChecked:
+            if getattr(args, p) is None:
+                print("{0} can not be empty\n".format(p))
+                ret = False
+        if not ret:
+            sys.exit(1)
+        downloadNewVersion(args.crxDir, args.archiveDir)
 
 
 if __name__ == "__main__":

@@ -114,7 +114,7 @@ def selenium_get_version(filedir, driver, blockRun=False, lib_type_array=None):
         lib_type_array = js_get_version_dict.keys()
     if not os.path.isfile(filedir):
         # if file not exits, set all version to 100
-        return dict([(x, "100") for x in lib_type_array])
+        return dict([(x, None) for x in lib_type_array])
     real_server_dir = "jqueryServer"
     scriptFile = os.path.join(real_server_dir, "script.js")
     if os.path.isfile(scriptFile):
@@ -125,7 +125,7 @@ def selenium_get_version(filedir, driver, blockRun=False, lib_type_array=None):
         js_get_version = js_get_version_dict[lib_type]
         try:
             version = driver.execute_script(js_get_version)
-            print("%s version:%s" % (lib_type, version))
+            logger.info("%s version:%s" % (lib_type, version))
         except Exception as e:
             # print("%s version not found" % lib_type)
             version = None
@@ -155,7 +155,8 @@ def set_all_version(library_type=None, database="../data/data.db"):
     # allFiles = db.select("Select * from filetable where id not in (select fileid from (Select count(*) as c,fileid from LibraryTable group by fileid) where c=10)")
     # allFiles = select(jinc for jinc in JavaScriptInclusion for l in jinc.libraries if count(l)!=10)
     with db_session:
-        allFiles = JavaScriptInclusion.select()
+        allFiles = select(j for j in JavaScriptInclusion if j.extension in (e for e in Extension if (e.extensionId, e.downloadTime) in ((e.extensionId, max(e.downloadTime)) for e in Extension)))[:]
+        # allFiles = JavaScriptInclusion.select()
         # allFiles = db.select("select * from filetable where id in (select fileid from LibraryTable where version = '100')")
         i = 10
         current_dir = os.path.abspath(inspect.getfile(inspect.currentframe()))
@@ -187,10 +188,12 @@ def set_all_version(library_type=None, database="../data/data.db"):
                 print(f.filename)
                 lib_array = selenium_get_version(f.filepath, driver, blockRun=True,
                         lib_type_array=lib_type_array_todo)
+                logger.error(lib_array)
                 for lib in lib_array:
                     # sql = "update FileTable set {0} = ? where id = ?".format(version)
                     ver = lib_array[lib]
                     if ver is None:
+                        libInfo = None
                         continue
                     libInfo = Library.get(libname=lib, version=ver)
                     # libInfo = db.select("select * from LibraryInfoTable where libname=? and version=?", lib, "%s" % lib_array[lib])

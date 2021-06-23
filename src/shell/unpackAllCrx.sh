@@ -28,6 +28,10 @@ if [[ ! -z $1 ]]; then
         crxDir=$BASEDIR/../../tests/shellTests/crxFiles/
         extSrcDir=$BASEDIR/../../tests/shellTests/extSrc/
         database=$BASEDIR/../../tests/shellTests/test.db
+    elif [[ $1 = "test2" ]]; then
+        crxDir=$BASEDIR/../../tests/shellTests/crxFiles/
+        extSrcDir=$BASEDIR/../../tests/shellTests/extSrc/
+        database=$BASEDIR/../../tests/shellTests/test.db
     else
         source $1
     fi
