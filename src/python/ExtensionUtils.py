@@ -22,7 +22,8 @@ def downloadExt(id, name="", save_path=""):
     else:
         save_name = name
     if save_path == "":
-        save_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "../../data/extensionsInCrx")
+        save_path = "./crxDownloaded"
+        # save_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "../../data/extensionsInCrx")
     # os.makedirs(save_path, exist_ok=True)
     save_path = save_path + "/" + save_name + ".crx"
     logger.debug("Downloader says: save_path is " + save_path)
