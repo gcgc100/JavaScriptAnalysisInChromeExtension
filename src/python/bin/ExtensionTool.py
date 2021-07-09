@@ -40,8 +40,7 @@ def allPack(dbpath, extensionList, crxDir, archiveDir):
     os.makedirs(crxDir, exist_ok=True)
     os.makedirs(archiveDir, exist_ok=True)
     for d in os.listdir(extensionList):
-        category = d.split(".")[0]
-        ExtensionUtils.init_database(os.path.join(extensionList, d), category)
+        ExtensionUtils.init_database(os.path.join(extensionList, d))
     eList = select(extension for extension in Extension if extension.downloadStatus==0 and extension.updateTime is None)
     for extension in eList:
         eid = extension.extensionId
@@ -143,8 +142,7 @@ def main():
             raise e
     if args.cmd == "addExtensionId":
         ExtensionUtils.init_database(
-                args.extensionIdList,
-                args.category)
+                args.extensionIdList)
     elif args.cmd == "setDetail":
         parametersToBeChecked = ["extensionId"]
         ret = True

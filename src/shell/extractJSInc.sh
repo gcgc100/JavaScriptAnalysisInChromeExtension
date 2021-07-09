@@ -55,4 +55,4 @@ mkdir -p ${scriptDir}
 
 echo "Analysing extension"
 $PYTHON $BASEDIR/../python/bin/ExtensionTool.py addPermission ${database} --extensionCollection ${extSrcDir}
-$PYTHON $BASEDIR/../python/bin/extractJSInc.py allPack ${database} ${scriptDir} --static --dynamic --srcPath ${extSrcDir} --crxPath ${crxDir}
+$PYTHON $BASEDIR/../python/bin/extractJSInc.py allPack ${database} ${scriptDir} --static --dynamic --tarnish --srcPath ${extSrcDir} --crxPath ${crxDir}

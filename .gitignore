@@ -1,4 +1,11 @@
-tests
+src/python/tests/tempdb
+*.db
+tests/shellTests/crxFiles             
+tests/shellTests/crxTestData          
+tests/shellTests/extSrc               
+tests/shellTests/extsrcTestData       
+tests/shellTests/scripts              
+tests/shellTests/exIdListWithMulVulLib
 
 data/
 

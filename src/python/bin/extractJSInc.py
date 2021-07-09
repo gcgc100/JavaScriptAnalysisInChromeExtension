@@ -89,6 +89,14 @@ def main():
             default=False,
             action='store_true',
             help="Static method. Dyanmic method is more accurate but slower. By default:use both static and dynamic method")
+    parser.add_argument("--tarnish",
+            default=False,
+            action='store_true',
+            help="Analyse with tarnish. Tarnish is a website that can analyse an extension with certain id")
+    parser.add_argument("--extAnalysis",
+            default=False,
+            action='store_true',
+            help="Analyse with extAnalysis. ExtAnalysis is an open-source project that can be used to analyse extension")
     parser.add_argument("--proxyDetection",
             default=False,
             action='store_true',
@@ -108,7 +116,7 @@ def main():
         db.generate_mapping(create_tables=True)
 
         if args.cmd == "allPack":
-            allPack(args.script, args.static, args.dynamic, True, True, srcPath, crxPath)
+            allPack(args.script, args.static, args.dynamic, args.tarnish, args.extAnalysis, srcPath, crxPath)
         elif args.cmd == "oneExtension":
             with db_session:
                 if not srcPath.endswith("/"):
@@ -119,10 +127,8 @@ def main():
                 extension_id = os.path.split(path)[1]
                 assert re.match("[a-z]{32}", extension_id), "illegal extensionId"
                 extension = Extension(srcPath=args.srcPath, extensionId=extension_id, crxPath=crxPath)
-                Analyser.detect_background_scripts(extension)
-                Analyser.detect_content_scripts(extension)
                 script_folder = args.script
-                detect(e, script_folder, static, dynamic, tarnish, extAnalysis, args.proxyDetection)
+                detect(e, script_folder, args.static, args.dynamic, args.tarnish, args.extAnalysis, args.proxyDetection)
     except KeyboardInterrupt as e:
         # Not an error, user wants to stop unpacking.
         sys.exit(2)

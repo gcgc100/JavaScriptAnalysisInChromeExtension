@@ -76,20 +76,19 @@ def unpackExtension(crxPath, extSrcPath):
     zip_contents.extractall(extSrcPath)
     zip_contents.close()
 
-def init_database(extensionIdJson, category):
+def init_database(extensionIdJson):
     """init database
     :returns: TODO
 
     """
-    addExtensionId(extensionIdJson, category)
+    addExtensionId(extensionIdJson)
 
-def addExtensionId(extensionIdJson, category):
+def addExtensionId(extensionIdJson):
     """Add the extension id in extensionIdJson file to sqlite database,
     if the extension id is in extensionIdExcluded, it will be ignored
 
     :dbpath: sqlite database path
     :extensionIdJson: extension id list json file
-    :category: The category of the extensions
     :returns: TODO
 
     """
@@ -97,7 +96,7 @@ def addExtensionId(extensionIdJson, category):
         extensionIdList = json.load(f)
     with db_session:
         for extensionId in extensionIdList:
-            extension = Extension(extensionId=extensionId, category=category, downloadStatus=0)
+            extension = Extension(extensionId=extensionId, downloadStatus=0)
 
 def setExtensionDetailForOne(extension):
     """Set the detail information for extension
