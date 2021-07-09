@@ -13,7 +13,7 @@ from enum import Enum
 
 db = Database()
 
-DetectMethod = Enum("DetectMethod", ("Dynamic", "Static"))
+DetectMethod = Enum("DetectMethod", ("Dynamic", "Static", "Tarnish", "ExtAnalysis"))
 
 class Extension(db.Entity):
 
@@ -58,6 +58,10 @@ class Extension(db.Entity):
             if type(manifest) == list:
                 raise ValueError()
         return manifest
+
+    @property
+    def webstoreUrl(self):
+        return "https://chrome.google.com/webstore/detail/%s" % self.extensionId
 
     @property
     def htmlFiles(self):

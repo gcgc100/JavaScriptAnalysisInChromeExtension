@@ -22,7 +22,7 @@ import Analyser
 from OrmDatabase import *
 
 @db_session
-def allPack(script_folder, static, dynamic, srcBasePath, crxBasePath):
+def allPack(script_folder, static, dynamic, tarnish, extAnalysis, srcBasePath, crxBasePath):
     """TODO: Docstring for allPack.
 
     :db_path: TODO
@@ -32,29 +32,45 @@ def allPack(script_folder, static, dynamic, srcBasePath, crxBasePath):
     """
     # __import__('pdb').set_trace()  # XXX BREAKPOINT
     # eList = db.select("select * from extensionTable where downloadStatus = 1")
-    eList = select(e for e in Extension if e.downloadStatus==1)
+    # eList = select(e for e in Extension if e.downloadStatus==1)
+    eList = select(e for e in Extension if (e.extensionId, e.downloadTime) in ((e.extensionId, max(e.downloadTime)) for e in Extension if e.downloadStatus==1))
     for e in eList:
         if not e.crxPath.startswith(crxBasePath):
             continue
         crxPath = e.crxPath
-        # crxPath = os.path.join(crxBasePath, 
-        #         "{0}.crx".format(e.extensionId))
         if not os.path.exists(e.srcPath):
             logger.info("{0} extension src code not exists".format(e.srcPath))
             continue
-        # ds = ["downloadStatus", "userNum"]
-        # for d in ds:
-        #     # if e.has_key(d):
-        #     if d in e:
-        #         e.pop(d)
         logger.info("Start to analyse extension{0}, dbId:{1}".format(e.extensionId, e.id))
+        detect(e, script_folder, static, dynamic, tarnish, extAnalysis)
+        logger.info("Extension{0} analysed".format(e.extensionId))
+
+def detect(extension, script_folder, static=True, dynamic=True, tarnish=True, extAnalysis=True, proxyDetection=False):
+    """TODO: Docstring for detect.
+
+    :extension: TODO
+    :script_folder: TODO
+    :static: TODO
+    :dynamic: TODO
+    :tarnish: TODO
+    :extAnalysis: TODO
+    :proxy: TODO
+    :returns: TODO
+
+    """
+    e = extension
+    if static:
+        Analyser.static_detect_javascript_in_html(e, script_folder)
         Analyser.detect_background_scripts(e)
         Analyser.detect_content_scripts(e)
-        if static:
-            Analyser.static_detect_javascript_in_html(e, script_folder)
-        if dynamic:
-            Analyser.dynamic_detect_javascript_in_html(e, script_folder)
-        logger.info("Extension{0} analysed".format(e.extensionId))
+    if dynamic:
+        Analyser.dynamic_detect_javascript_in_html(e, script_folder)
+    if tarnish:
+        Analyser.detect_with_tarnish(e)
+    if extAnalysis:
+        Analyser.detect_with_extAnalysis(e)
+    if proxyDetection:
+        Analyser.proxy_detect_javascript_in_html(e, script_folder)
 
 def main():
     parser = argparse.ArgumentParser("Extract JavaScript Inclusion and save to sqlite database")
@@ -92,7 +108,7 @@ def main():
         db.generate_mapping(create_tables=True)
 
         if args.cmd == "allPack":
-            allPack(args.script, args.static, args.dynamic, srcPath, crxPath)
+            allPack(args.script, args.static, args.dynamic, True, True, srcPath, crxPath)
         elif args.cmd == "oneExtension":
             with db_session:
                 if not srcPath.endswith("/"):
@@ -105,12 +121,8 @@ def main():
                 extension = Extension(srcPath=args.srcPath, extensionId=extension_id, crxPath=crxPath)
                 Analyser.detect_background_scripts(extension)
                 Analyser.detect_content_scripts(extension)
-                if args.static:
-                    Analyser.static_detect_javascript_in_html(extension, args.script)
-                if args.dynamic:
-                    Analyser.dynamic_detect_javascript_in_html(extension, args.script)
-                if args.proxyDetection:
-                    Analyser.proxy_detect_javascript_in_html(extension, args.script)
+                script_folder = args.script
+                detect(e, script_folder, static, dynamic, tarnish, extAnalysis, args.proxyDetection)
     except KeyboardInterrupt as e:
         # Not an error, user wants to stop unpacking.
         sys.exit(2)

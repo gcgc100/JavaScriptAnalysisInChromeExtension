@@ -23,6 +23,84 @@ logger = mylogging.logger
 
 from OrmDatabase import *
 import utils
+import TarnishAnalyser as ta
+import ExtAnaAnalyser as ea
+
+def detect(extension, script_folder):
+    """TODO: Docstring for detect.
+
+    :extension: TODO
+    :returns: TODO
+
+    """
+    e = extension
+    if static:
+        static_detect_javascript_in_html(e, script_folder)
+    if dynamic:
+        dynamic_detect_javascript_in_html(e, script_folder)
+    if tarnish:
+        detect_with_tarnish(e)
+    if extAnalysis:
+        detect_with_extAnalysis(e)
+
+def detect_with_tarnish(extension):
+    """Detect the vulnerable library with tarnish tool
+
+    :extension: TODO
+    :returns: TODO
+
+    """
+    ret = ta.analyseExtension(extension)
+    for r in ret:
+        r["filepath"] = os.path.join(extension.srcPath, r["filepath"])
+        loc = r["filepath"]
+        js = JavaScriptInclusion.select(lambda j: j.filepath==loc and
+                j.detectMethod==DetectMethod.Tarnish.value and
+                j.extension==extension)[:]
+        if len(js) == 0:
+            js = JavaScriptInclusion(detectMethod=DetectMethod.Tarnish.value,
+                    filepath = loc,
+                    extension = extension)
+        else:
+            assert(len(js) == 1)
+            js = js[0]
+
+        l = r["library"]
+        libversion = l["version"]
+        libname = l["libname"]
+        lib = Library.select(
+                lambda x: x.version==libversion and x.libname==libname
+                )[:]
+        if len(lib) == 0:
+            # lib = Library(libname = libname,
+            #         version = libversion)
+            lib = Library(**l)
+        else:
+            assert(len(lib) == 1)
+            lib = lib[0]
+        js.libraries.add(lib)
+        lib.scripts.add(js)
+
+def detect_with_extAnalysis(extension):
+    """TODO: Docstring for detect_with_extAnalysis.
+
+    :extension: TODO
+    :returns: TODO
+
+    """
+    ret = ea.ExtAnaAnalyser().analyseExtension(extension, headless=True)
+    for r in ret:
+        loc = os.path.join(extension.srcPath, r)
+        js = JavaScriptInclusion.select(lambda j: j.filepath==loc and 
+                j.detectMethod==DetectMethod.ExtAnalysis.value and
+                j.extension==extension)[:]
+        if len(js) == 0:
+            js = JavaScriptInclusion(detectMethod=DetectMethod.ExtAnalysis.value,
+                    filepath = loc,
+                    extension = extension)
+        else:
+            assert(len(js)==1)
+            js = js[0]
 
 def detect_background_scripts(extension):
     """Detect all background scripts in extension and set the scripts property in extension
@@ -293,11 +371,11 @@ def dynamic_detect_javascript_in_html(extension, script_folder):
                 pass
             elif re.match("[a-zA-Z]+://.*", src) is not None or src.startswith("//"):
                 # the src is a url or no protocol url
+                script_data = None
                 try:
                     script_data = script_from_src(src)
                 except socket.error as e:
                     err = e
-                # script_data = None
                 script_data_path = script_folder
                 if script_data is None:
                     # filepath will be changed to abspath in future, 

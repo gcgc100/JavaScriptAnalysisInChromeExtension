@@ -107,7 +107,7 @@ def setExtensionDetailForOne(extension):
 
     """
     eid = extension.extensionId
-    detail = utils.getExtensionDetail(eid)
+    detail = utils.getExtensionDetail(extension.webstoreUrl)
     if detail is None:
         logger.error("Getting %s detail failed" % eid)
         ret = 0

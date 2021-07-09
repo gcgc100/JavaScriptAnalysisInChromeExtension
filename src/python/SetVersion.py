@@ -188,7 +188,6 @@ def set_all_version(library_type=None, database="../data/data.db"):
                 print(f.filename)
                 lib_array = selenium_get_version(f.filepath, driver, blockRun=True,
                         lib_type_array=lib_type_array_todo)
-                logger.error(lib_array)
                 for lib in lib_array:
                     # sql = "update FileTable set {0} = ? where id = ?".format(version)
                     ver = lib_array[lib]

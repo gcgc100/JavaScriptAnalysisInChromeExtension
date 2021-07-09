@@ -29,7 +29,7 @@ import mylogging
 logger = mylogging.logger
 # logger.setLevel(logging.WARNING)
 
-def getExtensionDetail(extensionId):
+def getExtensionDetail(exDetailUrl):
     """TODO: Docstring for getExtensionDetail.
 
     :extensionId: TODO
@@ -41,7 +41,7 @@ def getExtensionDetail(extensionId):
     # exName = manifest["name"]
     # exNameInUlr = "-".join(map(lambda s: s.lower(), exName.split(" ")))
     # exDetailUrl = "https://chrome.google.com/webstore/detail/%s/%s" % (exNameInUlr, extensionId)
-    exDetailUrl = "https://chrome.google.com/webstore/detail/%s" % extensionId
+    # exDetailUrl = "https://chrome.google.com/webstore/detail/%s" % extensionId
     logger.info(exDetailUrl)
     ret = {}
     try:

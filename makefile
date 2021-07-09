@@ -18,7 +18,7 @@ clean:
 testShell:
 	bash src/shell/downloadCrx.sh test || exit 1
 	bash src/shell/unpackAllCrx.sh test || exit 1
-	bash src/shell/extractJSInc.sh test || exit 1
+	bash src/shell/extractJSInc.sh test || exit 1 
 	bash src/shell/setLibVersion.sh test || exit 1
 
 cleanTest:

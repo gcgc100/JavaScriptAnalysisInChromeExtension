@@ -10,7 +10,6 @@ import json
 import time
 import threading
 
-import wget
 
 current_dir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 parent_dir = os.path.dirname(current_dir)
@@ -26,16 +25,6 @@ import mylogging
 logger = mylogging.logger
 
 gc_timeout = False
-
-@db_session
-def downloadNewVersion(arg1):
-    """TODO: Docstring for downloadNewVersion.
-
-    :arg1: TODO
-    :returns: TODO
-
-    """
-    pass
 
 @db_session
 def allPack(dbpath, extensionList, crxDir, archiveDir):

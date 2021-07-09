@@ -15,6 +15,7 @@ archive=$BASEDIR/../../data/archive/
 
 if [[ ! -z $1 ]]; then
     if [[ $1 = "test" ]]; then
+        #extensionIdList=$BASEDIR/../../tests/shellTests/exIdListWithMulVulLib/
         extensionIdList=$BASEDIR/../../tests/shellTests/exIdList/
         crxDir=$BASEDIR/../../tests/shellTests/crxFiles/
         database=$BASEDIR/../../tests/shellTests/test.db
