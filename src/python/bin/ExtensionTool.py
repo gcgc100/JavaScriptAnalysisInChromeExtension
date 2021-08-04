@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 import sys
@@ -43,12 +43,12 @@ def allPack(db, extensionList, crxDir, archiveDir, checkNewVersion=False):
         ExtensionUtils.init_database(os.path.join(extensionList, d), db)
 
             # select(e for e in self.db.Extension if orm.raw_sql('e.extensionStatus=="Init"'))
-
-    setDetailInDB(db, checkNewVersion)
-    downloadInDB(db, crxDir)
+    # The setDetail and download must be done together in case the downloaded extension miss match the extension detail
+    setDetailAndDownloadInDB(db, checkNewVersion)
+    # downloadInDB(db, crxDir)
 
 @db_session
-def setDetailInDB(db, checkNewVersion=False):
+def setDetailAndDownloadInDB(db, checkNewVersion=False):
     if checkNewVersion:
         eList = select(extension for extension in db.Extension if orm.raw_sql("extension.extensionStatus!='{0}'".format(
             ExtensionStatus.UnPublished.name)))
@@ -61,40 +61,27 @@ def setDetailInDB(db, checkNewVersion=False):
             try:
                 if extension.extensionStatus == ExtensionStatus.Init:
                     retCode = ExtensionUtils.setExtensionDetailForOne(extension)
+                    downloadExt(eid, save_path=crxDir)
+                    extension.crxPath = os.path.join(crxDir, "{0}.crx".format(eid))
+                    extension.extensionStatus = ExtensionStatus.Downloaded
                 elif extension.extensionStatus == ExtensionStatus.UnPublished:
                     pass
                 elif extension.extensionStatus in [ExtensionStatus.Detailed, ExtensionStatus.Downloaded]:
                     newExt = db.Extension(extension)
+                    newExt.analysedStatus = 0
+                    newExt.extensionStatus = ExtensionStatus.Init
+                    retCode = ExtensionUtils.setExtensionDetailForOne(newExt)
                     if newExt.updateTime == extension.updateTime:
                         db.rollback()
+                    else:
+                        downloadExt(eid, save_path=crxDir)
+                        newExt.crxPath = os.path.join(crxDir, "{0}.crx".format(eid))
+                        newExt.extensionStatus = ExtensionStatus.Downloaded
                 else:
                     assert False, "Unknown extension status with solution"
             except Exception as e:
                 logger.error(e)
                 db.rollback()
-                continue
-
-@db_session
-def downloadInDB(db, crxDir):
-    """Download new extensions
-
-    :db: TODO
-    :returns: TODO
-
-    """
-    eList = select(extension for extension in db.Extension if orm.raw_sql("extension.extensionStatus=='{0}'".format(
-            ExtensionStatus.Detailed.name)))
-    for extension in eList:
-        eid = extension.extensionId
-        with db_session:
-            try:
-                downloadExt(eid, save_path=crxDir)
-                extension.crxPath = os.path.join(crxDir, "{0}.crx".format(eid))
-                extension.extensionStatus = ExtensionStatus.Downloaded
-            except Exception as e:
-                logger.error(e)
-                extension.extensionStatus = ExtensionStatus.Detailed
-                #TODO: Remove downloaded files when error occured
                 continue
 
 def main():
@@ -116,17 +103,12 @@ def main():
                         help="The directory to save the archived zip file")
     parser.add_argument("--extSrcDir",
                         help="The directory to save the archived zip file")
-    # parser.add_argument("--extensionExcluded",
-    #                     help="The extensions excluded")
 
 
     args = parser.parse_args()
     try:
         dbpath = os.path.abspath(args.db)
         db = define_database_and_entities(provider='sqlite', filename=dbpath, create_db=True)
-        # db.bind(provider='sqlite', filename=dbpath, create_db=True)
-        # db.provider.converter_classes.append((Enum, EnumConverter))
-        # db.generate_mapping(create_tables=True)
     except BindingError as e:
         if e.args[0] != "Database object was already bound to SQLite provider":
             raise e
@@ -212,7 +194,6 @@ def main():
         if not ret:
             sys.exit(1)
         setDetailInDB(db, True)
-        downloadInDB(db, crxDir)
 
 
 if __name__ == "__main__":

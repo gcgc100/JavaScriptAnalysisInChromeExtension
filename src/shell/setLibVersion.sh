@@ -8,7 +8,7 @@ dataDir=$BASEDIR/../../data/
 database=$BASEDIR/../../data/data.db
 
 if [[ ! -z $1 ]]; then
-    if [[ $1 = "test" || $1 = "test2" ]]; then
+    if [[ $1 = "test" ]]; then
         dataDir=$BASEDIR/../../tests/shellTests/
         database=${dataDir}test.db
         if [[ ! -f "${dataDir}test.db" ]]; then

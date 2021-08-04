@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 import sys
@@ -38,7 +38,6 @@ class EnumConverter(StrConverter):
         # Any enum type can be used, so py_type ensures the correct one is used to create the enum instance
         return self.py_type[value]
 
-# db = Database()
 
 def define_database_and_entities(**db_params):
     db = Database(**db_params)

@@ -28,21 +28,6 @@ if [[ ! -z $1 ]]; then
             cp -R ${dataDir}crxTestData/crxFiles/ ${dataDir}crxFiles/
         fi
         crxDir=${dataDir}crxFiles/
-    elif [[ $1 = "test2" ]]; then
-        dataDir=$BASEDIR/../../tests/shellTests/
-        if [[ ! -f "${dataDir}test.db" ]]; then
-            cp ${dataDir}crxTestData/test.db ${dataDir}test.db
-        fi
-        database=${dataDir}test.db
-        extSrcDir=${dataDir}extSrc/
-        if [[ ! -d  "${dataDir}extSrc/" ]]; then
-            cp -R ${dataDir}extsrcTestData/extSrc/ ${dataDir}extSrc/
-        fi
-        scriptDir=${dataDir}scripts/
-        crxDir=${dataDir}crxFiles/
-        if [[ ! -d  "${dataDir}crxFiles/" ]]; then
-            cp -R ${dataDir}crxTestData/crxFiles/ ${dataDir}crxFiles/
-        fi
     else
         source $1
     fi

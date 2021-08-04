@@ -28,9 +28,3 @@ cleanTest:
 	rm -rf tests/shellTests/scripts
 	rm -rf tests/shellTests/extSrc
 	rm -rf tests/shellTests/cacheData
-
-testShell2:
-	bash src/shell/downloadCrx.sh test2 || exit 1
-	bash src/shell/unpackAllCrx.sh test2 || exit 1
-	bash src/shell/extractJSInc.sh test2 || exit 1
-	bash src/shell/setLibVersion.sh test2 || exit 1
