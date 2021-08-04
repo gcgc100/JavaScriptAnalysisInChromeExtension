@@ -1,0 +1,26 @@
+{
+  "p": {
+    "m":{
+      "link": "",
+      "message": "",
+      "messagedatenumerical": 0,
+      "expires": 0
+    }  
+  },
+  "t": {
+    "m": {
+      "link": "",
+      "message": "",
+      "messagedatenumerical": 0,
+      "expires": 0
+    }
+  },
+  "f": {
+    "m": {
+      "link": "https://www.texthelp.com/en-us/company/education-blog/october-2016/practice-reading-aloud-with-read-write-for-google",
+      "message": "New Practice Reading Aloud feature now available! Click here to learn more.",
+      "messagedatenumerical": 0,
+      "expires": 0
+    }
+  }
+}

@@ -3,6 +3,7 @@
 
 import unittest
 import os
+import shutil
 
 import SetVersion 
 
@@ -14,10 +15,11 @@ class TestSetVersion(unittest.TestCase):
     """Test SetVersion"""
 
     def setUp(self):
+        os.mkdir("jqueryServer")
         pass
 
     def tearDown(self):
-        pass
+        shutil.rmtree("jqueryServer")
 
     def test_simple_server(self):
         return

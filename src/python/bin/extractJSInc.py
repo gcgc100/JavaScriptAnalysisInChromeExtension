@@ -22,7 +22,7 @@ import Analyser
 from OrmDatabase import *
 
 @db_session
-def allPack(script_folder, static, dynamic, tarnish, extAnalysis, srcBasePath, crxBasePath):
+def allPack(script_folder, static, dynamic, tarnish, extAnalysis, srcBasePath, crxBasePath, db):
     """TODO: Docstring for allPack.
 
     :db_path: TODO
@@ -31,9 +31,7 @@ def allPack(script_folder, static, dynamic, tarnish, extAnalysis, srcBasePath, c
 
     """
     # __import__('pdb').set_trace()  # XXX BREAKPOINT
-    # eList = db.select("select * from extensionTable where downloadStatus = 1")
-    # eList = select(e for e in Extension if e.downloadStatus==1)
-    eList = select(e for e in Extension if (e.extensionId, e.downloadTime) in ((e.extensionId, max(e.downloadTime)) for e in Extension if e.downloadStatus==1))
+    eList = select(e for e in db.Extension if (e.extensionId, e.downloadTime) in ((e.extensionId, max(e.downloadTime)) for e in db.Extension if orm.raw_sql("e.extensionStatus=='{0}'".format(ExtensionStatus.Downloaded.name))))
     for e in eList:
         if not e.crxPath.startswith(crxBasePath):
             continue
@@ -42,10 +40,10 @@ def allPack(script_folder, static, dynamic, tarnish, extAnalysis, srcBasePath, c
             logger.info("{0} extension src code not exists".format(e.srcPath))
             continue
         logger.info("Start to analyse extension{0}, dbId:{1}".format(e.extensionId, e.id))
-        detect(e, script_folder, static, dynamic, tarnish, extAnalysis)
+        detect(db, e, script_folder, static, dynamic, tarnish, extAnalysis)
         logger.info("Extension{0} analysed".format(e.extensionId))
 
-def detect(extension, script_folder, static=True, dynamic=True, tarnish=True, extAnalysis=True, proxyDetection=False):
+def detect(db, extension, script_folder, static=True, dynamic=True, tarnish=True, extAnalysis=True, proxyDetection=False):
     """TODO: Docstring for detect.
 
     :extension: TODO
@@ -60,15 +58,16 @@ def detect(extension, script_folder, static=True, dynamic=True, tarnish=True, ex
     """
     e = extension
     if static:
-        Analyser.static_detect_javascript_in_html(e, script_folder)
-        Analyser.detect_background_scripts(e)
-        Analyser.detect_content_scripts(e)
+        Analyser.static_detect_javascript_in_html(e, script_folder, db)
+        Analyser.detect_background_scripts(e, db)
+        Analyser.detect_content_scripts(e, db)
+        e.analysedStatus = e.analysedStatus | AnalysedStatus.Static.value
     if dynamic:
-        Analyser.dynamic_detect_javascript_in_html(e, script_folder)
+        Analyser.dynamic_detect_javascript_in_html(e, script_folder, db)
     if tarnish:
-        Analyser.detect_with_tarnish(e)
+        Analyser.detect_with_tarnish(e, db)
     if extAnalysis:
-        Analyser.detect_with_extAnalysis(e)
+        Analyser.detect_with_extAnalysis(e, db)
     if proxyDetection:
         Analyser.proxy_detect_javascript_in_html(e, script_folder)
 
@@ -112,11 +111,10 @@ def main():
         crxPath = args.crxPath
 
         dbpath = os.path.abspath(args.db)
-        db.bind(provider='sqlite', filename=dbpath, create_db=True)
-        db.generate_mapping(create_tables=True)
+        db = define_database_and_entities(provider='sqlite', filename=dbpath, create_db=True)
 
         if args.cmd == "allPack":
-            allPack(args.script, args.static, args.dynamic, args.tarnish, args.extAnalysis, srcPath, crxPath)
+            allPack(args.script, args.static, args.dynamic, args.tarnish, args.extAnalysis, srcPath, crxPath, db)
         elif args.cmd == "oneExtension":
             with db_session:
                 if not srcPath.endswith("/"):
@@ -126,7 +124,7 @@ def main():
                     path = os.path.split(path)[0]
                 extension_id = os.path.split(path)[1]
                 assert re.match("[a-z]{32}", extension_id), "illegal extensionId"
-                extension = Extension(srcPath=args.srcPath, extensionId=extension_id, crxPath=crxPath)
+                extension = db.Extension(srcPath=args.srcPath, extensionId=extension_id, crxPath=crxPath)
                 script_folder = args.script
                 detect(e, script_folder, args.static, args.dynamic, args.tarnish, args.extAnalysis, args.proxyDetection)
     except KeyboardInterrupt as e:

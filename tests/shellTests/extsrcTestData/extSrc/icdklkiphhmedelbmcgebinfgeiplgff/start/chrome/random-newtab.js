@@ -1,0 +1,1 @@
+(function(e){if(e.location.search===""){chrome.runtime.sendMessage({getNewTabURL:true})}chrome.runtime.sendMessage({openNewTab:true})})(this);

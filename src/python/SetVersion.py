@@ -138,8 +138,10 @@ def set_all_version(library_type=None, database="../data/data.db"):
     """
     try:
         dbpath = os.path.abspath(database)
-        db.bind(provider='sqlite', filename=dbpath, create_db=True)
-        db.generate_mapping(create_tables=True)
+        db = define_database_and_entities(provider='sqlite', filename=dbpath, create_db=True)
+        # db.bind(provider='sqlite', filename=dbpath, create_db=True)
+        # db.provider.converter_classes.append((Enum, EnumConverter))
+        # db.generate_mapping(create_tables=True)
     except BindingError as e:
         if e.args[0] != "Database object was already bound to SQLite provider":
             raise e
@@ -155,7 +157,7 @@ def set_all_version(library_type=None, database="../data/data.db"):
     # allFiles = db.select("Select * from filetable where id not in (select fileid from (Select count(*) as c,fileid from LibraryTable group by fileid) where c=10)")
     # allFiles = select(jinc for jinc in JavaScriptInclusion for l in jinc.libraries if count(l)!=10)
     with db_session:
-        allFiles = select(j for j in JavaScriptInclusion if j.extension in (e for e in Extension if (e.extensionId, e.downloadTime) in ((e.extensionId, max(e.downloadTime)) for e in Extension)))[:]
+        allFiles = select(j for j in db.JavaScriptInclusion if j.extension in (e for e in db.Extension if (e.extensionId, e.downloadTime) in ((e.extensionId, max(e.downloadTime)) for e in db.Extension)))[:]
         # allFiles = JavaScriptInclusion.select()
         # allFiles = db.select("select * from filetable where id in (select fileid from LibraryTable where version = '100')")
         i = 10
@@ -194,10 +196,10 @@ def set_all_version(library_type=None, database="../data/data.db"):
                     if ver is None:
                         libInfo = None
                         continue
-                    libInfo = Library.get(libname=lib, version=ver)
+                    libInfo = db.Library.get(libname=lib, version=ver)
                     # libInfo = db.select("select * from LibraryInfoTable where libname=? and version=?", lib, "%s" % lib_array[lib])
                     if libInfo is None:
-                        libInfo = Library(libname=lib, version=ver)
+                        libInfo = db.Library(libname=lib, version=ver)
                         # libId = db.insert("LibraryInfoTable", commit=False, **{"version": "%s" % lib_array[lib], "libname": lib})[1]
                     libId = libInfo.id
                     f.libraries.add(libInfo)

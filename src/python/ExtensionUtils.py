@@ -52,7 +52,7 @@ def downloadExtList(extList, save_path=""):
     for ext in extList:
         downloadExt(ext)
 
-def unpackExtAndFilldb(eid, crxPath, extSrcPath):
+def unpackExtAndFilldb(eid, crxPath, extSrcPath, db):
     """TODO: Docstring for unpackExtAndFilldb.
 
     :database: TODO
@@ -60,7 +60,7 @@ def unpackExtAndFilldb(eid, crxPath, extSrcPath):
 
     """
     with db_session:
-        e = Extension.get(extensionId = eid, crxPath=crxPath)
+        e = db.Extension.get(extensionId = eid, crxPath=crxPath)
         assert(e is not None)
         e.srcPath = extSrcPath
         unpackExtension(crxPath, extSrcPath)
@@ -77,14 +77,15 @@ def unpackExtension(crxPath, extSrcPath):
     zip_contents.extractall(extSrcPath)
     zip_contents.close()
 
-def init_database(extensionIdJson):
+@db_session
+def init_database(extensionIdJson, db):
     """init database
     :returns: TODO
 
     """
-    addExtensionId(extensionIdJson)
+    addExtensionId(extensionIdJson, db)
 
-def addExtensionId(extensionIdJson):
+def addExtensionId(extensionIdJson, db):
     """Add the extension id in extensionIdJson file to sqlite database,
     if the extension id is in extensionIdExcluded, it will be ignored
 
@@ -97,8 +98,11 @@ def addExtensionId(extensionIdJson):
         extensionIdList = json.load(f)
     with db_session:
         for extensionId in extensionIdList:
-            extension = Extension(extensionId=extensionId, downloadStatus=0)
+            extension = db.Extension(extensionId=extensionId, 
+                    extensionStatus=ExtensionStatus.Init,
+                    analysedStatus=0)
 
+@db_session
 def setExtensionDetailForOne(extension):
     """Set the detail information for extension
 
@@ -110,9 +114,12 @@ def setExtensionDetailForOne(extension):
     detail = utils.getExtensionDetail(extension.webstoreUrl)
     if detail is None:
         logger.error("Getting %s detail failed" % eid)
+        logger.info("Get extension detail failed")
         ret = 0
     elif type(detail) == int:
         ret = detail
+        if ret == 404:
+            extension.extensionStatus = ExtensionStatus.UnPublished
     else:
         dateFmtStr = "%Y-%m-%d"
         # __import__('pdb').set_trace()  # XXX BREAKPOINT
@@ -129,19 +136,21 @@ def setExtensionDetailForOne(extension):
             detail["updateTime"] = datetime.datetime.strptime(detail["updateTime"], dateFmtStr)
             extension.set(**detail)
             extension.downloadTime = datetime.datetime.now()
-            extension.downloadStatus = 1
+            extension.extensionStatus = ExtensionStatus.Detailed
             logger.info("End of getting detail of %s" % eid)
             ret = 1
         elif curUpTime == newUpTime:
             ret = 2
+            logger.info("Extension already the newest")
         else:
             logger.warning("The updatetime in database is inconsistence.")
+            logger.info("Get extension detail failed")
             ret = 0
 
     return ret
 
 @db_session
-def setPermissionAllPack(extensionCollection):
+def setPermissionAllPack(extensionCollection, db):
     """TODO: Docstring for setPermissionAllPack.
 
     :extensionCollection: TODO
@@ -152,11 +161,11 @@ def setPermissionAllPack(extensionCollection):
     if os.path.isdir(extensionCollection):
         for eid in os.listdir(extensionCollection):
             extPath = os.path.join(extensionCollection, eid)
-            extension = Extension.get(extensionId=eid, srcPath=extPath)
+            extension = db.Extension.get(extensionId=eid, srcPath=extPath)
             permissions = extension.getPermissions()
             for p in permissions:
-                permission = ExtensionPermission.get(permission = p)
+                permission = db.ExtensionPermission.get(permission = p)
                 if permission is None:
-                    permission= ExtensionPermission(permission = p)
+                    permission= db.ExtensionPermission(permission = p)
                 permission.extensions.add(extension)
                 extension.permissions.add(permission)

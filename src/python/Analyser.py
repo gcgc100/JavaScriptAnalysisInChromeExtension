@@ -26,7 +26,7 @@ import utils
 import TarnishAnalyser as ta
 import ExtAnaAnalyser as ea
 
-def detect(extension, script_folder):
+def detect(extension, script_folder, db):
     """TODO: Docstring for detect.
 
     :extension: TODO
@@ -35,15 +35,15 @@ def detect(extension, script_folder):
     """
     e = extension
     if static:
-        static_detect_javascript_in_html(e, script_folder)
+        static_detect_javascript_in_html(e, script_folder, db)
     if dynamic:
-        dynamic_detect_javascript_in_html(e, script_folder)
+        dynamic_detect_javascript_in_html(e, script_folder, db)
     if tarnish:
-        detect_with_tarnish(e)
+        detect_with_tarnish(e, db)
     if extAnalysis:
-        detect_with_extAnalysis(e)
+        detect_with_extAnalysis(e, db)
 
-def detect_with_tarnish(extension):
+def detect_with_tarnish(extension, db):
     """Detect the vulnerable library with tarnish tool
 
     :extension: TODO
@@ -54,11 +54,11 @@ def detect_with_tarnish(extension):
     for r in ret:
         r["filepath"] = os.path.join(extension.srcPath, r["filepath"])
         loc = r["filepath"]
-        js = JavaScriptInclusion.select(lambda j: j.filepath==loc and
+        js = db.JavaScriptInclusion.select(lambda j: j.filepath==loc and
                 j.detectMethod==DetectMethod.Tarnish.value and
                 j.extension==extension)[:]
         if len(js) == 0:
-            js = JavaScriptInclusion(detectMethod=DetectMethod.Tarnish.value,
+            js = db.JavaScriptInclusion(detectMethod=DetectMethod.Tarnish.value,
                     filepath = loc,
                     extension = extension)
         else:
@@ -68,20 +68,21 @@ def detect_with_tarnish(extension):
         l = r["library"]
         libversion = l["version"]
         libname = l["libname"]
-        lib = Library.select(
+        lib = db.Library.select(
                 lambda x: x.version==libversion and x.libname==libname
                 )[:]
         if len(lib) == 0:
             # lib = Library(libname = libname,
             #         version = libversion)
-            lib = Library(**l)
+            lib = db.Library(**l)
         else:
             assert(len(lib) == 1)
             lib = lib[0]
         js.libraries.add(lib)
         lib.scripts.add(js)
+    extension.analysedStatus = extension.analysedStatus | AnalysedStatus.Tarnish.value
 
-def detect_with_extAnalysis(extension):
+def detect_with_extAnalysis(extension, db):
     """TODO: Docstring for detect_with_extAnalysis.
 
     :extension: TODO
@@ -91,18 +92,19 @@ def detect_with_extAnalysis(extension):
     ret = ea.ExtAnaAnalyser().analyseExtension(extension, headless=True)
     for r in ret:
         loc = os.path.join(extension.srcPath, r)
-        js = JavaScriptInclusion.select(lambda j: j.filepath==loc and 
+        js = db.JavaScriptInclusion.select(lambda j: j.filepath==loc and 
                 j.detectMethod==DetectMethod.ExtAnalysis.value and
                 j.extension==extension)[:]
         if len(js) == 0:
-            js = JavaScriptInclusion(detectMethod=DetectMethod.ExtAnalysis.value,
+            js = db.JavaScriptInclusion(detectMethod=DetectMethod.ExtAnalysis.value,
                     filepath = loc,
                     extension = extension)
         else:
             assert(len(js)==1)
             js = js[0]
+    extension.analysedStatus = extension.analysedStatus | AnalysedStatus.ExtAnalysis.value
 
-def detect_background_scripts(extension):
+def detect_background_scripts(extension, db):
     """Detect all background scripts in extension and set the scripts property in extension
 
     :extension: Must be Extension object
@@ -116,14 +118,14 @@ def detect_background_scripts(extension):
         else:
             filepath = os.path.join(extension.srcPath, background_script)
         filepath = os.path.abspath(filepath)
-        script = BackgroundScript(extension = extension,
+        script = db.BackgroundScript(extension = extension,
                 filepath = filepath,
                 detectMethod = DetectMethod.Static.value)
         script.hash = script.setHash()
         scripts.append(script)
     return scripts
 
-def detect_content_scripts(extension):
+def detect_content_scripts(extension, db):
     """Detect all ContentScripts in extension and set the scripts property in extension
 
     :extension: Must be Extension object
@@ -144,7 +146,7 @@ def detect_content_scripts(extension):
                 logger.error(e)
                 raise e
             filepath = os.path.abspath(filepath)
-            script = ContentScript(extension = extension,
+            script = db.ContentScript(extension = extension,
                     filepath = filepath,
                     detectMethod = DetectMethod.Static.value,
                     matches = matches,
@@ -152,7 +154,7 @@ def detect_content_scripts(extension):
             script.hash = script.setHash()
             scripts.append(script)
 
-def detect_javascript_in_html(extension, script_folder):
+def detect_javascript_in_html(extension, script_folder, db):
     """Detect all JavaScripts in html webpages and set the scripts property in extension
 
     :extension: Must be Extension object
@@ -160,7 +162,7 @@ def detect_javascript_in_html(extension, script_folder):
     :method: Detection method
 
     """
-    static_detect_javascript_in_html(extension, script_folder)
+    static_detect_javascript_in_html(extension, script_folder, db)
     dynamic_detect_javascript_in_html(extension, script_folder)
 
 def script_from_src(src):
@@ -202,7 +204,7 @@ def format_filename(s):
     filename = filename.replace(' ','_') # I don't like spaces in filenames.
     return filename
 
-def static_detect_javascript_in_html(extension, script_folder):
+def static_detect_javascript_in_html(extension, script_folder, db):
     """Detect all JavaScripts in html webpages with static method and set the scripts property in extension
 
     :extension: Must be Extension object
@@ -301,14 +303,14 @@ def static_detect_javascript_in_html(extension, script_folder):
             # Otherwise, aa/bb/../cc and aa/cc would be treated 
             # as different filepath
             filepath = os.path.abspath(filepath)
-            script = ExtensionWebpageScript(extension = extension,
+            script = db.ExtensionWebpageScript(extension = extension,
                     filepath = filepath,
                     detectMethod = DetectMethod.Static.value,
                     htmlPath = html_file)
             script.hash = script.setHash()
             script.url = src
 
-def dynamic_detect_javascript_in_html(extension, script_folder):
+def dynamic_detect_javascript_in_html(extension, script_folder, db):
     """Detect all JavaScripts in html webpages with dynamic method and set the scripts property in extension
 
     :extension: Must be Extension object
@@ -385,11 +387,11 @@ def dynamic_detect_javascript_in_html(extension, script_folder):
                     filepath = "/error:{0}".format(err)
                 else:
                     filename = os.path.basename(
-                            urlparse.urlparse(src).path)
+                            urlparse.urlparse(src).path)[:20]
                     filepath = os.path.join(script_data_path, 
                             extension.extensionId,
                             format_filename(html_file),
-                            format_filename(src),
+                            # format_filename(src),
                             filename)
                     filepath = os.path.abspath(filepath)
                     if not os.path.exists(
@@ -427,12 +429,13 @@ def dynamic_detect_javascript_in_html(extension, script_folder):
             # Otherwise, aa/bb/../cc and aa/cc would be treated 
             # as different filepath
             filepath = os.path.abspath(filepath)
-            script = ExtensionWebpageScript(extension = extension,
+            script = db.ExtensionWebpageScript(extension = extension,
                     filepath = filepath,
                     detectMethod = DetectMethod.Dynamic.value,
                     htmlPath = html_file)
             script.url = src
             script.hash = script.setHash()
+    extension.analysedStatus = extension.analysedStatus | AnalysedStatus.Dynamic.value
     if driver is not None:
         driver.close()
         driver.quit()

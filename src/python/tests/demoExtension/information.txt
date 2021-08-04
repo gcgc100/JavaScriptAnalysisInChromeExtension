@@ -1,0 +1,16 @@
+username:1234
+password:4567
+web:passport.jd.com
+
+username:4578
+password:tttfd
+web:weibo.com
+
+username:1234
+password:qwer
+web:passport.jd.com
+
+username:13345
+password:geeg
+web:weibo.com
+

@@ -11,7 +11,6 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait as Wait
 from selenium.common.exceptions import TimeoutException
 
-from OrmDatabase import *
 import mylogging
 logger = mylogging.logger
 

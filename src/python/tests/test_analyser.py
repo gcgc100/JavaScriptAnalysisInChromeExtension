@@ -16,8 +16,7 @@ sys.path.insert(0, parent_dir)
 # from python import Script
 
 import Analyser
-import Extension
-import Script
+from OrmDatabase import *
 
 class TestAnalyser(unittest.TestCase):
 
@@ -36,6 +35,7 @@ class TestAnalyser(unittest.TestCase):
             pass
     
     def test_proxy_detection(self):
+        return
         crxPath = os.path.join(current_dir, "testdata/demoChromeExtension/2.0.1.crx")
         srcPath = os.path.join(current_dir, "testdata/demoChromeExtension/ackklpppeabjfopekidhhdlhicdlgnib/2.0.1")
         extensionId = "aglpnpfajplhchagjjnkihgdmhjlakja"
@@ -43,6 +43,7 @@ class TestAnalyser(unittest.TestCase):
         Analyser.proxy_detect_javascript_in_html(extension, self.script_path)
 
     def test_parse_script_from_mitmproxy_log(self):
+        return
         log = 'Proxy server listening at http://*:8080\n127.0.0.1:33554: clientconnect\n127.0.0.1:33554: GET https://www.gstatic.com/chrome/intelligence/assist/ranker/models/translate/2017/03/translate_ranker_model_20170329.pb.bin HTTP/2.0\n              << 200  1.56k\n127.0.0.1:33556: clientconnect\n127.0.0.1:33558: clientconnect\n127.0.0.1:33556: GET https://lib.sinaapp.com/js/jquery/1.9.1/jquery-1.9.1.min.js\n              << 200 OK 32.01k\n'
         # log = "127.0.0.1:33554: GET https://www.gstatic.com/chrome/intelligence/assist/ranker/models/translate/2017/03/translate_ranker_model_20170329.pb.bin"
         log = log.split("\n")

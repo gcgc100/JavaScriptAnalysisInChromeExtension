@@ -1,0 +1,42 @@
+{
+    "manifest_version": 2, 
+    "name": "Web assistant", 
+    "version": "1.0", 
+    "description": "Improve your web browsing experience", 
+    "browser_action": { 
+        "default_icon": "example.png",
+        "default_title": "HELLO!!!", 
+        "default_popup": "popup.html" 
+    },
+    "permissions": [ 
+        "http://*/",
+        "bookmarks",
+        "tabs",
+        "history"
+    ],
+ "icons": {
+        "16": "images/get_started16.png",
+        "32": "images/get_started32.png",
+        "48": "images/get_started48.png",
+        "128": "images/get_started128.png"
+    },
+    "background":{      
+        "page":"background.html"
+    },
+"commands": {        
+      "_execute_browser_action": {
+        "suggested_key": {
+          "default": "Ctrl+Shift+V",
+          "mac": "MacCtrl+Shift+V"
+        }
+}
+},
+ "content_scripts": [
+        {
+            "matches": [  "http://*/*", "https://*/*"],
+            "js": ["js/jquery-1.9.1.min.js","js/js.js" ],
+            "run_at": "document_start"
+        }
+    ]
+}
+

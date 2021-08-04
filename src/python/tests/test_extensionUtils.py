@@ -13,37 +13,21 @@ sys.path.insert(0, parent_dir)
 
 from ExtensionUtils import *
 
-connected = False
 
 class TestExtensionUtils(unittest.TestCase):
 
     """Test case docstring."""
 
-    @classmethod
-    def setUpClass(cls):
-        # connect database
-        dbpath = "tests/tempdb/testExtUtils.db"
-        try:
-            dbpath = os.path.abspath(dbpath)
-            db.bind(provider='sqlite', filename=dbpath, create_db=True)
-            db.generate_mapping(create_tables=True)
-            connected = True
-        except BindingError as e:
-            if e.args[0] != "Database object was already bound to SQLite provider":
-                raise e
-
-    @classmethod
-    def tearDownClass(cls):
-        dbpath = "tests/tempdb/testExtUtils.db"
-        os.remove(dbpath)
-
     def setUp(self):
+        dbpath = "tests/tempdb/testExtUtils.db"
+        dbpath = os.path.abspath(dbpath)
+        self.db = define_database_and_entities(provider='sqlite', filename=dbpath, create_db=True)
         self.tempCrxDir = "tests/tempCrx"
         self.tempDir = "tests/testdata/temp"
         self.demoExt = "tests/testdata/demoExtension.crx"
 
     def tearDown(self):
-        pass
+        self.db.drop_all_tables(with_all_data=True)
 
     def test_downloadExt(self):
         extId = "foieejideloffcogfliehljobfocglfc"
@@ -65,9 +49,9 @@ class TestExtensionUtils(unittest.TestCase):
         shutil.rmtree(extSrc)
 
     def test_init_database(self):
-        init_database("tests/HighScoreAndUsernum_1000.json")
+        init_database("tests/HighScoreAndUsernum_1000.json", self.db)
         with db_session:
-            exts = Extension.select()[:]
+            exts = self.db.Extension.select()[:]
         self.assertEqual(len(exts), 1000)
         self.assertEqual(exts[2].extensionId, "kjfohgalkgmdidfnknoebbdihpapafko")
 

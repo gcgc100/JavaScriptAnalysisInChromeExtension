@@ -11,7 +11,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait as Wait
 from selenium.common.exceptions import TimeoutException
 
-from OrmDatabase import *
+# from OrmDatabase import *
 import mylogging
 logger = mylogging.logger
 
@@ -50,7 +50,7 @@ def analyseExtension(extension, headless=True):
             vulCount = int(vulCount)
             if vulCount == 0:
                 logger.info("No vulnerable library found")
-                return
+                return ret
             # if vulCount > 1:
             #     pass
             #     __import__("nose").tools.set_trace()
@@ -75,3 +75,4 @@ def analyseExtension(extension, headless=True):
         if driver is not None:
             driver.close()
             driver.quit()
+        return ret

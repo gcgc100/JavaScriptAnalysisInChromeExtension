@@ -1,0 +1,351 @@
+div#itw_panel_bar {
+	display: block;
+	height: 35px;
+	width: 330px;
+	-webkit-user-select: none;
+	position: fixed;
+	top: 0px;
+	left: 0px;
+	z-index: 99999999999999999995;
+	padding: 0px;
+	margin: 0px;
+	-webkit-box-sizing: content-box;
+	overflow: visible;	
+	border: 1px solid #9b9b9b;
+	background-color: #f5f5f5;
+	-moz-box-shadow: inset 0 1px 0 #fff;
+	-webkit-box-shadow: inset 0 1px 0 #fff;
+	box-shadow: inset 0 1px 0 #fff;
+	min-width: 0 !important;
+}
+
+div#itw_panel_bar > div {
+	display: inline;
+	overflow: visible;
+}
+
+div#itw_panel_bar div {
+	min-width: 0 !important;
+	margin: 0px;
+}
+
+div#itw_panel_bar div#itw_profile {
+	width: 35px;
+	float: left;
+	display: inline;
+}
+
+div#itw_panel_bar div.itw_transition {
+	background-image: url('chrome-extension://__MSG_@@extension_id__/images/sprite.png');
+	height: 35px;
+	width: 5px;
+	float: left;
+	display: inline;
+	background-position: -406px -36px; 
+}
+
+div#itw_panel_bar div.itw_move {
+	background-image: url('chrome-extension://__MSG_@@extension_id__/images/sprite.png');
+	height: 35px;
+	width: 15px;
+	float: right;
+	display: inline;
+	cursor: move;
+	background-position: -390px -36px;
+}
+
+div#itw_panel_bar div.itw_button {
+	background-image: url('chrome-extension://__MSG_@@extension_id__/images/sprite.png');
+	float: left;
+	width: 25px;
+	height: 26px;
+	display: inline;
+	margin: 5px 0px 0px 0px;
+	padding: 0px;
+	border: 0px none;
+	cursor: pointer;
+}
+
+div#itw_panel_bar div.itw_overlay {
+	position: absolute;
+	height: 100%;
+	left: 40px;
+	right: 15px;
+	z-index: 99999999999999999999;
+	background-color: #ffffff;
+	display: block;
+	opacity: 0.5;"
+}
+
+div#itw_panel_bar div#itw_login  {
+	background-image: url('chrome-extension://__MSG_@@extension_id__/images/sprite.png');
+	width: 35px;
+	height: 35px;
+	display: inline;
+	float: left;
+	cursor: pointer;
+}
+
+div#itw_panel_bar div#itw_login {
+	background-position: -360px 0px; 
+}
+
+div#itw_panel_bar div#itw_login:hover {
+	background-position: -396px 0px; 
+}
+
+div#itw_panel_bar div#itw_login a {
+	display: block;
+	width: 35px;
+	height: 35px;
+}
+
+div#itw_panel_bar div#itw_playpausetext {
+	margin-right: 3px;
+	background-position: -26px -71px;
+}
+div#itw_panel_bar div#itw_playpausetext:hover {
+	background-position: -52px -71px;
+}
+div#itw_panel_bar div#itw_playpausetext:active {
+	background-position: -78px -71px;	
+}
+
+div#itw_panel_bar div#itw_playpausetext.pause {
+	background-position: -208px -71px;	
+}
+div#itw_panel_bar div#itw_playpausetext.pause:hover {
+	background-position: -234px -71px;	
+}
+div#itw_panel_bar div#itw_playpausetext.pause:active {
+	background-position: -260px -71px;
+}
+
+div#itw_panel_bar div#itw_stoptext {
+	margin-right: 10px;
+	background-position: -130px -71px;
+}
+div#itw_panel_bar div#itw_stoptext:hover {
+	background-position: -156px -71px;	
+}
+div#itw_panel_bar div#itw_stoptext:active {
+	background-position: -182px -71px;	
+}
+
+div#itw_panel_bar div#itw_predictionsonoff {
+	background-image: url('chrome-extension://__MSG_@@extension_id__/images/predict_norm.gif'); 
+}
+div#itw_panel_bar div#itw_predictionsonoff:hover {
+	background-image: url('chrome-extension://__MSG_@@extension_id__/images/predict_over.gif'); 
+}
+div#itw_panel_bar div#itw_predictionsonoff:active {
+	background-image: url('chrome-extension://__MSG_@@extension_id__/images/predict_toggle.gif'); 
+}
+
+div#itw_panel_bar div#itw_speedslider {
+	width: 200px;
+	float: left;
+	position: relative;
+}
+
+div#itw_panel_bar div#itw_profile div.active {
+	width: 35px;
+	height: 35px;
+}
+
+div#itw_panel_bar div#itw_profile div.navprofile {
+	background-image:url('chrome-extension://__MSG_@@extension_id__/images/sprite.png');
+}
+
+div#itw_panel_bar div#itw_profile div.navprofile1.active {
+	background-position: 0px 0px;
+}
+div#itw_panel_bar div#itw_profile div.navprofile1.active:hover	{
+	background-position: -36px 0px;
+}
+
+div#itw_panel_bar div#itw_profile div.navprofile2.active {
+	background-position: -288px 0px;
+}
+div#itw_panel_bar div#itw_profile  div.navprofile2.active:hover	{
+	background-position: -324px 0px;
+}
+
+div#itw_panel_bar div#itw_profile div.navprofile3.active {
+	background-position: -72px 0px;
+}
+div#itw_panel_bar div#itw_profile  div.navprofile3.active:hover	{
+	background-position: -108px 0px;
+}
+
+div#itw_panel_bar div#itw_profile div.navprofile4.active {
+	background-position: -216px 0px;
+}
+div#itw_panel_bar div#itw_profile  div.navprofile4.active:hover	{
+	background-position: -252px 0px;
+}
+
+div#itw_panel_bar div#itw_profile div.navprofile5.active {
+	background-position: -144px 0px;
+}
+div#itw_panel_bar div#itw_profile  div.navprofile5.active:hover	{
+	background-position: -180px 0px;
+}
+
+/* de */
+div#itw_panel_bar div#itw_profile div.navprofile7.active {
+	background-position: -432px 0px;
+}
+div#itw_panel_bar div#itw_profile  div.navprofile7.active:hover	{
+	background-position: -468px 0px;
+}
+
+/* es1 female */
+div#itw_panel_bar div#itw_profile div.navprofile6.active {
+	background-position: -504px 0px;
+}
+div#itw_panel_bar div#itw_profile  div.navprofile6.active:hover	{
+	background-position: -540px 0px;
+}
+
+/* es2 male */
+div#itw_panel_bar div#itw_profile div.navprofile8.active {
+	background-position: -576px 0px;
+}
+div#itw_panel_bar div#itw_profile  div.navprofile8.active:hover	{
+	background-position: -612px 0px;
+}
+
+div#profilebox {
+    position: relative;
+}
+
+div#itw_panel_bar div#itw_profile div#profilebox ul {
+	list-style: none;
+	margin:0px; 
+    padding:0px; 
+}
+
+div#itw_panel_bar div#itw_profile div#profilebox ul li {
+	margin: 0px;
+	padding: 0px;
+}
+
+div#itw_panel_bar div#itw_profile div#profilebox ul li:before {
+	content: '';
+}
+
+div#itw_panel_bar div#itw_profile div#profilebox ul li a  
+{
+    margin:0px; 
+    padding:0px; 
+    border:0px; 
+    display:block; 
+    color:#FFFFFF; 
+    text-decoration:none; 
+    line-height:36px; 
+    font-weight:bold; 
+    background-repeat:no-repeat;
+	height: 34px;
+	width: 34px;
+	text-align: center;
+}
+
+div#itw_panel_bar div#itw_profile div#profilebox ul li a {
+	background-image: url('chrome-extension://__MSG_@@extension_id__/images/sprite.png');
+}
+
+div#itw_panel_bar div#itw_profile div#profilebox ul li a.profile1 {	
+	background-position: 0px -36px;
+}
+div#itw_panel_bar div#itw_profile div#profilebox ul li a.profile1:hover {
+	background-position: -36px -36px;
+}
+
+div#itw_panel_bar div#itw_profile div#profilebox ul li a.profile2 {
+	background-position: -288px -36px;
+}
+div#itw_panel_bar div#itw_profile div#profilebox ul li a.profile2:hover {
+	background-position: -324px -36px;
+}
+
+div#itw_panel_bar div#itw_profile div#profilebox ul li a.profile3 {
+	background-position: -72px -36px;
+}
+div#itw_panel_bar div#itw_profile div#profilebox ul li a.profile3:hover {
+	background-position: -108px -36px;
+}
+
+div#itw_panel_bar div#itw_profile div#profilebox ul li a.profile4 {
+	background-position: -216px -36px;
+}
+div#itw_panel_bar div#itw_profile div#profilebox ul li a.profile4:hover {
+	background-position: -252px -36px;
+}
+
+div#itw_panel_bar div#itw_profile div#profilebox ul li a.profile5 {
+	background-position: -144px -36px;
+}
+div#itw_panel_bar div#itw_profile div#profilebox ul li a.profile5:hover {
+	background-position: -180px -36px;
+}
+
+/* de */
+div#itw_panel_bar div#itw_profile div#profilebox ul li a.profile7 {
+	background-position: -432px -36px;
+}
+div#itw_panel_bar div#itw_profile div#profilebox ul li a.profile7:hover {
+	background-position: -468px -36px;
+}
+
+/* es1 female */
+div#itw_panel_bar div#itw_profile div#profilebox ul li a.profile6 {
+	background-position: -504px -36px;
+}
+div#itw_panel_bar div#itw_profile div#profilebox ul li a.profile6:hover {
+	background-position: -540px -36px;
+}
+
+/* es2 male */
+div#itw_panel_bar div#itw_profile div#profilebox ul li a.profile8 {
+	background-position: -576px -36px;
+}
+div#itw_panel_bar div#itw_profile div#profilebox ul li a.profile8:hover {
+	background-position: -612px -36px;
+}
+
+div#itw_speedslider.ui-slider-horizontal {
+    background: url('chrome-extension://__MSG_@@extension_id__/images/ui-sliderbg_12x7.png') repeat-x scroll 50% center transparent;
+    border: 0 none;
+    cursor: pointer;
+    height: 100%;
+	padding: 0px;
+}
+div#itw_speedslider.ui-slider {
+    text-align: left;
+}
+
+div#itw_speedslider.ui-slider-horizontal .ui-slider-handle {
+    top: 10px;
+}
+div#itw_speedslider.ui-slider .ui-slider-handle {
+    background-image: url('chrome-extension://__MSG_@@extension_id__/images/sprite.png');
+	background-position: -412px -36px;
+	border: 0 none;
+    cursor: pointer;
+    height: 14px;
+    margin: 0px 0px 0px -5px;
+	padding: 0px;
+    position: absolute;
+    width: 14px;
+    z-index: 2;
+	outline: medium none;
+}
+
+@media print
+{    
+    .no-print, .no-print *
+    {
+        display: none !important;
+    }
+}

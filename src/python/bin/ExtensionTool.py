@@ -27,87 +27,75 @@ logger = mylogging.logger
 gc_timeout = False
 
 @db_session
-def allPack(dbpath, extensionList, crxDir, archiveDir):
+def allPack(db, extensionList, crxDir, archiveDir, checkNewVersion=False):
     """All things together
 
     :dbpath: TODO
     :extensionList: TODO
     :crxDir: TODO
-    :archiveDir: TODO
+    :archiveDir: Unused, maybe for backup in the future
     :returns: TODO
 
     """
     os.makedirs(crxDir, exist_ok=True)
     os.makedirs(archiveDir, exist_ok=True)
     for d in os.listdir(extensionList):
-        ExtensionUtils.init_database(os.path.join(extensionList, d))
-    eList = select(extension for extension in Extension if extension.downloadStatus==0 and extension.updateTime is None)
-    for extension in eList:
-        eid = extension.extensionId
-        try:
-            retCode = ExtensionUtils.setExtensionDetailForOne(extension)
-            if retCode == 1:
-                try:
-                    downloadExt(eid, save_path=crxDir)
-                    extension.crxPath = os.path.join(crxDir, "{0}.crx".format(eid))
-                except Exception as e:
-                    logger.error(e)
-                    raise e
-            elif retCode == 0:
-                logger.info("Get extension detail failed")
-            elif retCode == 2:
-                logger.info("Extension already the newest")
-            elif retCode == 404:
-                extension.downloadStatus = retCode
-            else:
-                logger.error("Unexpected return when set detail:%s" % retCode)
-        except Exception as e:
-            logger.error(e)
-            extension.reset()
-            if e.args[0] == 'http error':
-                extension.downloadStatus = e.args[1]
-            continue
+        ExtensionUtils.init_database(os.path.join(extensionList, d), db)
+
+            # select(e for e in self.db.Extension if orm.raw_sql('e.extensionStatus=="Init"'))
+
+    setDetailInDB(db, checkNewVersion)
+    downloadInDB(db, crxDir)
 
 @db_session
-def downloadNewVersion(crxDir, archiveDir):
-    """TODO: Docstring for downloadNewVersion.
+def setDetailInDB(db, checkNewVersion=False):
+    if checkNewVersion:
+        eList = select(extension for extension in db.Extension if orm.raw_sql("extension.extensionStatus!='{0}'".format(
+            ExtensionStatus.UnPublished.name)))
+    else:
+        eList = select(extension for extension in db.Extension if orm.raw_sql("extension.extensionStatus=='{0}'".format(ExtensionStatus.Init.name)) and extension.updateTime is None)
 
-    :arg1: TODO
+    for extension in eList:
+        eid = extension.extensionId
+        with db_session:
+            try:
+                if extension.extensionStatus == ExtensionStatus.Init:
+                    retCode = ExtensionUtils.setExtensionDetailForOne(extension)
+                elif extension.extensionStatus == ExtensionStatus.UnPublished:
+                    pass
+                elif extension.extensionStatus in [ExtensionStatus.Detailed, ExtensionStatus.Downloaded]:
+                    newExt = db.Extension(extension)
+                    if newExt.updateTime == extension.updateTime:
+                        db.rollback()
+                else:
+                    assert False, "Unknown extension status with solution"
+            except Exception as e:
+                logger.error(e)
+                db.rollback()
+                continue
+
+@db_session
+def downloadInDB(db, crxDir):
+    """Download new extensions
+
+    :db: TODO
     :returns: TODO
 
     """
-    os.makedirs(crxDir, exist_ok=True)
-    os.makedirs(archiveDir, exist_ok=True)
-    eList = select(extension for extension in Extension)
-    #TODO: Should select the extensions without repeat. Now there are no repeat in db now, so no need to filter.
-    for e in eList:
-        eid = e.extensionId
-        extension = Extension(extensionId=eid, category=e.category, downloadStatus=0)
-        try:
-            retCode = ExtensionUtils.setExtensionDetailForOne(extension)
-            if retCode == 1:
-                try:
-                    downloadExt(eid, save_path=crxDir)
-                    extension.crxPath = os.path.join(crxDir, "{0}.crx".format(eid))
-                except Exception as e:
-                    logger.error(e)
-                    raise e
-            elif retCode == 0:
-                logger.info("Get extension detail failed")
-            elif retCode == 2:
-                logger.info("Extension already the newest")
-            elif retCode == 404:
-                extension.downloadStatus = retCode
-            else:
-                logger.error("Unexpected return when set detail:%s" % retCode)
-        except Exception as e:
-            logger.error(e)
-            extension.reset()
-            #TODO: The extension row should be removed instead of reset here
-            if e.args[0] == 'http error':
-                extension.downloadStatus = e.args[1]
-            continue
-
+    eList = select(extension for extension in db.Extension if orm.raw_sql("extension.extensionStatus=='{0}'".format(
+            ExtensionStatus.Detailed.name)))
+    for extension in eList:
+        eid = extension.extensionId
+        with db_session:
+            try:
+                downloadExt(eid, save_path=crxDir)
+                extension.crxPath = os.path.join(crxDir, "{0}.crx".format(eid))
+                extension.extensionStatus = ExtensionStatus.Downloaded
+            except Exception as e:
+                logger.error(e)
+                extension.extensionStatus = ExtensionStatus.Detailed
+                #TODO: Remove downloaded files when error occured
+                continue
 
 def main():
     parser = argparse.ArgumentParser("Add extension id to sqlite database")
@@ -135,14 +123,16 @@ def main():
     args = parser.parse_args()
     try:
         dbpath = os.path.abspath(args.db)
-        db.bind(provider='sqlite', filename=dbpath, create_db=True)
-        db.generate_mapping(create_tables=True)
+        db = define_database_and_entities(provider='sqlite', filename=dbpath, create_db=True)
+        # db.bind(provider='sqlite', filename=dbpath, create_db=True)
+        # db.provider.converter_classes.append((Enum, EnumConverter))
+        # db.generate_mapping(create_tables=True)
     except BindingError as e:
         if e.args[0] != "Database object was already bound to SQLite provider":
             raise e
     if args.cmd == "addExtensionId":
         ExtensionUtils.init_database(
-                args.extensionIdList)
+                args.extensionIdList, db)
     elif args.cmd == "setDetail":
         parametersToBeChecked = ["extensionId"]
         ret = True
@@ -152,7 +142,7 @@ def main():
                 ret = False
         if not ret:
             sys.exit(1)
-        exitCode = ExtensionUtils.setExtensionDetailForOne(args.db, args.extensionId)
+        exitCode = ExtensionUtils.setExtensionDetailForOne(db.Extension.get(extensionId=args.extensionId)[0])
         if exitCode == 1:
             exitCode = 0
         elif exitCode == 0:
@@ -168,7 +158,7 @@ def main():
         if not ret:
             sys.exit(1)
         logger.info("Set permission in sqlite databse for extensions")
-        ExtensionUtils.setPermissionAllPack(args.extensionCollection)
+        ExtensionUtils.setPermissionAllPack(args.extensionCollection, db)
         logger.info("Permissions are all set in sqlite databse")
     elif args.cmd == "resetExtension":
         parametersToBeChecked = ["extensionId"]
@@ -180,7 +170,7 @@ def main():
         if not ret:
             sys.exit(1)
         with db_session:
-            extension = Extension.get(extensionId=args.extensionId)
+            extension = db.Extension.get(extensionId=args.extensionId)
         extension.reset()
     elif args.cmd == "allPack":
         parametersToBeChecked = ["extensionIdList", "crxDir", "archiveDir"]
@@ -192,7 +182,7 @@ def main():
         if not ret:
             sys.exit(1)
             
-        allPack(args.db, args.extensionIdList, args.crxDir, args.archiveDir)
+        allPack(db, args.extensionIdList, args.crxDir, args.archiveDir)
     elif args.cmd == "unpack":
         parametersToBeChecked = ["crxDir", "extSrcDir"]
         ret = True
@@ -211,7 +201,7 @@ def main():
                 extSrcDir = os.path.join(extSrcRootDir, eid)
                 os.makedirs(extSrcDir, exist_ok=True)
                 ExtensionUtils.unpackExtAndFilldb(eid, os.path.join(crxDir, crx),
-                        extSrcDir)
+                        extSrcDir, db)
     elif args.cmd == "NewVersionDownload":
         parametersToBeChecked = ["crxDir", "archiveDir"]
         ret = True
@@ -221,7 +211,8 @@ def main():
                 ret = False
         if not ret:
             sys.exit(1)
-        downloadNewVersion(args.crxDir, args.archiveDir)
+        setDetailInDB(db, True)
+        downloadInDB(db, crxDir)
 
 
 if __name__ == "__main__":
