@@ -30,6 +30,7 @@ if [[ ! -z $1 ]]; then
         database=$BASEDIR/../../tests/shellTests/test.db
     else
         source $1
+        exit
     fi
 fi
 

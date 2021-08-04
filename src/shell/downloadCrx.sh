@@ -20,8 +20,15 @@ if [[ ! -z $1 ]]; then
         crxDir=$BASEDIR/../../tests/shellTests/crxFiles/
         database=$BASEDIR/../../tests/shellTests/test.db
         archive=$BASEDIR/../../tests/shellTests/archive/
+    elif [[ $1 = "testNewVersion" ]]; then
+        extensionIdList=$BASEDIR/../../tests/shellTests/exIdList/
+        crxDir=$BASEDIR/../../tests/shellTests/crxFiles/
+        database=$BASEDIR/../../tests/shellTests/test.db
+        cp $BASEDIR/../../tests/shellTests/crxTestData/testNewVersion.db $database
+        archive=$BASEDIR/../../tests/shellTests/archive/
     else
         source $1
+        exit
     fi
 fi
 
@@ -29,9 +36,11 @@ mkdir -p ${archive}crx/
 tmpData=$BASEDIR/../../data/tmpData
 mkdir -p $tmpData
 if [[ ! -z $1 ]]; then
-    if [[ $1 = "test2" ]]; then
+    if [[ $1 = "testNewVersion" ]]; then
         $PYTHON $BASEDIR/../python/bin/ExtensionTool.py NewVersionDownload $database --crxDir $crxDir --archiveDir $archive
     else
-        $PYTHON $BASEDIR/../python/bin/ExtensionTool.py allPack $database --extensionIdList $extensionIdList --crxDir $crxDir --archiveDir $archive
+        $PYTHON $BASEDIR/../python/bin/ExtensionTool.py allPack $database --crxDir $crxDir --archiveDir $archive
     fi
+else
+    $PYTHON $BASEDIR/../python/bin/ExtensionTool.py allPack $database --crxDir $crxDir --archiveDir $archive
 fi

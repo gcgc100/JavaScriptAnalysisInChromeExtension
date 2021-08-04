@@ -64,6 +64,7 @@ def unpackExtAndFilldb(eid, crxPath, extSrcPath, db):
         assert(e is not None)
         e.srcPath = extSrcPath
         unpackExtension(crxPath, extSrcPath)
+        e.extensionStatus = ExtensionStatus.Unpacked
 
 def unpackExtension(crxPath, extSrcPath):
     """TODO: Docstring for unpackExtension.
@@ -150,22 +151,21 @@ def setExtensionDetailForOne(extension):
     return ret
 
 @db_session
-def setPermissionAllPack(extensionCollection, db):
+def setPermissionAllPack(db):
     """TODO: Docstring for setPermissionAllPack.
 
     :extensionCollection: TODO
     :returns: TODO
 
     """
-    # Unknow error if without this line. 'NoneType' object has no attribute 'cursor'
-    if os.path.isdir(extensionCollection):
-        for eid in os.listdir(extensionCollection):
-            extPath = os.path.join(extensionCollection, eid)
-            extension = db.Extension.get(extensionId=eid, srcPath=extPath)
-            permissions = extension.getPermissions()
-            for p in permissions:
-                permission = db.ExtensionPermission.get(permission = p)
-                if permission is None:
-                    permission= db.ExtensionPermission(permission = p)
-                permission.extensions.add(extension)
-                extension.permissions.add(permission)
+    exts = select(e for e in db.Extension if 
+            orm.raw_sql("e.extensionStatus=='{0}'".format(ExtensionStatus.Unpacked.name)))
+    for extension in exts:
+        permissions = extension.getPermissions()
+        for p in permissions:
+            permission = db.ExtensionPermission.get(permission = p)
+            if permission is None:
+                permission= db.ExtensionPermission(permission = p)
+            permission.extensions.add(extension)
+            extension.permissions.add(permission)
+            extension.extensionStatus = ExtensionStatus.PermissionSetted

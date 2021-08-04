@@ -22,7 +22,7 @@ import Analyser
 from OrmDatabase import *
 
 @db_session
-def allPack(script_folder, static, dynamic, tarnish, extAnalysis, srcBasePath, crxBasePath, db):
+def allPack(script_folder, static, dynamic, tarnish, extAnalysis, srcBasePath, db):
     """TODO: Docstring for allPack.
 
     :db_path: TODO
@@ -30,18 +30,25 @@ def allPack(script_folder, static, dynamic, tarnish, extAnalysis, srcBasePath, c
     :returns: TODO
 
     """
-    # __import__('pdb').set_trace()  # XXX BREAKPOINT
-    eList = select(e for e in db.Extension if (e.extensionId, e.downloadTime) in ((e.extensionId, max(e.downloadTime)) for e in db.Extension if orm.raw_sql("e.extensionStatus=='{0}'".format(ExtensionStatus.Downloaded.name))))
+    eList = select(e for e in db.Extension)
+    # eList = select(e for e in db.Extension if (e.extensionId, e.downloadTime) in ((e.extensionId, max(e.downloadTime)) for e in db.Extension if orm.raw_sql("e.extensionStatus=='{0}'".format(ExtensionStatus.Unpacked.name))))
     for e in eList:
-        if not e.crxPath.startswith(crxBasePath):
+        if e.extensionStatus == ExtensionStatus.Init:
             continue
-        crxPath = e.crxPath
-        if not os.path.exists(e.srcPath):
-            logger.info("{0} extension src code not exists".format(e.srcPath))
+        if e.extensionStatus == ExtensionStatus.UnPublished:
             continue
-        logger.info("Start to analyse extension{0}, dbId:{1}".format(e.extensionId, e.id))
-        detect(db, e, script_folder, static, dynamic, tarnish, extAnalysis)
-        logger.info("Extension{0} analysed".format(e.extensionId))
+        if e.extensionStatus == ExtensionStatus.Detailed:
+            continue
+        if e.extensionStatus == ExtensionStatus.Downloaded:
+            continue
+        if e.extensionStatus == ExtensionStatus.Unpacked or e.extensionStatus == ExtensionStatus.PermissionSetted:
+            crxPath = e.crxPath
+            if not os.path.exists(e.srcPath):
+                logger.info("{0} extension src code not exists".format(e.srcPath))
+                continue
+            logger.info("Start to analyse extension{0}, dbId:{1}".format(e.extensionId, e.id))
+            detect(db, e, script_folder, static, dynamic, tarnish, extAnalysis)
+            logger.info("Extension{0} analysed".format(e.extensionId))
 
 def detect(db, extension, script_folder, static=True, dynamic=True, tarnish=True, extAnalysis=True, proxyDetection=False):
     """TODO: Docstring for detect.
@@ -114,7 +121,8 @@ def main():
         db = define_database_and_entities(provider='sqlite', filename=dbpath, create_db=True)
 
         if args.cmd == "allPack":
-            allPack(args.script, args.static, args.dynamic, args.tarnish, args.extAnalysis, srcPath, crxPath, db)
+            allPack(args.script, args.static, args.dynamic, 
+                    args.tarnish, args.extAnalysis, srcPath, db)
         elif args.cmd == "oneExtension":
             with db_session:
                 if not srcPath.endswith("/"):

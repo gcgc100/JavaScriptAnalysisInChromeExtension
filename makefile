@@ -1,10 +1,11 @@
 .PHONY: run testShell clean cleanTest
 
 run: 
-	bash src/shell/downloadCrx.sh
-	bash src/shell/unpackAllCrx.sh
-	bash src/shell/extractJSInc.sh
-	bash src/shell/setLibVersion.sh
+	bash src/shell/InitDatabase.sh || exit 1
+	bash src/shell/downloadCrx.sh || exit 1
+	bash src/shell/unpackAllCrx.sh || exit 1
+	bash src/shell/extractJSInc.sh || exit 1
+	bash src/shell/setLibVersion.sh || exit 1
 
 clean:
 	rm -rf data/archive
@@ -16,6 +17,7 @@ clean:
 	rm -rf data/tmpData
 
 testShell:
+	bash src/shell/InitDatabase.sh test || exit 1
 	bash src/shell/downloadCrx.sh test || exit 1
 	bash src/shell/unpackAllCrx.sh test || exit 1
 	bash src/shell/extractJSInc.sh test || exit 1 
@@ -28,3 +30,9 @@ cleanTest:
 	rm -rf tests/shellTests/scripts
 	rm -rf tests/shellTests/extSrc
 	rm -rf tests/shellTests/cacheData
+
+newVersionTest:
+	bash src/shell/downloadCrx.sh testNewVersion || exit 1
+	bash src/shell/unpackAllCrx.sh test || exit 1
+	bash src/shell/extractJSInc.sh test || exit 1 
+	bash src/shell/setLibVersion.sh test || exit 1

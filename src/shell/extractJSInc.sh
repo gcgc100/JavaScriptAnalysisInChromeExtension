@@ -30,6 +30,7 @@ if [[ ! -z $1 ]]; then
         crxDir=${dataDir}crxFiles/
     else
         source $1
+        exit
     fi
 fi
 
@@ -39,5 +40,5 @@ echo "time: $(date +%s)"
 mkdir -p ${scriptDir}
 
 echo "Analysing extension"
-$PYTHON $BASEDIR/../python/bin/ExtensionTool.py addPermission ${database} --extensionCollection ${extSrcDir}
+$PYTHON $BASEDIR/../python/bin/ExtensionTool.py addPermission ${database}
 $PYTHON $BASEDIR/../python/bin/extractJSInc.py allPack ${database} ${scriptDir} --static --dynamic --tarnish --srcPath ${extSrcDir} --crxPath ${crxDir}

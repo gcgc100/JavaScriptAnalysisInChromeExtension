@@ -15,7 +15,14 @@ from enum import Enum
 
 
 DetectMethod = Enum("DetectMethod", ("Dynamic", "Static", "Tarnish", "ExtAnalysis"))
-ExtensionStatus = Enum("ExtensionStatus", ("Init", "Detailed", "Downloaded", "UnPublished"))
+
+class ExtensionStatus(Enum):
+    Init = 1 
+    Detailed = 2
+    Downloaded = 3
+    Unpacked = 4
+    UnPublished = 5
+    PermissionSetted = 6
 
 class AnalysedStatus(Enum):
     Static = 1 << 0

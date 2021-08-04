@@ -25,6 +25,9 @@ if [[ ! -z $1 ]]; then
         if [[ ! -d  "${dataDir}crxFiles/" ]]; then
             cp -R ${dataDir}crxTestData/crxFiles/ ${dataDir}crxFiles/
         fi
+    else
+        source $1
+        exit
     fi
 fi
 
