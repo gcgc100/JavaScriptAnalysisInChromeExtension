@@ -72,7 +72,6 @@ def define_database_and_entities(**db_params):
         scripts      = Set("JavaScriptInclusion")
         permissions  = Set("ExtensionPermission")
 
-
         @property
         def manifest(self):
             # __import__('pdb').set_trace()  # XXX BREAKPOINT

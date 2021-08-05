@@ -62,20 +62,23 @@ def setDetailAndDownloadInDB(db, crxDir, checkNewVersion=False):
                     extension.extensionStatus = ExtensionStatus.Downloaded
                 elif extension.extensionStatus == ExtensionStatus.UnPublished:
                     pass
-                elif extension.extensionStatus in [ExtensionStatus.Detailed, ExtensionStatus.Downloaded]:
+                elif extension.extensionStatus in [ExtensionStatus.Detailed, ExtensionStatus.Downloaded, ExtensionStatus.Unpacked, ExtensionStatus.PermissionSetted]:
                     if checkNewVersion:
-                        newExt = db.Extension(extension)
+                        newExt = db.Extension(extensionId = extension.extensionId)
                         newExt.analysedStatus = 0
                         newExt.extensionStatus = ExtensionStatus.Init
                         retCode = ExtensionUtils.setExtensionDetailForOne(newExt)
-                        if newExt.updateTime == extension.updateTime:
+                        if newExt.version == extension.version:
+                            __import__('pdb').set_trace()  # XXX BREAKPOINT
                             db.rollback()
                         else:
                             crxDirTmp = os.path.join(crxDir, eid)
                             os.makedirs(crxDirTmp, exist_ok=True)
+                            fileName = newExt.version.replace(".", "-")
                             downloadExt(eid, name=fileName, save_path=crxDirTmp)
-                            extension.crxPath = os.path.join(crxDirTmp, "{0}.crx".format(fileName))
+                            newExt.crxPath = os.path.join(crxDirTmp, "{0}.crx".format(fileName))
                             newExt.extensionStatus = ExtensionStatus.Downloaded
+                            db.commit()
                 else:
                     assert False, "Unknown extension status with solution"
             except Exception as e:

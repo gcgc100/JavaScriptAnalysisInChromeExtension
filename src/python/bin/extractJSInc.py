@@ -65,16 +65,20 @@ def detect(db, extension, script_folder, static=True, dynamic=True, tarnish=True
     """
     e = extension
     if static:
-        Analyser.static_detect_javascript_in_html(e, script_folder, db)
-        Analyser.detect_background_scripts(e, db)
-        Analyser.detect_content_scripts(e, db)
-        e.analysedStatus = e.analysedStatus | AnalysedStatus.Static.value
+        if extension.analysedStatus & AnalysedStatus.Static.value != 0:
+            Analyser.static_detect_javascript_in_html(e, script_folder, db)
+            Analyser.detect_background_scripts(e, db)
+            Analyser.detect_content_scripts(e, db)
+            e.analysedStatus = e.analysedStatus | AnalysedStatus.Static.value
     if dynamic:
-        Analyser.dynamic_detect_javascript_in_html(e, script_folder, db)
+        if extension.analysedStatus & AnalysedStatus.Dynamic.value != 0:
+            Analyser.dynamic_detect_javascript_in_html(e, script_folder, db)
     if tarnish:
-        Analyser.detect_with_tarnish(e, db)
+        if extension.analysedStatus & AnalysedStatus.Tarnish.value != 0:
+            Analyser.detect_with_tarnish(e, db)
     if extAnalysis:
-        Analyser.detect_with_extAnalysis(e, db)
+        if extension.analysedStatus & AnalysedStatus.ExtAnalysis.value != 0:
+            Analyser.detect_with_extAnalysis(e, db)
     if proxyDetection:
         Analyser.proxy_detect_javascript_in_html(e, script_folder)
 
