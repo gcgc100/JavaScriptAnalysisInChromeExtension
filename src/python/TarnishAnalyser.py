@@ -17,6 +17,8 @@ logger = mylogging.logger
 
 
 def analyseExtension(extension, headless=True):
+    #TODO: Tarnish analyse the extension online. So it only analyse the newest extension.
+    # How to make sure current extnsion item in database is the newest one
     logger.info("Tarnish anaysis start for {0}(DBID:{1})".format(extension.extensionId, extension.id))
     chrome_options = Options()
     if headless:

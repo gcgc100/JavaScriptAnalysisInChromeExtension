@@ -15,7 +15,6 @@ shopt -s nullglob
 BASEDIR=$(dirname "$BASH_SOURCE")
 PYTHON=python3
 
-crxDir=$BASEDIR/../../data/crxFiles/
 extSrcDir=$BASEDIR/../../data/extSrc/
 database=$BASEDIR/../../data/data.db
 
@@ -25,7 +24,6 @@ if [[ ! -z $1 ]]; then
         if [[ ! -d "$BASEDIR/../../tests/shellTests/crxFiles/" ]]; then
             cp -R $BASEDIR/../../tests/shellTests/crxTestData/crxFiles/ $BASEDIR/../../tests/shellTests/crxFiles
         fi
-        crxDir=$BASEDIR/../../tests/shellTests/crxFiles/
         extSrcDir=$BASEDIR/../../tests/shellTests/extSrc/
         database=$BASEDIR/../../tests/shellTests/test.db
     else
@@ -36,4 +34,4 @@ fi
 
 rm -rf /tmp/.org.chromium.Chromium.*
 echo "Start to unpack extensions"
-$PYTHON $BASEDIR/../python/bin/ExtensionTool.py unpack ${database} --crxDir ${crxDir} --extSrcDir $extSrcDir
+$PYTHON $BASEDIR/../python/bin/ExtensionTool.py unpackAllInDB ${database} --extSrcDir $extSrcDir

@@ -40,57 +40,14 @@ def allPack(db, crxDir, archiveDir, checkNewVersion=False):
     os.makedirs(archiveDir, exist_ok=True)
 
     # The setDetail and download must be done together in case the downloaded extension miss match the extension detail
-    setDetailAndDownloadInDB(db, crxDir, checkNewVersion)
+    ExtensionUtils.setDetailAndDownloadInDB(db, crxDir, checkNewVersion)
     # downloadInDB(db, crxDir)
-
-@db_session
-def setDetailAndDownloadInDB(db, crxDir, checkNewVersion=False):
-    eList = select(extension for extension in db.Extension if orm.raw_sql("extension.extensionStatus!='{0}'".format(
-            ExtensionStatus.UnPublished.name)))
-
-    for extension in eList:
-        eid = extension.extensionId
-        with db_session:
-            try:
-                if extension.extensionStatus == ExtensionStatus.Init:
-                    retCode = ExtensionUtils.setExtensionDetailForOne(extension)
-                    crxDirTmp = os.path.join(crxDir, eid)
-                    os.makedirs(crxDirTmp, exist_ok=True)
-                    fileName = extension.version.replace(".", "-")
-                    downloadExt(eid, name=fileName, save_path=crxDirTmp)
-                    extension.crxPath = os.path.join(crxDirTmp, "{0}.crx".format(fileName))
-                    extension.extensionStatus = ExtensionStatus.Downloaded
-                elif extension.extensionStatus == ExtensionStatus.UnPublished:
-                    pass
-                elif extension.extensionStatus in [ExtensionStatus.Detailed, ExtensionStatus.Downloaded, ExtensionStatus.Unpacked, ExtensionStatus.PermissionSetted]:
-                    if checkNewVersion:
-                        newExt = db.Extension(extensionId = extension.extensionId)
-                        newExt.analysedStatus = 0
-                        newExt.extensionStatus = ExtensionStatus.Init
-                        retCode = ExtensionUtils.setExtensionDetailForOne(newExt)
-                        if newExt.version == extension.version:
-                            __import__('pdb').set_trace()  # XXX BREAKPOINT
-                            db.rollback()
-                        else:
-                            crxDirTmp = os.path.join(crxDir, eid)
-                            os.makedirs(crxDirTmp, exist_ok=True)
-                            fileName = newExt.version.replace(".", "-")
-                            downloadExt(eid, name=fileName, save_path=crxDirTmp)
-                            newExt.crxPath = os.path.join(crxDirTmp, "{0}.crx".format(fileName))
-                            newExt.extensionStatus = ExtensionStatus.Downloaded
-                            db.commit()
-                else:
-                    assert False, "Unknown extension status with solution"
-            except Exception as e:
-                logger.error(e)
-                db.rollback()
-                continue
 
 def main():
     parser = argparse.ArgumentParser("Add extension id to sqlite database")
     parser.add_argument("cmd",
             choices = ["addExtensionId", "SetDetail", "addPermission", 
-                "resetExtension", "allPack", "unpack", "NewVersionDownload"],
+                "resetExtension", "allPack", "unpackAllInDB", "NewVersionDownload"],
             help="The command to be used")
     parser.add_argument("db", help="sqlite database")
     parser.add_argument("--extensionIdList",
@@ -119,9 +76,7 @@ def main():
     if args.cmd == "addExtensionId":
         extensionList = args.extensionIdList
         for d in os.listdir(extensionList):
-            ExtensionUtils.init_database(os.path.join(extensionList, d), db)
-        # ExtensionUtils.init_database(
-        #         args.extensionIdList, db)
+            ExtensionUtils.init_database(db, os.path.join(extensionList, d))
     elif args.cmd == "setDetail":
         parametersToBeChecked = ["extensionId"]
         ret = True
@@ -172,8 +127,8 @@ def main():
             sys.exit(1)
             
         allPack(db, args.crxDir, args.archiveDir)
-    elif args.cmd == "unpack":
-        parametersToBeChecked = ["crxDir", "extSrcDir"]
+    elif args.cmd == "unpackAllInDB":
+        parametersToBeChecked = ["extSrcDir"]
         ret = True
         for p in parametersToBeChecked:
             if getattr(args, p) is None:
@@ -181,17 +136,17 @@ def main():
                 ret = False
         if not ret:
             sys.exit(1)
-        crxDir = args.crxDir
-        extSrcRootDir = args.extSrcDir
-        for eid in os.listdir(crxDir):
-            for crx in os.listdir(os.path.join(crxDir, eid)):
-                if crx.endswith(".crx"):
-                    version = crx[:-4]
-                    assert(len(eid)==32)
-                    extSrcDir = os.path.join(extSrcRootDir, eid, version)
-                    os.makedirs(extSrcDir, exist_ok=True)
-                    ExtensionUtils.unpackExtAndFilldb(eid, os.path.join(crxDir, eid, crx),
-                            extSrcDir, db)
+        with db_session:
+            exts = select(e for e in db.Extension if 
+                    orm.raw_sql("e.extensionStatus=='{0}'".format(ExtensionStatus.Downloaded.name)))
+            extSrcRootDir = args.extSrcDir
+            for e in exts:
+                crxDir = e.crxPath
+                extSrcPath = e.generateExtSrcPath(extSrcRootDir)
+                os.makedirs(extSrcPath, exist_ok=True)
+                ExtensionUtils.unpackExtension(e.crxPath, extSrcPath)
+                e.extensionStatus = ExtensionStatus.Unpacked
+                e.srcPath = extSrcPath
     elif args.cmd == "NewVersionDownload":
         parametersToBeChecked = ["crxDir", "archiveDir"]
         ret = True

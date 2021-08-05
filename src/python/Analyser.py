@@ -26,7 +26,7 @@ import utils
 import TarnishAnalyser as ta
 import ExtAnaAnalyser as ea
 
-def detect(extension, script_folder, db):
+def detect(db, extension, script_folder):
     """TODO: Docstring for detect.
 
     :extension: TODO
@@ -35,15 +35,15 @@ def detect(extension, script_folder, db):
     """
     e = extension
     if static:
-        static_detect_javascript_in_html(e, script_folder, db)
+        static_detect_javascript_in_html(db, e, script_folder)
     if dynamic:
-        dynamic_detect_javascript_in_html(e, script_folder, db)
+        dynamic_detect_javascript_in_html(db, e, script_folder)
     if tarnish:
-        detect_with_tarnish(e, db)
+        detect_with_tarnish(db, e)
     if extAnalysis:
-        detect_with_extAnalysis(e, db)
+        detect_with_extAnalysis(db, e)
 
-def detect_with_tarnish(extension, db):
+def detect_with_tarnish(db, extension):
     """Detect the vulnerable library with tarnish tool
 
     :extension: TODO
@@ -82,7 +82,7 @@ def detect_with_tarnish(extension, db):
         lib.scripts.add(js)
     extension.analysedStatus = extension.analysedStatus | AnalysedStatus.Tarnish.value
 
-def detect_with_extAnalysis(extension, db):
+def detect_with_extAnalysis(db, extension):
     """TODO: Docstring for detect_with_extAnalysis.
 
     :extension: TODO
@@ -104,7 +104,7 @@ def detect_with_extAnalysis(extension, db):
             js = js[0]
     extension.analysedStatus = extension.analysedStatus | AnalysedStatus.ExtAnalysis.value
 
-def detect_background_scripts(extension, db):
+def detect_background_scripts(db, extension):
     """Detect all background scripts in extension and set the scripts property in extension
 
     :extension: Must be Extension object
@@ -125,7 +125,7 @@ def detect_background_scripts(extension, db):
         scripts.append(script)
     return scripts
 
-def detect_content_scripts(extension, db):
+def detect_content_scripts(db, extension):
     """Detect all ContentScripts in extension and set the scripts property in extension
 
     :extension: Must be Extension object
@@ -154,7 +154,7 @@ def detect_content_scripts(extension, db):
             script.hash = script.setHash()
             scripts.append(script)
 
-def detect_javascript_in_html(extension, script_folder, db):
+def detect_javascript_in_html(db, extension, script_folder):
     """Detect all JavaScripts in html webpages and set the scripts property in extension
 
     :extension: Must be Extension object
@@ -162,7 +162,7 @@ def detect_javascript_in_html(extension, script_folder, db):
     :method: Detection method
 
     """
-    static_detect_javascript_in_html(extension, script_folder, db)
+    static_detect_javascript_in_html(db, extension, script_folder)
     dynamic_detect_javascript_in_html(extension, script_folder)
 
 def script_from_src(src):
@@ -204,7 +204,7 @@ def format_filename(s):
     filename = filename.replace(' ','_') # I don't like spaces in filenames.
     return filename
 
-def static_detect_javascript_in_html(extension, script_folder, db):
+def static_detect_javascript_in_html(db, extension, script_folder):
     """Detect all JavaScripts in html webpages with static method and set the scripts property in extension
 
     :extension: Must be Extension object
@@ -310,7 +310,7 @@ def static_detect_javascript_in_html(extension, script_folder, db):
             script.hash = script.setHash()
             script.url = src
 
-def dynamic_detect_javascript_in_html(extension, script_folder, db):
+def dynamic_detect_javascript_in_html(db, extension, script_folder):
     """Detect all JavaScripts in html webpages with dynamic method and set the scripts property in extension
 
     :extension: Must be Extension object

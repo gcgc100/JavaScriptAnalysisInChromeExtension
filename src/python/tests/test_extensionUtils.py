@@ -6,10 +6,7 @@ import os
 import shutil
 import inspect
 import unittest
-
-current_dir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
-parent_dir = os.path.dirname(current_dir)
-sys.path.insert(0, parent_dir) 
+from datetime import datetime
 
 from ExtensionUtils import *
 
@@ -17,6 +14,30 @@ from ExtensionUtils import *
 class TestExtensionUtils(unittest.TestCase):
 
     """Test case docstring."""
+    @db_session
+    def fill_database(self):
+        self.db.Extension(extensionId="1", 
+                downloadTime = datetime.datetime.fromisoformat('2011-11-04'), 
+                version = "1.0",
+                extensionStatus = ExtensionStatus.PermissionSetted,
+                analysedStatus = 3)
+        self.db.Extension(extensionId="1", 
+                downloadTime = datetime.datetime.fromisoformat('2012-11-04'), 
+                version = "1.1",
+                extensionStatus = ExtensionStatus.PermissionSetted,
+                analysedStatus = 3)
+        self.db.Extension(extensionId="1", 
+                downloadTime = datetime.datetime.fromisoformat('2015-11-04'), 
+                extensionStatus = ExtensionStatus.UnPublished,
+                analysedStatus = 0)
+        self.db.Extension(extensionId="2",
+                downloadTime = datetime.datetime.fromisoformat('2012-11-04'), 
+                extensionStatus = ExtensionStatus.Init
+                )
+        self.db.Extension(extensionId="3",
+                downloadTime = datetime.datetime.fromisoformat('2012-11-04'), 
+                extensionStatus = ExtensionStatus.Init
+                )
 
     def setUp(self):
         dbpath = "tests/tempdb/testExtUtils.db"
@@ -49,7 +70,7 @@ class TestExtensionUtils(unittest.TestCase):
         shutil.rmtree(extSrc)
 
     def test_init_database(self):
-        init_database("tests/HighScoreAndUsernum_1000.json", self.db)
+        init_database(self.db, "tests/HighScoreAndUsernum_1000.json")
         with db_session:
             exts = self.db.Extension.select()[:]
         self.assertEqual(len(exts), 1000)
@@ -58,3 +79,11 @@ class TestExtensionUtils(unittest.TestCase):
     def test_setDetailForOne(self):
         # TODO:
         pass
+
+    def test_extension(self):
+        self.fill_database()
+        with db_session:
+            exts = selectExtension(self.db)[:]
+        for e in exts:
+            print(e)
+        self.assertEqual(len(exts), 3)

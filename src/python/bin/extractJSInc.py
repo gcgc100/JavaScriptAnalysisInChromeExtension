@@ -22,7 +22,7 @@ import Analyser
 from OrmDatabase import *
 
 @db_session
-def allPack(script_folder, static, dynamic, tarnish, extAnalysis, srcBasePath, db):
+def allPack(db, script_folder, static, dynamic, tarnish, extAnalysis, srcBasePath):
     """TODO: Docstring for allPack.
 
     :db_path: TODO
@@ -30,8 +30,8 @@ def allPack(script_folder, static, dynamic, tarnish, extAnalysis, srcBasePath, d
     :returns: TODO
 
     """
-    eList = select(e for e in db.Extension)
-    # eList = select(e for e in db.Extension if (e.extensionId, e.downloadTime) in ((e.extensionId, max(e.downloadTime)) for e in db.Extension if orm.raw_sql("e.extensionStatus=='{0}'".format(ExtensionStatus.Unpacked.name))))
+    # eList = select(e for e in db.Extension)
+    eList = select(e for e in db.Extension if (e.extensionId, e.downloadTime) in ((e.extensionId, max(e.downloadTime)) for e in db.Extension))
     for e in eList:
         if e.extensionStatus == ExtensionStatus.Init:
             continue
@@ -65,20 +65,20 @@ def detect(db, extension, script_folder, static=True, dynamic=True, tarnish=True
     """
     e = extension
     if static:
-        if extension.analysedStatus & AnalysedStatus.Static.value != 0:
-            Analyser.static_detect_javascript_in_html(e, script_folder, db)
-            Analyser.detect_background_scripts(e, db)
-            Analyser.detect_content_scripts(e, db)
+        if extension.analysedStatus & AnalysedStatus.Static.value == 0:
+            Analyser.static_detect_javascript_in_html(db, e, script_folder)
+            Analyser.detect_background_scripts(db, e)
+            Analyser.detect_content_scripts(db, e)
             e.analysedStatus = e.analysedStatus | AnalysedStatus.Static.value
     if dynamic:
-        if extension.analysedStatus & AnalysedStatus.Dynamic.value != 0:
-            Analyser.dynamic_detect_javascript_in_html(e, script_folder, db)
+        if extension.analysedStatus & AnalysedStatus.Dynamic.value == 0:
+            Analyser.dynamic_detect_javascript_in_html(db, e, script_folder)
     if tarnish:
-        if extension.analysedStatus & AnalysedStatus.Tarnish.value != 0:
-            Analyser.detect_with_tarnish(e, db)
+        if extension.analysedStatus & AnalysedStatus.Tarnish.value == 0:
+            Analyser.detect_with_tarnish(db, e)
     if extAnalysis:
-        if extension.analysedStatus & AnalysedStatus.ExtAnalysis.value != 0:
-            Analyser.detect_with_extAnalysis(e, db)
+        if extension.analysedStatus & AnalysedStatus.ExtAnalysis.value == 0:
+            Analyser.detect_with_extAnalysis(db, e)
     if proxyDetection:
         Analyser.proxy_detect_javascript_in_html(e, script_folder)
 
@@ -125,8 +125,8 @@ def main():
         db = define_database_and_entities(provider='sqlite', filename=dbpath, create_db=True)
 
         if args.cmd == "allPack":
-            allPack(args.script, args.static, args.dynamic, 
-                    args.tarnish, args.extAnalysis, srcPath, db)
+            allPack(db, args.script, args.static, args.dynamic, 
+                    args.tarnish, args.extAnalysis, srcPath)
         elif args.cmd == "oneExtension":
             with db_session:
                 if not srcPath.endswith("/"):

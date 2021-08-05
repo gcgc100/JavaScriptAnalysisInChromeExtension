@@ -72,6 +72,10 @@ def define_database_and_entities(**db_params):
         scripts      = Set("JavaScriptInclusion")
         permissions  = Set("ExtensionPermission")
 
+        def __str__(self):
+            return "id:{0}, version:{1}, dtime:{2}".format(self.extensionId,
+                    self.version,
+                    self.downloadTime)
         @property
         def manifest(self):
             # __import__('pdb').set_trace()  # XXX BREAKPOINT
@@ -102,6 +106,12 @@ def define_database_and_entities(**db_params):
         @property
         def htmlFiles(self):
             return self._find_files_with_ext(".html")
+
+        def generateCrxPath(self, crxRootDir):
+            return os.path.join(crxRootDir, self.extensionId, self.version.replace(".", "-"))
+
+        def generateExtSrcPath(self, extSrcRootDir):
+            return os.path.join(extSrcRootDir, self.extensionId, self.version.replace(".", "-"))
 
         def _find_files_with_ext(self, file_ext):
             """Find all the files with certain ext in this extension source code

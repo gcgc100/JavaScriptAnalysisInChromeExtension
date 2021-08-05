@@ -37,7 +37,6 @@ def downloadExt(id, name="", save_path=""):
         return save_name
     except urllib.error.HTTPError as e:
         if e.reason == 'error-invalidAppId':
-            __import__('pdb').set_trace()  # XXX BREAKPOINT
             with open(os.path.dirname(save_path)+"/unexistExt.md", 'a') as f: 
                 f.write(ext_id + "\n")
         else:
@@ -52,20 +51,6 @@ def downloadExtList(extList, save_path=""):
     for ext in extList:
         downloadExt(ext)
 
-def unpackExtAndFilldb(eid, crxPath, extSrcPath, db):
-    """TODO: Docstring for unpackExtAndFilldb.
-
-    :database: TODO
-    :returns: TODO
-
-    """
-    with db_session:
-        e = db.Extension.get(extensionId = eid, crxPath=crxPath)
-        assert(e is not None)
-        e.srcPath = extSrcPath
-        unpackExtension(crxPath, extSrcPath)
-        e.extensionStatus = ExtensionStatus.Unpacked
-
 def unpackExtension(crxPath, extSrcPath):
     """TODO: Docstring for unpackExtension.
 
@@ -79,14 +64,14 @@ def unpackExtension(crxPath, extSrcPath):
     zip_contents.close()
 
 @db_session
-def init_database(extensionIdJson, db):
+def init_database(db, extensionIdJson):
     """init database
     :returns: TODO
 
     """
-    addExtensionId(extensionIdJson, db)
+    addExtensionId(db, extensionIdJson)
 
-def addExtensionId(extensionIdJson, db):
+def addExtensionId(db, extensionIdJson):
     """Add the extension id in extensionIdJson file to sqlite database,
     if the extension id is in extensionIdExcluded, it will be ignored
 
@@ -123,7 +108,6 @@ def setExtensionDetailForOne(extension):
             extension.extensionStatus = ExtensionStatus.UnPublished
     else:
         dateFmtStr = "%Y-%m-%d"
-        # __import__('pdb').set_trace()  # XXX BREAKPOINT
         if extension.updateTime is None:
             curUpTime = None
         else:
@@ -169,3 +153,63 @@ def setPermissionAllPack(db):
             permission.extensions.add(extension)
             extension.permissions.add(permission)
             extension.extensionStatus = ExtensionStatus.PermissionSetted
+
+def selectExtension(db):
+    """Select the extensions which need to be handle
+
+    :db: TODO
+    :returns: TODO
+
+    """
+    eList = select(extension for extension in db.Extension 
+            if (extension.extensionId, extension.downloadTime) in ((
+                e.extensionId, max(e.downloadTime)) for e in db.Extension
+            if orm.raw_sql("e.extensionStatus!='{0}'".format(
+                ExtensionStatus.UnPublished.name))) or
+            orm.raw_sql("extension.extensionStatus='{0}'".format(
+                    ExtensionStatus.Init.name)))
+    return eList
+
+@db_session
+def setDetailAndDownloadInDB(db, crxDir, checkNewVersion=False):
+    eList = selectExtension(db)
+    # eList = select(extension for extension in db.Extension 
+    #         if orm.raw_sql("extension.extensionStatus!='{0}'".format(
+    #         ExtensionStatus.UnPublished.name)))
+
+    for extension in eList:
+        eid = extension.extensionId
+        with db_session:
+            try:
+                if extension.extensionStatus == ExtensionStatus.Init:
+                    retCode = setExtensionDetailForOne(extension)
+                    crxDirTmp = os.path.join(crxDir, eid)
+                    os.makedirs(crxDirTmp, exist_ok=True)
+                    fileName = extension.version.replace(".", "-")
+                    downloadExt(eid, name=fileName, save_path=crxDirTmp)
+                    extension.crxPath = os.path.join(crxDirTmp, "{0}.crx".format(fileName))
+                    extension.extensionStatus = ExtensionStatus.Downloaded
+                elif extension.extensionStatus == ExtensionStatus.UnPublished:
+                    pass
+                elif extension.extensionStatus in [ExtensionStatus.Detailed, ExtensionStatus.Downloaded, ExtensionStatus.Unpacked, ExtensionStatus.PermissionSetted]:
+                    if checkNewVersion:
+                        newExt = db.Extension(extensionId = extension.extensionId)
+                        newExt.analysedStatus = 0
+                        newExt.extensionStatus = ExtensionStatus.Init
+                        retCode = setExtensionDetailForOne(newExt)
+                        if newExt.version == extension.version:
+                            db.rollback()
+                        else:
+                            crxDirTmp = os.path.join(crxDir, eid)
+                            os.makedirs(crxDirTmp, exist_ok=True)
+                            fileName = newExt.version.replace(".", "-")
+                            downloadExt(eid, name=fileName, save_path=crxDirTmp)
+                            newExt.crxPath = os.path.join(crxDirTmp, "{0}.crx".format(fileName))
+                            newExt.extensionStatus = ExtensionStatus.Downloaded
+                            db.commit()
+                else:
+                    assert False, "Unknown extension status with solution"
+            except Exception as e:
+                logger.error(e)
+                db.rollback()
+                continue
