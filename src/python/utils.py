@@ -36,16 +36,10 @@ def getExtensionDetail(exDetailUrl):
     :returns: TODO
 
     """
-    # with open(os.path.join(extensionPath, "manifest.json")) as f:
-    #     manifest = json.load(f)
-    # exName = manifest["name"]
-    # exNameInUlr = "-".join(map(lambda s: s.lower(), exName.split(" ")))
-    # exDetailUrl = "https://chrome.google.com/webstore/detail/%s/%s" % (exNameInUlr, extensionId)
-    # exDetailUrl = "https://chrome.google.com/webstore/detail/%s" % extensionId
     logger.info(exDetailUrl)
     ret = {}
     try:
-        urlObj = urlopen(exDetailUrl, timeout=30)
+        urlObj = urlopen(exDetailUrl, timeout=10)
         if urlObj.getcode() != 200:
             logger.error("Url error: %d, %s" % (urlObj.getcode(), exDetailUrl))
             return urlObj.getcode()

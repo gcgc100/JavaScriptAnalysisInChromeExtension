@@ -55,10 +55,10 @@ def detect_with_tarnish(db, extension):
         r["filepath"] = os.path.join(extension.srcPath, r["filepath"])
         loc = r["filepath"]
         js = db.JavaScriptInclusion.select(lambda j: j.filepath==loc and
-                j.detectMethod==DetectMethod.Tarnish.value and
+                orm.raw_sql("j.detectMethod=='{0}'".format(DetectMethod.Tarnish.name)) and
                 j.extension==extension)[:]
         if len(js) == 0:
-            js = db.JavaScriptInclusion(detectMethod=DetectMethod.Tarnish.value,
+            js = db.JavaScriptInclusion(detectMethod=DetectMethod.Tarnish,
                     filepath = loc,
                     extension = extension)
         else:
@@ -93,10 +93,11 @@ def detect_with_extAnalysis(db, extension):
     for r in ret:
         loc = os.path.join(extension.srcPath, r)
         js = db.JavaScriptInclusion.select(lambda j: j.filepath==loc and 
-                j.detectMethod==DetectMethod.ExtAnalysis.value and
+                # j.detectMethod==DetectMethod.ExtAnalysis.value and
+                orm.raw_sql("j.detectMethod=='{0}'".format(DetectMethod.ExtAnalysis.name)) and
                 j.extension==extension)[:]
         if len(js) == 0:
-            js = db.JavaScriptInclusion(detectMethod=DetectMethod.ExtAnalysis.value,
+            js = db.JavaScriptInclusion(detectMethod=DetectMethod.ExtAnalysis,
                     filepath = loc,
                     extension = extension)
         else:
@@ -120,7 +121,7 @@ def detect_background_scripts(db, extension):
         filepath = os.path.abspath(filepath)
         script = db.BackgroundScript(extension = extension,
                 filepath = filepath,
-                detectMethod = DetectMethod.Static.value)
+                detectMethod = DetectMethod.Static)
         script.hash = script.setHash()
         scripts.append(script)
     return scripts
@@ -148,7 +149,7 @@ def detect_content_scripts(db, extension):
             filepath = os.path.abspath(filepath)
             script = db.ContentScript(extension = extension,
                     filepath = filepath,
-                    detectMethod = DetectMethod.Static.value,
+                    detectMethod = DetectMethod.Static,
                     matches = matches,
                     runAt = runAt)
             script.hash = script.setHash()
@@ -305,7 +306,7 @@ def static_detect_javascript_in_html(db, extension, script_folder):
             filepath = os.path.abspath(filepath)
             script = db.ExtensionWebpageScript(extension = extension,
                     filepath = filepath,
-                    detectMethod = DetectMethod.Static.value,
+                    detectMethod = DetectMethod.Static,
                     htmlPath = html_file)
             script.hash = script.setHash()
             script.url = src
@@ -431,7 +432,7 @@ def dynamic_detect_javascript_in_html(db, extension, script_folder):
             filepath = os.path.abspath(filepath)
             script = db.ExtensionWebpageScript(extension = extension,
                     filepath = filepath,
-                    detectMethod = DetectMethod.Dynamic.value,
+                    detectMethod = DetectMethod.Dynamic,
                     htmlPath = html_file)
             script.url = src
             script.hash = script.setHash()

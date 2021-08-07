@@ -8,19 +8,9 @@ PYTHON=python3
 echo $BASEDIR
 
 #extensionIdList=$BASEDIR/../../data/extensionIdList/
-extensionIdList=$BASEDIR/../../data/extensionIdListSample10/
-database=$BASEDIR/../../data/data.db
+extensionIdList=$BASEDIR/$GCEXTANA_EXTENSIONIDLIST
+database=$BASEDIR/$GCEXTANA_DATABASE
 
-if [[ ! -z $1 ]]; then
-    if [[ $1 = "test" ]]; then
-        #extensionIdList=$BASEDIR/../../tests/shellTests/exIdListWithMulVulLib/
-        extensionIdList=$BASEDIR/../../tests/shellTests/exIdList/
-        database=$BASEDIR/../../tests/shellTests/test.db
-    else
-        source $1
-        exit
-    fi
-fi
 
 if test -f $database; then
     exit

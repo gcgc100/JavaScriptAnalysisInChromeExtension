@@ -24,6 +24,9 @@ class ExtensionStatus(Enum):
     UnPublished = 5
     PermissionSetted = 6
 
+    # For temp check when the extension list is very big
+    ExtensionChecked = 100
+
 class AnalysedStatus(Enum):
     Static = 1 << 0
     Dynamic = 1 << 1
@@ -128,8 +131,29 @@ def define_database_and_entities(**db_params):
 
             return html_file_array
 
+        def standardCrxPath(self, prefix=""):
+            """Return a standard crxpath like 
+            '{prefix}/{extensionId}/{version in (\d-\d-\d) format}
+
+            :withPrefix: TODO
+            :returns: TODO
+
+            """
+            return os.path.join(prefix, self.extensionId, 
+                    "{0}.crx".format(self.version.replace(".", "-")))
+
+        def standardExtSrcPath(self, prefix=""):
+            """Return a standard crxpath like 
+            '{prefix}/{extensionId}/{version in (\d-\d-\d) format}
+
+            :withPrefix: TODO
+            :returns: TODO
+
+            """
+            return os.path.join(prefix, self.extensionId, self.version.replace(".", "-"))
+
         def getPermissions(self):
-            """TODO: Docstring for getPermissions.
+            """Output all permissions based on the manifest.json in source code
             :returns: TODO
 
             """
@@ -163,7 +187,7 @@ def define_database_and_entities(**db_params):
         """Docstring for JavaScriptInclusion. """
 
         size = Optional(int)
-        detectMethod = Optional(int)
+        detectMethod = Optional(DetectMethod)
         filepath = Required(str)
         extension = Required(Extension)
         hash = Optional(str)

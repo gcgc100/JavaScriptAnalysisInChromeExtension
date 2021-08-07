@@ -204,6 +204,10 @@ def set_all_version(library_type=None, database="../data/data.db"):
                     libId = libInfo.id
                     f.libraries.add(libInfo)
                     libInfo.scripts.add(f)
+            except SystemExit as e:
+                raise e
+            except KeyboardInterrupt as e:
+                break
             except exceptions.UnexpectedAlertPresentException as e:
                 shutdownChrome(driver)
                 driver = prepareSelenium()

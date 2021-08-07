@@ -3,7 +3,6 @@
 
 import sys
 import os
-import sys
 import argparse
 import inspect
 import json
@@ -40,14 +39,18 @@ def allPack(db, crxDir, archiveDir, checkNewVersion=False):
     os.makedirs(archiveDir, exist_ok=True)
 
     # The setDetail and download must be done together in case the downloaded extension miss match the extension detail
-    ExtensionUtils.setDetailAndDownloadInDB(db, crxDir, checkNewVersion)
+    if checkNewVersion:
+        ExtensionUtils.setDetailAndDownloadInDB(db, crxDir, checkNewVersion, True)
+    else:
+        ExtensionUtils.setDetailAndDownloadInDB(db, crxDir, checkNewVersion)
     # downloadInDB(db, crxDir)
 
 def main():
     parser = argparse.ArgumentParser("Add extension id to sqlite database")
     parser.add_argument("cmd",
             choices = ["addExtensionId", "SetDetail", "addPermission", 
-                "resetExtension", "allPack", "unpackAllInDB", "NewVersionDownload"],
+                "resetExtension", "allPack", "unpackAllInDB", 
+                "NewVersionDownload"],
             help="The command to be used")
     parser.add_argument("db", help="sqlite database")
     parser.add_argument("--extensionIdList",
@@ -64,6 +67,10 @@ def main():
                         help="The directory to save the archived zip file")
     parser.add_argument("--extSrcDir",
                         help="The directory to save the archived zip file")
+    parser.add_argument("--checkNewVersion",
+            default=False,
+            action="store_true",
+            help="Need to check all extension for new version?")
 
 
     args = parser.parse_args()
@@ -126,7 +133,7 @@ def main():
         if not ret:
             sys.exit(1)
             
-        allPack(db, args.crxDir, args.archiveDir)
+        allPack(db, args.crxDir, args.archiveDir, args.checkNewVersion)
     elif args.cmd == "unpackAllInDB":
         parametersToBeChecked = ["extSrcDir"]
         ret = True
