@@ -20,6 +20,10 @@ logger = mylogging.logger
 
 import Analyser
 from OrmDatabase import *
+from StaticAnalyser import StaticAnalyser
+from DynamicAnalyser import DynamicAnalyser
+from TarnishAnalyser import TarnishAnalyser
+from ExtAnaAnalyser import ExtAnaAnalyser
 
 @db_session
 def allPack(db, script_folder, static, dynamic, tarnish, extAnalysis, srcBasePath):
@@ -66,19 +70,23 @@ def detect(db, extension, script_folder, static=True, dynamic=True, tarnish=True
     e = extension
     if static:
         if extension.analysedStatus & AnalysedStatus.Static.value == 0:
-            Analyser.static_detect_javascript_in_html(db, e, script_folder)
-            Analyser.detect_background_scripts(db, e)
-            Analyser.detect_content_scripts(db, e)
-            e.analysedStatus = e.analysedStatus | AnalysedStatus.Static.value
+            StaticAnalyser(db).detect(e, script_folder)
+            # Analyser.static_detect_javascript_in_html(db, e, script_folder)
+            # Analyser.detect_background_scripts(db, e)
+            # Analyser.detect_content_scripts(db, e)
+            # e.analysedStatus = e.analysedStatus | AnalysedStatus.Static.value
     if dynamic:
         if extension.analysedStatus & AnalysedStatus.Dynamic.value == 0:
-            Analyser.dynamic_detect_javascript_in_html(db, e, script_folder)
+            DynamicAnalyser(db).detect(e, script_folder)
+            # Analyser.dynamic_detect_javascript_in_html(db, e, script_folder)
     if tarnish:
         if extension.analysedStatus & AnalysedStatus.Tarnish.value == 0:
-            Analyser.detect_with_tarnish(db, e)
+            TarnishAnalyser(db).detect(e, False)
+            # Analyser.detect_with_tarnish(db, e)
     if extAnalysis:
         if extension.analysedStatus & AnalysedStatus.ExtAnalysis.value == 0:
-            Analyser.detect_with_extAnalysis(db, e)
+            ExtAnaAnalyser(db).detect(e)
+            # Analyser.detect_with_extAnalysis(db, e)
     if proxyDetection:
         Analyser.proxy_detect_javascript_in_html(e, script_folder)
 

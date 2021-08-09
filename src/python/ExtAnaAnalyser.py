@@ -23,6 +23,9 @@ class ExtAnaAnalyser(object):
         self.chrome_options = Options()
         self.driver = None
         self.headless = True
+
+    def detect(self, extension):
+        self.analyseExtension(extension)
     
     def analyseExtension(self, extension, extAnalysisUrl="http://127.0.0.1:8080/", headless=True, reportsDir="/Users/guanchong/MyDocuments/research/extensionAnalysis/ExtAnalysis/reports"):
         """TODO: Docstring for analyseExtension.
