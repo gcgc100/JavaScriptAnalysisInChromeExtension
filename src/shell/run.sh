@@ -1,6 +1,6 @@
 #!/bin/bash
 
-if [[ !-z ]]; then
+if [[ -n $1 ]]; then
     if [[ $1 = "test" ]]; then
         source src/shell/testConfig.sh
     else

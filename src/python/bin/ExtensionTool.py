@@ -149,11 +149,23 @@ def main():
             extSrcRootDir = args.extSrcDir
             for e in exts:
                 crxDir = e.crxPath
-                extSrcPath = e.generateExtSrcPath(extSrcRootDir)
+                extSrcPath = e.standardExtSrcPath(extSrcRootDir)
                 os.makedirs(extSrcPath, exist_ok=True)
-                ExtensionUtils.unpackExtension(e.crxPath, extSrcPath)
+                try:
+                    ExtensionUtils.unpackExtension(e.crxPath, extSrcPath)
+                except FileNotFoundError as err:
+                    with open("UnpackCrxError.log", 'a') as f:
+                        f.write(e.extensionId)
+                        f.write("\n")
+                    os.rmdir(extSrcPath)  # Remove version folder
+                    ppath = os.path.dirname(extSrcPath)
+                    if len(os.listdir(ppath)) == 0:
+                        # Check whether the extension src dir is empty, if so remove it
+                        os.rmdir(ppath)
+                    continue
                 e.extensionStatus = ExtensionStatus.Unpacked
                 e.srcPath = extSrcPath
+                db.commit()
     elif args.cmd == "NewVersionDownload":
         parametersToBeChecked = ["crxDir", "archiveDir"]
         ret = True

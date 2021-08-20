@@ -13,6 +13,9 @@ from pony.orm.dbapiprovider import StrConverter
 
 from enum import Enum
 
+import mylogging
+logger = mylogging.logger
+
 
 DetectMethod = Enum("DetectMethod", ("Dynamic", "Static", "Tarnish", "ExtAnalysis"))
 
@@ -81,25 +84,26 @@ def define_database_and_entities(**db_params):
                     self.downloadTime)
         @property
         def manifest(self):
-            # __import__('pdb').set_trace()  # XXX BREAKPOINT
             srcPath = self.srcPath
             subDirs = os.listdir(srcPath)
+            # Why do we need to look into two levels subdir in previous code
             if "manifest.json" in subDirs:
                 manifestPath = os.path.join(srcPath, "manifest.json")
-            elif len(subDirs) == 1:
-                srcPath = os.path.join(self.srcPath, subDirs[0])
-                subDirs = os.listdir(srcPath)
-                if "manifest.json" in subDirs:
-                    manifestPath = os.path.join(srcPath, "manifest.json")
-                else:
-                    return None
+            # elif len(subDirs) == 1:
+            #     srcPath = os.path.join(self.srcPath, subDirs[0])
+            #     subDirs = os.listdir(srcPath)
+            #     if "manifest.json" in subDirs:
+            #         manifestPath = os.path.join(srcPath, "manifest.json")
+            #     else:
+            #         return None
             else:
-                return None
+                logger.error("mainfest file not exists for extension:{0}".format(self.extensionId))
+                raise Exception("mainfest file not exists for extension:{0}".format(self.extensionId))
             with open(manifestPath) \
                     as manifest_file:
                 manifest = json.load(manifest_file)
                 if type(manifest) == list:
-                    raise ValueError()
+                    raise ValueError("Manifest file content wrong")
             return manifest
 
         @property
@@ -109,12 +113,6 @@ def define_database_and_entities(**db_params):
         @property
         def htmlFiles(self):
             return self._find_files_with_ext(".html")
-
-        def generateCrxPath(self, crxRootDir):
-            return os.path.join(crxRootDir, self.extensionId, self.version.replace(".", "-"))
-
-        def generateExtSrcPath(self, extSrcRootDir):
-            return os.path.join(extSrcRootDir, self.extensionId, self.version.replace(".", "-"))
 
         def _find_files_with_ext(self, file_ext):
             """Find all the files with certain ext in this extension source code

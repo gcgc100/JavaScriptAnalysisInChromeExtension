@@ -143,6 +143,9 @@ def setPermissionAllPack(db):
     exts = select(e for e in db.Extension if 
             orm.raw_sql("e.extensionStatus=='{0}'".format(ExtensionStatus.Unpacked.name)))
     for extension in exts:
+        if len(extension.permissions) > 0:
+            logger.warning("Set permissions failed since already setted")
+            continue
         permissions = extension.getPermissions()
         for p in permissions:
             permission = db.ExtensionPermission.get(permission = p)

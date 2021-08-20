@@ -28,7 +28,7 @@ class TestExtensionUtils(unittest.TestCase):
                 analysedStatus = 3)
         self.db.Extension(extensionId="1", 
                 downloadTime = datetime.datetime.fromisoformat('2015-11-04'), 
-                extensionStatus = ExtensionStatus.UnPublished,
+                extensionStatus = ExtensionStatus.PermissionSetted,
                 analysedStatus = 0)
         self.db.Extension(extensionId="2",
                 downloadTime = datetime.datetime.fromisoformat('2012-11-04'), 
@@ -83,7 +83,7 @@ class TestExtensionUtils(unittest.TestCase):
     def test_extension(self):
         self.fill_database()
         with db_session:
-            exts = selectExtension(self.db)[:]
+            exts = list(selectExtension(self.db))
         for e in exts:
             print(e)
         self.assertEqual(len(exts), 3)
