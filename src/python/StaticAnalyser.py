@@ -124,7 +124,7 @@ class StaticAnalyser(Analyser):
                     scripts.append(tag)
             temp_scripts = scripts
             for temp_script in temp_scripts:
-                logger.info("script %s found and to be processed", temp_script)
+                logger.info("script %s found and to be processed", str(temp_script)[10:50])
                 # temp_script format demo: ['script', [('src', '../lib/js/proto.js')], '\n    ', 0]
                 #TODO: use filter
                 src = [x for x in temp_script[1] if x[0] == "src"]

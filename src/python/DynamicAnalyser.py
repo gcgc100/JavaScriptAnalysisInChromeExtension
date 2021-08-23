@@ -61,11 +61,10 @@ class DynamicAnalyser(Analyser):
                 driver.switch_to.window(driver.window_handles[0])
             driver.get(html_url)
             scripts = driver.execute_script(js_code)
-            logger.debug(scripts)
             seq = 0
             for script in scripts:
                 src = script.get_attribute("src")
-                logger.debug(src)
+                logger.info("script %s found and to be processed", src)
                 if src.startswith("chrome-extension://"):
                     # remove the extension root path from src
                     # e.g. chrome-extension://abcdabcdabcdabcdabcdabcdabcdabcd/a.js -> a.js
@@ -80,7 +79,6 @@ class DynamicAnalyser(Analyser):
                 retScripts.append(retScript)
             temp_scripts = retScripts
             for temp_script in temp_scripts:
-                logger.info("script %s found and to be processed", temp_script)
                 src = [x for x in temp_script[1] if x[0] == "src"]
                 if len(src) == 1:
                     src = src[0][1]
