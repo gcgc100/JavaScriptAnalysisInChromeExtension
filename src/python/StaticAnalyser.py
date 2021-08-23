@@ -33,6 +33,7 @@ class StaticAnalyser(Analyser):
 
         """
         assert extension.analysedStatus & AnalysedStatus.Static.value == 0
+        logger.info("Static analysing")
         retScripts = []
         scripts = self.detect_background_scripts(extension)
         retScripts.extend(scripts)

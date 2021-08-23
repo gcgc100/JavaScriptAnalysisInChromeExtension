@@ -25,6 +25,19 @@ from DynamicAnalyser import DynamicAnalyser
 from TarnishAnalyser import TarnishAnalyser
 from ExtAnaAnalyser import ExtAnaAnalyser
 
+
+def selectExtension(db):
+    eList = []
+    exts = select((e.extensionId, max(e.downloadTime)) for e in db.Extension)
+    for e in exts:
+        extensions = select(ex for ex in db.Extension if ex.extensionId==e[0])
+        extension = list(filter(lambda x: x.downloadTime==e[1], extensions))[0]
+        if extension.extensionStatus == ExtensionStatus.UnPublished:
+            continue
+        if extension.extensionStatus == ExtensionStatus.ExtensionChecked:
+            continue
+        yield extension
+
 @db_session
 def allPack(db, script_folder, static, dynamic, tarnish, extAnalysis, srcBasePath):
     """TODO: Docstring for allPack.
@@ -34,8 +47,8 @@ def allPack(db, script_folder, static, dynamic, tarnish, extAnalysis, srcBasePat
     :returns: TODO
 
     """
-    # eList = select(e for e in db.Extension)
-    eList = select(e for e in db.Extension if (e.extensionId, e.downloadTime) in ((e.extensionId, max(e.downloadTime)) for e in db.Extension))
+    # eList = select(e for e in db.Extension if (e.extensionId, e.downloadTime) in ((e.extensionId, max(e.downloadTime)) for e in db.Extension))
+    eList = selectExtension(db)
     for e in eList:
         if e.extensionStatus == ExtensionStatus.Init:
             continue
@@ -46,13 +59,19 @@ def allPack(db, script_folder, static, dynamic, tarnish, extAnalysis, srcBasePat
         if e.extensionStatus == ExtensionStatus.Downloaded:
             continue
         if e.extensionStatus == ExtensionStatus.Unpacked or e.extensionStatus == ExtensionStatus.PermissionSetted:
-            crxPath = e.crxPath
-            if not os.path.exists(e.srcPath):
-                logger.info("{0} extension src code not exists".format(e.srcPath))
-                continue
-            logger.info("Start to analyse extension{0}, dbId:{1}".format(e.extensionId, e.id))
-            detect(db, e, script_folder, static, dynamic, tarnish, extAnalysis)
-            logger.info("Extension{0} analysed".format(e.extensionId))
+            try:
+                logger.info("Extension\n({0}, status:{1})\n to be analysed".format(e.extensionId,
+                    e.extensionStatus.name))
+                crxPath = e.crxPath
+                if not os.path.exists(e.srcPath):
+                    logger.error("{0} extension src code not exists".format(e.srcPath))
+                    continue
+                detect(db, e, script_folder, static, dynamic, tarnish, extAnalysis)
+                logger.info("Extension:{0} analysed".format(e.extensionId))
+            except KeyboardInterrupt as e:
+                raise e
+            except Exception as e:
+                logger.error(e)
 
 def detect(db, extension, script_folder, static=True, dynamic=True, tarnish=True, extAnalysis=True, proxyDetection=False):
     """TODO: Docstring for detect.

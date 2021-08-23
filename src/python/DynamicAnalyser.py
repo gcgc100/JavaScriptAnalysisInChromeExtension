@@ -37,6 +37,7 @@ class DynamicAnalyser(Analyser):
 
         """
         assert extension.analysedStatus & AnalysedStatus.Dynamic.value == 0
+        logger.info("Dynamic analysing")
         db = self._db
         rScripts = []
         extension_id = extension.extensionId
