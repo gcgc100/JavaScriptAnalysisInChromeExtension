@@ -121,7 +121,6 @@ def detect(db, extension, script_folder, static=True, dynamic=True, tarnish=True
             TarnishAnalyser(db).detect(e, False)
             # Analyser.detect_with_tarnish(db, e)
     if extAnalysis:
-        if e.downloadTime
         if extension.analysedStatus & AnalysedStatus.ExtAnalysis.value == 0:
             ExtAnaAnalyser(db).detect(e)
             # Analyser.detect_with_extAnalysis(db, e)
