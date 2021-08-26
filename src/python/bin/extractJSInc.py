@@ -27,6 +27,12 @@ from ExtAnaAnalyser import ExtAnaAnalyser
 
 
 def selectExtension(db):
+    """Select the extensions which need to be handle
+
+    :db: TODO
+    :returns: TODO
+
+    """
     eList = []
     exts = select((e.extensionId, max(e.downloadTime)) for e in db.Extension)
     for e in exts:
@@ -62,16 +68,25 @@ def allPack(db, script_folder, static, dynamic, tarnish, extAnalysis, srcBasePat
             try:
                 logger.info("Extension\n({0}, status:{1})\n to be analysed".format(e.extensionId,
                     e.extensionStatus.name))
+                if e.analysedStatus & AnalysedStatus.Error.value != 0:
+                    logger.warning("Extension ({0}) contains error not solved".format(e.extensionId))
+                    continue
                 crxPath = e.crxPath
                 if not os.path.exists(e.srcPath):
                     logger.error("{0} extension src code not exists".format(e.srcPath))
                     continue
                 detect(db, e, script_folder, static, dynamic, tarnish, extAnalysis)
+                db.commit()
                 logger.info("Extension:{0} analysed".format(e.extensionId))
             except KeyboardInterrupt as e:
                 raise e
-            except Exception as e:
-                logger.error(e)
+            except Exception as err:
+                logger.error("{0},{1}".format(e.extensionId, err))
+                dbid = e.id
+                db.rollback()
+                e = db.Extension.get(id=dbid)
+                e.analysedStatus = e.analysedStatus | AnalysedStatus.Error.value
+                db.commit()
 
 def detect(db, extension, script_folder, static=True, dynamic=True, tarnish=True, extAnalysis=True, proxyDetection=False):
     """TODO: Docstring for detect.
@@ -87,6 +102,9 @@ def detect(db, extension, script_folder, static=True, dynamic=True, tarnish=True
 
     """
     e = extension
+    if extension.analysedStatus & AnalysedStatus.Error.value != 0:
+        logger.warning("Extension ({0}) contains error not solved".format(e.extensionId))
+        return
     if static:
         if extension.analysedStatus & AnalysedStatus.Static.value == 0:
             StaticAnalyser(db).detect(e, script_folder)
@@ -103,6 +121,7 @@ def detect(db, extension, script_folder, static=True, dynamic=True, tarnish=True
             TarnishAnalyser(db).detect(e, False)
             # Analyser.detect_with_tarnish(db, e)
     if extAnalysis:
+        if e.downloadTime
         if extension.analysedStatus & AnalysedStatus.ExtAnalysis.value == 0:
             ExtAnaAnalyser(db).detect(e)
             # Analyser.detect_with_extAnalysis(db, e)

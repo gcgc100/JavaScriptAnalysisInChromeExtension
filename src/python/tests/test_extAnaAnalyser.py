@@ -31,6 +31,11 @@ class TestExtAnaAnalyser(unittest.TestCase):
         pass
 
     def test_analyseExtension(self):
+        crxFile = os.path.join(current_dir, "testdata/demoExtension.crx")
+        print(ea.ExtAnaAnalyser().analyseExtension(crxFile))
+
+    @unittest.skip("Switc off when ExtAnalysis server running")
+    def test_analyseExtensionSelenium(self):
         with open("tests/extensionWithMulLib.json") as f:
             extList = json.loads(f.read())
         start = 0
@@ -45,7 +50,6 @@ class TestExtAnaAnalyser(unittest.TestCase):
             ext.extensionId = e
             ext.id = 1
             ret = self.ana.analyseExtension(ext, headless=False)
-            __import__("nose").tools.set_trace()
             # self.ana.analyseExtension(ext)
     
     def test_extract(self):

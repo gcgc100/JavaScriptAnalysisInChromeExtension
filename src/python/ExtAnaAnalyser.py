@@ -11,6 +11,17 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait as Wait
 from selenium.common.exceptions import TimeoutException
 
+import inspect
+import sys
+import json
+
+current_dir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
+extAnalysisDir = os.path.join(current_dir, "ExtAnalysis")
+sys.path.insert(0, extAnalysisDir) 
+
+import core.core as core
+import core.analyze as analysis
+
 import mylogging
 logger = mylogging.logger
 
@@ -26,8 +37,29 @@ class ExtAnaAnalyser(object):
 
     def detect(self, extension):
         self.analyseExtension(extension)
+        for js in self.jsFiles:
+            jsInc = JavaScriptInclusion(filepath=js, 
+                    extension=extension, 
+                    detectMethod=DetectMethod.ExtAnalysis)
+        extension.analysedStatus = extension.analyseExtension | AnalysedStatus.ExtAnalysis.value
+
+    def analyseExtension(self, crxFile, reportsDir="./ExtAnalysis/reports"):
+        """Analyse the crxFile extension
+
+        :crxFile: TODO
+        :returns: TODO
+
+        """
+        logger.info("ExtAnalysis anaysis start for {0}".format(crxFile))
+        core.updatelog('File Uploaded.. Filename: ' + crxFile)
+        anls = analysis.analyze(crxFile)
+        r = re.match(".*(EXA\d*)", anls)
+        reportName = r.group(1)
+        reportFileDir = os.path.abspath(os.path.join(reportsDir, reportName, "extanalysis_report.json"))
+        self.jsFiles = self.extractAnalysisResult(reportFileDir)
+        return self.jsFiles
     
-    def analyseExtension(self, extension, extAnalysisUrl="http://127.0.0.1:8080/", headless=True, reportsDir="/Users/guanchong/MyDocuments/research/extensionAnalysis/ExtAnalysis/reports"):
+    def analyseExtensionSelenium(self, extension, extAnalysisUrl="http://127.0.0.1:8080/", headless=True, reportsDir="/Users/guanchong/MyDocuments/research/extensionAnalysis/ExtAnalysis/reports"):
         """TODO: Docstring for analyseExtension.
 
         :extension: TODO

@@ -35,6 +35,7 @@ class AnalysedStatus(Enum):
     Dynamic = 1 << 1
     Tarnish = 1 << 2
     ExtAnalysis = 1 << 3
+    Error = 1 << 7
         
 
 class EnumConverter(StrConverter):

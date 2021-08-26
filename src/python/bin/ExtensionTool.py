@@ -46,10 +46,10 @@ def allPack(db, crxDir, archiveDir, checkNewVersion=False):
     # downloadInDB(db, crxDir)
 
 def main():
-    parser = argparse.ArgumentParser("Add extension id to sqlite database")
+    parser = argparse.ArgumentParser("")
     parser.add_argument("cmd",
             choices = ["addExtensionId", "SetDetail", "addPermission", 
-                "resetExtension", "allPack", "unpackAllInDB", 
+                "resetExtension", "allPack", "unpackAllInDB", "unpack",
                 "NewVersionDownload"],
             help="The command to be used")
     parser.add_argument("db", help="sqlite database")
@@ -166,6 +166,14 @@ def main():
                 e.extensionStatus = ExtensionStatus.Unpacked
                 e.srcPath = extSrcPath
                 db.commit()
+    elif args.cmd == "unpack":
+        parametersToBeChecked = ["crxDir", "extSrcDir"]
+        ret = True
+        for p in parametersToBeChecked:
+            if getattr(args, p) is None:
+                print("{0} can not be empty\n".format(p))
+                ret = False
+        ExtensionUtils.unpackExtension(args.crxDir, args.extSrcDir)
     elif args.cmd == "NewVersionDownload":
         parametersToBeChecked = ["crxDir", "archiveDir"]
         ret = True
