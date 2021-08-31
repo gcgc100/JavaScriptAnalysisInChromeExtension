@@ -25,14 +25,14 @@ class TestExtAnaAnalyser(unittest.TestCase):
     """Test ExtAnaAnalyser"""
 
     def setUp(self):
-        self.ana = ea.ExtAnaAnalyser()
+        self.ana = ea.ExtAnaAnalyser("a.db")
 
     def tearDown(self):
         pass
 
     def test_analyseExtension(self):
         crxFile = os.path.join(current_dir, "testdata/demoExtension.crx")
-        print(ea.ExtAnaAnalyser().analyseExtension(crxFile))
+        print(ea.ExtAnaAnalyser("a.db").analyseExtension(crxFile))
 
     @unittest.skip("Switc off when ExtAnalysis server running")
     def test_analyseExtensionSelenium(self):

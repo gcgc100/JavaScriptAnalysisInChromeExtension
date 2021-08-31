@@ -19,31 +19,36 @@ current_dir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentfra
 extAnalysisDir = os.path.join(current_dir, "ExtAnalysis")
 sys.path.insert(0, extAnalysisDir) 
 
+from Analyser import Analyser
+from OrmDatabase import *
+
 import core.core as core
 import core.analyze as analysis
 
 import mylogging
 logger = mylogging.logger
 
-class ExtAnaAnalyser(object):
+class ExtAnaAnalyser(Analyser):
 
     """Docstring for ExtAnaAnalyser. """
 
-    def __init__(self):
-        """TODO: to be defined. """
+    def __init__(self, db):
         self.chrome_options = Options()
         self.driver = None
         self.headless = True
+        Analyser.__init__(self, db)
 
     def detect(self, extension):
         self.analyseExtension(extension)
-        for js in self.jsFiles:
-            jsInc = JavaScriptInclusion(filepath=js, 
-                    extension=extension, 
-                    detectMethod=DetectMethod.ExtAnalysis)
-        extension.analysedStatus = extension.analyseExtension | AnalysedStatus.ExtAnalysis.value
+        with db_session:
+            for js in self.jsFiles:
+                jsInc = self._db.JavaScriptInclusion(filepath=js, 
+                        extension=extension, 
+                        detectMethod=DetectMethod.ExtAnalysis)
+            extension.analysedStatus = extension.analyseExtension | AnalysedStatus.ExtAnalysis.value
+            self._db.commit()
 
-    def analyseExtension(self, crxFile, reportsDir="./ExtAnalysis/reports"):
+    def analyseExtension(self, crxFile, reportsDir="./ExtAnalysis/reports", log=False):
         """Analyse the crxFile extension
 
         :crxFile: TODO
@@ -51,8 +56,16 @@ class ExtAnaAnalyser(object):
 
         """
         logger.info("ExtAnalysis anaysis start for {0}".format(crxFile))
+        class NullWriter(object):
+            def write(self, arg):
+                pass
+
+        oldstdout = sys.stdout
+        if not log:
+            sys.stdout=NullWriter()
         core.updatelog('File Uploaded.. Filename: ' + crxFile)
         anls = analysis.analyze(crxFile)
+        sys.stdout = oldstdout
         r = re.match(".*(EXA\d*)", anls)
         reportName = r.group(1)
         reportFileDir = os.path.abspath(os.path.join(reportsDir, reportName, "extanalysis_report.json"))
