@@ -39,13 +39,13 @@ class ExtAnaAnalyser(Analyser):
         Analyser.__init__(self, db)
 
     def detect(self, extension):
-        self.analyseExtension(extension)
+        self.analyseExtension(extension.crxPath)
         with db_session:
             for js in self.jsFiles:
                 jsInc = self._db.JavaScriptInclusion(filepath=js, 
                         extension=extension, 
                         detectMethod=DetectMethod.ExtAnalysis)
-            extension.analysedStatus = extension.analyseExtension | AnalysedStatus.ExtAnalysis.value
+            extension.analysedStatus = extension.analysedStatus | AnalysedStatus.ExtAnalysis.value
             self._db.commit()
 
     def analyseExtension(self, crxFile, reportsDir="./ExtAnalysis/reports", log=False):
@@ -55,7 +55,7 @@ class ExtAnaAnalyser(Analyser):
         :returns: TODO
 
         """
-        logger.info("ExtAnalysis anaysis start for {0}".format(crxFile))
+        logger.info("ExtAnalysis analysis start for {0}".format(crxFile))
         class NullWriter(object):
             def write(self, arg):
                 pass
@@ -82,7 +82,7 @@ class ExtAnaAnalyser(Analyser):
         :returns: TODO
 
         """
-        logger.info("ExtAnalysis anaysis start for {0}(DBID:{1})".format(extension.extensionId, extension.id))
+        logger.info("ExtAnalysis analysis start for {0}(DBID:{1})".format(extension.extensionId, extension.id))
         self.headless = headless
         self.invokeBrowser(extAnalysisUrl)
         try:

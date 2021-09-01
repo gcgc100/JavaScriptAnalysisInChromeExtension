@@ -181,9 +181,13 @@ def main():
                     path = os.path.split(path)[0]
                 extension_id = os.path.split(path)[1]
                 assert re.match("[a-z]{32}", extension_id), "illegal extensionId"
-                extension = db.Extension(srcPath=args.srcPath, extensionId=extension_id, crxPath=crxPath)
+                extension = db.Extension(srcPath=args.srcPath, 
+                        extensionId=extension_id, 
+                        crxPath=crxPath, 
+                        extensionStatus=ExtensionStatus.PermissionSetted,
+                        analysedStatus=0)
                 script_folder = args.script
-                detect(e, script_folder, args.static, args.dynamic, args.tarnish, args.extAnalysis, args.proxyDetection)
+                detect(db, extension, script_folder, args.static, args.dynamic, args.tarnish, args.extAnalysis, args.proxyDetection)
     except KeyboardInterrupt as e:
         # Not an error, user wants to stop unpacking.
         sys.exit(2)
