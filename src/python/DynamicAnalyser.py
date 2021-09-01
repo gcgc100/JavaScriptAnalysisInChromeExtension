@@ -117,7 +117,7 @@ class DynamicAnalyser(Analyser):
                                 self.format_filename(html_file),
                                 # format_filename(src),
                                 filename)
-                        filepath = os.path.abspath(filepath)
+                        # filepath = os.path.abspath(filepath)
                         if not os.path.exists(
                                 os.path.dirname(filepath)):
                             os.makedirs(os.path.dirname(filepath))
@@ -149,10 +149,10 @@ class DynamicAnalyser(Analyser):
                     else:
                         # General relative path javascript
                         filepath = os.path.join(os.path.dirname(html_file), src)
-                # use abspath to remove .. component
+                # use normpath to remove .. component
                 # Otherwise, aa/bb/../cc and aa/cc would be treated 
                 # as different filepath
-                filepath = os.path.abspath(filepath)
+                filepath = os.path.normpath(filepath)
                 script = db.ExtensionWebpageScript(extension = extension,
                         filepath = filepath,
                         detectMethod = DetectMethod.Dynamic,

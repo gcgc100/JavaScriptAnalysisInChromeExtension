@@ -59,7 +59,7 @@ class StaticAnalyser(Analyser):
                 filepath = os.path.join(extension.srcPath, background_script[1:])
             else:
                 filepath = os.path.join(extension.srcPath, background_script)
-            filepath = os.path.abspath(filepath)
+            filepath = os.path.normpath(filepath)
             script = db.BackgroundScript(extension = extension,
                     filepath = filepath,
                     detectMethod = DetectMethod.Static)
@@ -89,7 +89,7 @@ class StaticAnalyser(Analyser):
                 except KeyError as e:
                     logger.error(e)
                     raise e
-                filepath = os.path.abspath(filepath)
+                filepath = os.path.normpath(filepath)
                 script = db.ContentScript(extension = extension,
                         filepath = filepath,
                         detectMethod = DetectMethod.Static,
@@ -152,7 +152,6 @@ class StaticAnalyser(Analyser):
                         err = e
                     script_data_path = script_folder
                     if script_data is None:
-                        # filepath will be changed to abspath in future, 
                         # add '/' so that it will not be extended
                         # filepath = "/{0}".format(os.path.basename(
                                 # urlparse.urlparse(src).path))
@@ -166,7 +165,7 @@ class StaticAnalyser(Analyser):
                                 self.format_filename(html_file),
                                 self.format_filename(src),
                                 filename)
-                        filepath = os.path.abspath(filepath)
+                        filepath = os.path.normpath(filepath)
                         if not os.path.exists(
                                 os.path.dirname(filepath)):
                             os.makedirs(os.path.dirname(filepath))
@@ -199,10 +198,10 @@ class StaticAnalyser(Analyser):
                     else:
                         # General relative path javascript
                         filepath = os.path.join(os.path.dirname(html_file), src)
-                # use abspath to remove .. component
+                # use normpath to remove .. component
                 # Otherwise, aa/bb/../cc and aa/cc would be treated 
                 # as different filepath
-                filepath = os.path.abspath(filepath)
+                filepath = os.path.normpath(filepath)
                 script = db.ExtensionWebpageScript(extension = extension,
                         filepath = filepath,
                         detectMethod = DetectMethod.Static,

@@ -196,13 +196,14 @@ def define_database_and_entities(**db_params):
         def filename(self):
             return os.path.basename(self.filepath)
 
-        def setHash(self):
+        def setHash(self, prefixPath=""):
             """Generate the hash for current js inclusion
             :returns: TODO
 
             """
-            if os.path.isfile(self.filepath):
-                with open(self.filepath) as fp:
+            path = os.path.join(prefixPath, self.filepath)
+            if os.path.isfile(path):
+                with open(path) as fp:
                     hasher = hashlib.md5()
                     hasher.update(fp.read().encode('utf-8'))
                     hashStr = hasher.hexdigest()
