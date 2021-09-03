@@ -50,7 +50,7 @@ def main():
     parser.add_argument("cmd",
             choices = ["addExtensionId", "SetDetail", "addPermission", 
                 "resetExtension", "allPack", "unpackAllInDB", "unpack",
-                "NewVersionDownload"],
+                "NewVersionDownload", "setHash"],
             help="The command to be used")
     parser.add_argument("db", help="sqlite database")
     parser.add_argument("--extensionIdList",
@@ -184,6 +184,19 @@ def main():
         if not ret:
             sys.exit(1)
         setDetailAndDownloadInDB(db, args.crxDir, True)
+    elif args.cmd == "setHash":
+        orm.sql_debug(True)
+        with db_session:
+            # jsList = select(js for js in db.JavaScriptInclusion if js.extension.downloadTime > datetime.datetime.strptime("2021-1-1", "%Y-%m-%d"))
+            jsList = select(js for js in db.JavaScriptInclusion )
+            for js in jsList:
+                try:
+                    if js.hash == "":
+                        js.hash = js.setHash(prefixPath="/Users/guanchong/MyDocuments/workspace/extensionSecurity/ChromeExtensionJSInc/JavaScriptAnalysisInChromeExtension/")
+                except Exception as e:
+                    logger.error(e)
+                    continue
+
 
 
 if __name__ == "__main__":

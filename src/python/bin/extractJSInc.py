@@ -101,31 +101,25 @@ def detect(db, extension, script_folder, static=True, dynamic=True, tarnish=True
     :returns: TODO
 
     """
-    e = extension
     if extension.analysedStatus & AnalysedStatus.Error.value != 0:
-        logger.warning("Extension ({0}) contains error not solved".format(e.extensionId))
+        logger.warning("Extension ({0}) contains error not solved".format(extension.extensionId))
         return
     if static:
         if extension.analysedStatus & AnalysedStatus.Static.value == 0:
-            StaticAnalyser(db).detect(e, script_folder)
-            # Analyser.static_detect_javascript_in_html(db, e, script_folder)
-            # Analyser.detect_background_scripts(db, e)
-            # Analyser.detect_content_scripts(db, e)
-            # e.analysedStatus = e.analysedStatus | AnalysedStatus.Static.value
+            StaticAnalyser(db).detect(extension, script_folder)
     if dynamic:
         if extension.analysedStatus & AnalysedStatus.Dynamic.value == 0:
-            DynamicAnalyser(db).detect(e, script_folder)
-            # Analyser.dynamic_detect_javascript_in_html(db, e, script_folder)
+            DynamicAnalyser(db).detect(extension, script_folder)
     if tarnish:
         if extension.analysedStatus & AnalysedStatus.Tarnish.value == 0:
-            TarnishAnalyser(db).detect(e, False)
+            TarnishAnalyser(db).detect(extension, False)
             # Analyser.detect_with_tarnish(db, e)
     if extAnalysis:
         if extension.analysedStatus & AnalysedStatus.ExtAnalysis.value == 0:
-            ExtAnaAnalyser(db).detect(e)
+            ExtAnaAnalyser(db).detect(extension)
             # Analyser.detect_with_extAnalysis(db, e)
     if proxyDetection:
-        Analyser.proxy_detect_javascript_in_html(e, script_folder)
+        Analyser.proxy_detect_javascript_in_html(extension, script_folder)
 
 def main():
     parser = argparse.ArgumentParser("Extract JavaScript Inclusion and save to sqlite database")
