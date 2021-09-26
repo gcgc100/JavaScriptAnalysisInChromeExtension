@@ -8,6 +8,7 @@ import os
 import functools
 import inspect
 import random
+import datetime
 from threading import Thread
 from selenium import webdriver
 from selenium.common import exceptions
@@ -22,17 +23,40 @@ import socketserver
 import http.server as SimpleHTTPServer
 
 
-js_get_version_dict = {"jquery": "return $.fn.jquery", 
-        "Modernizr": "return Modernizr._version",
-        "Underscore": "return _.VERSION",
-        "Moment": "return moment.version",
-        "RequireJS": "return requirejs.version",
-        "Backbone": "return Backbone.VERSION",
-        "Handlebars": "return Handlebars.VERSION",
-        "Mootools": "return Mootools.version",
-        "Knockout": "return ko.version",
-        "Mustache": "return Mustache.version" 
-        }
+js_get_version_dict = {"jquery": "return $.fn.jquery"}
+# js_get_version_dict = {"jquery": "return $.fn.jquery", 
+#         "Modernizr": "return Modernizr._version",
+#         "Underscore": "return _.VERSION",
+#         "Moment": "return moment.version",
+#         "RequireJS": "return requirejs.version",
+#         "Backbone": "return Backbone.VERSION",
+#         "Handlebars": "return Handlebars.VERSION",
+#         "Mootools": "return Mootools.version",
+#         "Knockout": "return ko.version",
+#         "Mustache": "return Mustache.version" 
+#         }
+
+def selectExtension(db):
+    """Select the extensions which need to be handle
+
+    :db: TODO
+    :returns: TODO
+
+    """
+    # orm.sql_debug(True)
+    exts = select((e.extensionId, max(e.downloadTime)) for e in db.Extension if e.downloadTime>datetime.datetime.strptime("2021-09-10", "%Y-%m-%d"))
+    for e in exts:
+        extensions = select(ex for ex in db.Extension if ex.extensionId==e[0])
+        extension = list(filter(lambda x: x.downloadTime==e[1], extensions))[0]
+        if extension.extensionStatus != ExtensionStatus.PermissionSetted:
+            continue
+        if extension.extensionStatus == ExtensionStatus.UnPublished:
+            continue
+        if extension.extensionStatus == ExtensionStatus.ExtensionChecked:
+            continue
+        if extension.extensionStatus == ExtensionStatus.LibSet:
+            continue
+        yield extension
 
 def simple_server():
     """Run a simple http server to server index.html
@@ -120,6 +144,7 @@ def selenium_get_version(filedir, driver, blockRun=False, lib_type_array=None):
     if os.path.isfile(scriptFile):
         os.remove(scriptFile)
     shutil.copy(filedir, scriptFile)
+    logger.debug("copy file done")
     driver.get("http://localhost:8000/jqueryServer/index.html?ram=%s" % random.randint(0, 10000))
     for lib_type in lib_type_array:
         js_get_version = js_get_version_dict[lib_type]
@@ -153,66 +178,69 @@ def set_all_version(library_type=None, database="../data/data.db"):
         if library_type not in js_get_version_dict.keys():
             assert False, "Unknown library type"
         lib_type_array = [library_type]
-    # skip the files whose version has been set
-    # allFiles = db.select("Select * from filetable where id not in (select fileid from (Select count(*) as c,fileid from LibraryTable group by fileid) where c=10)")
-    # allFiles = select(jinc for jinc in JavaScriptInclusion for l in jinc.libraries if count(l)!=10)
+    httpd = None
     with db_session:
-        allFiles = select(j for j in db.JavaScriptInclusion if j.extension in (e for e in db.Extension if (e.extensionId, e.downloadTime) in ((e.extensionId, max(e.downloadTime)) for e in db.Extension)))[:]
-        # allFiles = JavaScriptInclusion.select()
-        # allFiles = db.select("select * from filetable where id in (select fileid from LibraryTable where version = '100')")
-        i = 10
-        current_dir = os.path.abspath(inspect.getfile(inspect.currentframe()))
-        server_data_dir = os.path.join(os.path.dirname(current_dir),
-            "tests/testdata/jqueryServer")
-        real_server_dir = "jqueryServer"
-        if os.path.exists(real_server_dir):
-            logger.error("jqueryServer dir must not exist, so that serve temp server")
-            return
-        shutil.copytree(server_data_dir, real_server_dir)
-        httpd = simple_server()
-        driver = prepareSelenium()
-        for f in allFiles:
-            exist_libs = f.libraries
-            current_libs = {}
-            for lib in js_get_version_dict.keys():
-                exist_lib = list(filter(lambda x: x.libname==lib, exist_libs))
-                assert len(exist_lib) < 2, "multi version for one file?"
-                if len(exist_lib) == 1:
-                    current_libs[lib] = exist_lib[0].version
-                else:
-                    current_libs[lib] = None
-            if None not in [current_libs[x] for x in lib_type_array]:
-                logger.info("Version already been set. Skip this file")
-                continue
-            lib_type_array_todo = list(filter(lambda x: current_libs[x] is None, lib_type_array))
-            try:
-                logger.info("id:%s, filename:%s", f.id, f.filename)
-                print(f.filename)
-                lib_array = selenium_get_version(f.filepath, driver, blockRun=True,
-                        lib_type_array=lib_type_array_todo)
-                for lib in lib_array:
-                    # sql = "update FileTable set {0} = ? where id = ?".format(version)
-                    ver = lib_array[lib]
-                    if ver is None:
-                        libInfo = None
-                        continue
-                    libInfo = db.Library.get(libname=lib, version=ver)
-                    # libInfo = db.select("select * from LibraryInfoTable where libname=? and version=?", lib, "%s" % lib_array[lib])
-                    if libInfo is None:
-                        libInfo = db.Library(libname=lib, version=ver)
-                        # libId = db.insert("LibraryInfoTable", commit=False, **{"version": "%s" % lib_array[lib], "libname": lib})[1]
-                    libId = libInfo.id
-                    f.libraries.add(libInfo)
-                    libInfo.scripts.add(f)
-            except SystemExit as e:
-                raise e
-            except KeyboardInterrupt as e:
-                break
-            except exceptions.UnexpectedAlertPresentException as e:
-                shutdownChrome(driver)
-                driver = prepareSelenium()
-            except Exception as e:
-                logger.error(e)
-    shutil.rmtree(real_server_dir)
-    shutdownChrome(driver)
+        for extension in selectExtension(db):
+            allFiles = extension.scripts
+            i = 10
+            current_dir = os.path.abspath(inspect.getfile(inspect.currentframe()))
+            server_data_dir = os.path.join(os.path.dirname(current_dir),
+                "tests/testdata/jqueryServer")
+            real_server_dir = "jqueryServer"
+            if os.path.exists(real_server_dir):
+                logger.error("jqueryServer dir must not exist, so that serve temp server")
+                return
+            shutil.copytree(server_data_dir, real_server_dir)
+            if httpd is None:
+                httpd = simple_server()
+            driver = prepareSelenium()
+            # if extension.id == 36429:
+            #     __import__('pdb').set_trace()  # XXX BREAKPOINT
+            for f in allFiles:
+                if len(f.libraries) > 0:
+                    continue
+                exist_libs = f.libraries
+                current_libs = {}
+                for lib in js_get_version_dict.keys():
+                    exist_lib = list(filter(lambda x: x.libname==lib, exist_libs))
+                    assert len(exist_lib) < 2, "multi version for one file?"
+                    if len(exist_lib) == 1:
+                        current_libs[lib] = exist_lib[0].version
+                    else:
+                        current_libs[lib] = None
+                if None not in [current_libs[x] for x in lib_type_array]:
+                    logger.info("Version already been set. Skip this file")
+                    continue
+                lib_type_array_todo = list(filter(lambda x: current_libs[x] is None, lib_type_array))
+                try:
+                    logger.info("id:%s, filename:%s", f.id, f.filename)
+                    lib_array = selenium_get_version(f.filepath, driver, blockRun=True,
+                            lib_type_array=lib_type_array_todo)
+                    # logger.info("selenium get version done")
+                    logger.info("libArray:{0}".format(lib_array))
+                    for lib in lib_array:
+                        ver = lib_array[lib]
+                        if ver is None:
+                            libInfo = None
+                            continue
+                        logger.info("\x1b[31;21mLib found:{0}\x1b[0m".format(lib))
+                        libInfo = db.Library.get(libname=lib, version=ver)
+                        if libInfo is None:
+                            libInfo = db.Library(libname=lib, version=ver)
+                        libId = libInfo.id
+                        f.libraries.add(libInfo)
+                        libInfo.scripts.add(f)
+                except SystemExit as e:
+                    raise e
+                except KeyboardInterrupt as e:
+                    break
+                except exceptions.UnexpectedAlertPresentException as e:
+                    shutdownChrome(driver)
+                    driver = prepareSelenium()
+                except Exception as e:
+                    logger.error(e)
+            extension.extensionStatus = ExtensionStatus.LibSet
+            db.commit()
+            shutil.rmtree(real_server_dir)
+            shutdownChrome(driver)
     httpd["httpd"].shutdown()

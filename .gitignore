@@ -1,4 +1,8 @@
 src/python/tests/tempdb
+src/python/tests/demoExtension
+src/python/tests/demoExtension.pem
+src/python/tests/testdata/demoExtension.pem
+src/python/temp
 *.db
 tests/shellTests/crxFiles             
 tests/shellTests/extSrc               

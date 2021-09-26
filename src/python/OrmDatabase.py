@@ -26,6 +26,7 @@ class ExtensionStatus(Enum):
     Unpacked = 4
     UnPublished = 5
     PermissionSetted = 6
+    LibSet = 7
 
     # For temp check when the extension list is very big
     ExtensionChecked = 100
