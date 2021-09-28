@@ -230,6 +230,8 @@ def setDetailAndDownloadInDB(db, crxDir, checkNewVersion=False, setChecked=False
                 elif extension.extensionStatus == ExtensionStatus.ExtensionChecked:
                     pass
                 elif extension.extensionStatus in [ExtensionStatus.Detailed, ExtensionStatus.Downloaded, ExtensionStatus.Unpacked, ExtensionStatus.PermissionSetted]:
+                    pass
+                elif extension.extensionStatus in [ExtensionStatus.LibSet]:
                     if checkNewVersion:
                         newExt = db.Extension(extensionId = extension.extensionId)
                         newExt.analysedStatus = 0

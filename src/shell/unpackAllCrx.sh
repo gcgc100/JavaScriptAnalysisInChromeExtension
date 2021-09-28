@@ -17,8 +17,8 @@ else
 fi
 PYTHON=python3
 
-extSrcDir=$DATADIR/$GCEXTANA_EXTSRC
-database=$DATADIR/$GCEXTANA_DATABASE
+extSrcDir=$DATADIR$GCEXTANA_EXTSRC
+database=$DATADIR$GCEXTANA_DATABASE
 
 
 #if [[ ! -z $1 ]]; then

@@ -1,7 +1,9 @@
-#!/bin/bash
+#!/bin/zsh
 
 DATADIR="../../data/"
-export GCEXTANA_EXTENSIONIDLIST=$DATADIR"extensionIdListSample10/"
+DATADIR="/Volumes/research/data/"
+export GCEXTANA_DATADIR=$DATADIR
+export GCEXTANA_EXTENSIONIDLIST=$DATADIR"exIdList/"
 export GCEXTANA_DATABASE=$DATADIR"dataV1-2.db"
 export GCEXTANA_CRXDIR=$DATADIR"crxFiles/"
 export GCEXTANA_ARCHIVE=$DATADIR"archive/"
