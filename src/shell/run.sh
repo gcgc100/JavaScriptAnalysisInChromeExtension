@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/zsh
 
 if [[ -n $1 ]]; then
     if [[ $1 = "test" ]]; then
@@ -9,8 +9,8 @@ if [[ -n $1 ]]; then
 else
     source src/shell/config.sh
 fi
-bash src/shell/InitDatabase.sh || exit 1
-bash src/shell/downloadCrx.sh || exit 1
-bash src/shell/unpackAllCrx.sh || exit 1
-bash src/shell/extractJSInc.sh || exit 1
-bash src/shell/setLibVersion.sh || exit 1
+zsh src/shell/InitDatabase.sh || exit 1
+zsh src/shell/downloadCrx.sh || exit 1
+zsh src/shell/unpackAllCrx.sh || exit 1
+zsh src/shell/extractJSInc.sh || exit 1
+zsh src/shell/setLibVersion.sh || exit 1

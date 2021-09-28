@@ -1,5 +1,8 @@
-#!/bin/bash
-DATADIR="../../tests/shellTests/"
+#!/bin/zsh
+
+#DATADIR="../../tests/shellTests/"
+DATADIR="/Volumes/research/shellTests/"
+export GCEXTANA_DATADIR=$DATADIR
 export GCEXTANA_EXTENSIONIDLIST=$DATADIR"exIdList/"
 export GCEXTANA_DATABASE=$DATADIR"test.db"
 export GCEXTANA_CRXDIR=$DATADIR"crxFiles/"

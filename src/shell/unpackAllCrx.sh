@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/zsh
 
 # Unpack all the crx files in extCrxFiles/ to data/extSrcFinal
 
@@ -8,13 +8,17 @@ The extension which is failed to unpack will be listed in UnpackCrxError.log
 
 EOF
 
-shopt -s nullglob
+BASEDIR=$(dirname "$0")
 
-BASEDIR=$(dirname "$BASH_SOURCE")
+if [[ $GCEXTANA_DATADIR == "/"* ]]; then
+    DATADIR=""
+else
+    DATADIR=$BASEDIR/
+fi
 PYTHON=python3
 
-extSrcDir=$BASEDIR/$GCEXTANA_EXTSRC
-database=$BASEDIR/$GCEXTANA_DATABASE
+extSrcDir=$DATADIR/$GCEXTANA_EXTSRC
+database=$DATADIR/$GCEXTANA_DATABASE
 
 
 #if [[ ! -z $1 ]]; then

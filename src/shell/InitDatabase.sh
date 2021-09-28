@@ -1,15 +1,17 @@
-#!/bin/bash
+#!/bin/zsh
 
-shopt -s nullglob
 
-BASEDIR=$(dirname "$BASH_SOURCE")
+BASEDIR=$(dirname "$0")
+if [[ $GCEXTANA_DATADIR == "/"* ]]; then
+    DATADIR=""
+else
+    DATADIR=$BASEDIR/
+fi
 PYTHON=python3
 
-echo $BASEDIR
 
-#extensionIdList=$BASEDIR/../../data/extensionIdList/
-extensionIdList=$BASEDIR/$GCEXTANA_EXTENSIONIDLIST
-database=$BASEDIR/$GCEXTANA_DATABASE
+extensionIdList=$DATADIR$GCEXTANA_EXTENSIONIDLIST
+database=$DATADIR$GCEXTANA_DATABASE
 
 
 if test -f $database; then

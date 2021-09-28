@@ -16,12 +16,7 @@ testShell:
 	zsh src/shell/run.sh test || exit 1
 
 cleanTest:
-	rm -rf tests/shellTests/archive
-	rm -rf tests/shellTests/crxFiles
-	rm -rf tests/shellTests/test.db
-	rm -rf tests/shellTests/scripts
-	rm -rf tests/shellTests/extSrc
-	rm -rf tests/shellTests/cacheData
+	zsh src/shell/cleanTest.sh || exit 1
 
 #newVersionTest:
 #    bash src/shell/downloadCrx.sh testNewVersion || exit 1

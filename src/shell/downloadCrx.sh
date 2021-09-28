@@ -1,17 +1,20 @@
-#!/bin/bash
+#!/bin/zsh
 
-shopt -s nullglob
 
-BASEDIR=$(dirname "$BASH_SOURCE")
+BASEDIR=$(dirname "$0")
+if [[ $GCEXTANA_DATADIR == "/"* ]]; then
+    DATADIR=""
+else
+    DATADIR=$BASEDIR/
+fi
 PYTHON=python3
 
 echo $BASEDIR
 
-#extensionIdList=$BASEDIR/../../data/extensionIdList/
-extensionIdList=$BASEDIR/$GCEXTANA_EXTENSIONIDLIST
-database=$BASEDIR/$GCEXTANA_DATABASE
-crxDir=$BASEDIR/$GCEXTANA_CRXDIR
-archive=$BASEDIR/$GCEXTANA_ARCHIVE
+extensionIdList=$DATADIR$GCEXTANA_EXTENSIONIDLIST
+database=$DATADIR$GCEXTANA_DATABASE
+crxDir=$DATADIR$GCEXTANA_CRXDIR
+archive=$DATADIR$GCEXTANA_ARCHIVE
 
 #if [[ ! -z $1 ]]; then
 #    if [[ $1 = "test" ]]; then
@@ -33,7 +36,7 @@ archive=$BASEDIR/$GCEXTANA_ARCHIVE
 #fi
 
 mkdir -p ${archive}crx/
-tmpData=$BASEDIR/../../data/tmpData
+tmpData=$DATADIR/../../data/tmpData
 mkdir -p $tmpData
 #if [[ ! -z $1 ]]; then
 #    if [[ $1 = "testNewVersion" ]]; then

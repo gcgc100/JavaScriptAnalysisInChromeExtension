@@ -1,10 +1,16 @@
-#!/bin/bash
+#!/bin/zsh
 
 
 PYTHON=python3
-BASEDIR=$(dirname "$BASH_SOURCE")
 
-database=$BASEDIR/$GCEXTANA_DATABASE
+BASEDIR=$(dirname "$0")
+if [[ $GCEXTANA_DATADIR == "/"* ]]; then
+    DATADIR=""
+else
+    DATADIR=$BASEDIR/
+fi
+
+database=$DATADIR$GCEXTANA_DATABASE
 
 #dataDir=$BASEDIR/../../data/
 #database=$BASEDIR/../../data/data.db

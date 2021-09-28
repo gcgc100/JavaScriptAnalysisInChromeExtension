@@ -1,14 +1,20 @@
-#!/bin/bash
+#!/bin/zsh
 
-shopt -s nullglob
 
 PYTHON=python3
-BASEDIR=$(dirname "$BASH_SOURCE")
 
-database=$BASEDIR/$GCEXTANA_DATABASE
-crxDir=$BASEDIR/$GCEXTANA_CRXDIR
-extSrcDir=$BASEDIR/$GCEXTANA_EXTSRC
-scriptDir=$BASEDIR/$GCEXTANA_SCRIPTDIR
+BASEDIR=$(dirname "$0")
+
+if [[ $GCEXTANA_DATADIR == "/"* ]]; then
+    DATADIR=""
+else
+    DATADIR=$BASEDIR/
+fi
+
+database=$DATADIR$GCEXTANA_DATABASE
+crxDir=$DATADIR$GCEXTANA_CRXDIR
+extSrcDir=$DATADIR$GCEXTANA_EXTSRC
+scriptDir=$DATADIR$GCEXTANA_SCRIPTDIR
 
 
 #dataDir=$BASEDIR/../../data/
