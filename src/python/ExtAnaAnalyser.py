@@ -43,9 +43,10 @@ class ExtAnaAnalyser(Analyser):
         self.analyseExtension(extension)
         with db_session:
             for js in self.jsFiles:
-                jsInc = self._db.JavaScriptInclusion(filepath=js, 
+                jsInc = self._db.JavaScriptInclusion(filepath=os.path.join(extension.srcPath, js), 
                         extension=extension, 
                         detectMethod=DetectMethod.ExtAnalysis)
+                jsInc.hash = jsInc.setHash()
             extension.analysedStatus = extension.analysedStatus | AnalysedStatus.ExtAnalysis.value
             self._db.commit()
 

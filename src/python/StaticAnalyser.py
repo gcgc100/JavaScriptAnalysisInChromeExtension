@@ -128,6 +128,7 @@ class StaticAnalyser(Analyser):
                 logger.info("script %s found and to be processed", str(temp_script)[10:50])
                 # temp_script format demo: ['script', [('src', '../lib/js/proto.js')], '\n    ', 0]
                 #TODO: use filter
+                #TODO: Remove the parameters in url when change it to filepath
                 src = [x for x in temp_script[1] if x[0] == "src"]
                 if len(src) == 1:
                     src = src[0][1]
