@@ -68,7 +68,7 @@ def allPack(db, script_folder, static, dynamic, tarnish, extAnalysis, srcBasePat
             continue
         if e.extensionStatus == ExtensionStatus.Downloaded:
             continue
-        if e.extensionStatus == ExtensionStatus.Unpacked or e.extensionStatus == ExtensionStatus.PermissionSetted:
+        if e.extensionStatus in [ExtensionStatus.Unpacked , ExtensionStatus.PermissionSetted, ExtensionStatus.LibSet]:
             try:
                 logger.info("Extension\n({0}, status:{1})\n to be analysed".format(e.extensionId,
                     e.extensionStatus.name))
@@ -80,7 +80,6 @@ def allPack(db, script_folder, static, dynamic, tarnish, extAnalysis, srcBasePat
                     logger.error("{0} extension src code not exists".format(e.srcPath))
                     continue
                 detect(db, e, script_folder, static, dynamic, tarnish, extAnalysis)
-                db.commit()
                 logger.info("Extension:{0} analysed".format(e.extensionId))
             except KeyboardInterrupt as e:
                 raise e
@@ -108,19 +107,24 @@ def detect(db, extension, script_folder, static=True, dynamic=True, tarnish=True
     if extension.analysedStatus & AnalysedStatus.Error.value != 0:
         logger.warning("Extension ({0}) contains error not solved".format(extension.extensionId))
         return
+    #Commit every time in case error occured during some kind of detection, then the result of other detection is abandoned. The analysedStatus Error set also may be mismatch.
     if static:
         if extension.analysedStatus & AnalysedStatus.Static.value == 0:
             StaticAnalyser(db).detect(extension, script_folder)
+            db.commit()
     if dynamic:
         if extension.analysedStatus & AnalysedStatus.Dynamic.value == 0:
             DynamicAnalyser(db).detect(extension, script_folder)
+            db.commit()
     if tarnish:
         if extension.analysedStatus & AnalysedStatus.Tarnish.value == 0:
             TarnishAnalyser(db).detect(extension, False)
+            db.commit()
             # Analyser.detect_with_tarnish(db, e)
     if extAnalysis:
         if extension.analysedStatus & AnalysedStatus.ExtAnalysis.value == 0:
             ExtAnaAnalyser(db).detect(extension)
+            db.commit()
             # Analyser.detect_with_extAnalysis(db, e)
     if proxyDetection:
         Analyser.proxy_detect_javascript_in_html(extension, script_folder)

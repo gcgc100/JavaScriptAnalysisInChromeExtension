@@ -39,7 +39,8 @@ class ExtAnaAnalyser(Analyser):
         Analyser.__init__(self, db)
 
     def detect(self, extension):
-        self.analyseExtension(extension.crxPath)
+        # self.analyseExtension(extension.crxPath)
+        self.analyseExtension(extension)
         with db_session:
             for js in self.jsFiles:
                 jsInc = self._db.JavaScriptInclusion(filepath=js, 
@@ -48,13 +49,14 @@ class ExtAnaAnalyser(Analyser):
             extension.analysedStatus = extension.analysedStatus | AnalysedStatus.ExtAnalysis.value
             self._db.commit()
 
-    def analyseExtension(self, crxFile, reportsDir="./ExtAnalysis/reports", log=False):
+    def analyseExtension(self, extension, reportsDir="./src/python/ExtAnalysis/reports", log=False):
         """Analyse the crxFile extension
 
         :crxFile: TODO
         :returns: TODO
 
         """
+        crxFile = extension.crxPath
         logger.info("ExtAnalysis analysis start for {0}".format(crxFile))
         class NullWriter(object):
             def write(self, arg):
@@ -68,6 +70,8 @@ class ExtAnaAnalyser(Analyser):
         sys.stdout = oldstdout
         r = re.match(".*(EXA\d*)", anls)
         reportName = r.group(1)
+        with db_session:
+            extension.EXALogSrc = reportName
         reportFileDir = os.path.abspath(os.path.join(reportsDir, reportName, "extanalysis_report.json"))
         self.jsFiles = self.extractAnalysisResult(reportFileDir)
         return self.jsFiles

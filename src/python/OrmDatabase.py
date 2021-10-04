@@ -77,6 +77,7 @@ def define_database_and_entities(**db_params):
         downloadTime = Optional(datetime.datetime)
         extensionStatus = Optional(ExtensionStatus)
         analysedStatus = Optional(int)
+        EXALogSrc    = Optional(str)
         scripts      = Set("JavaScriptInclusion")
         permissions  = Set("ExtensionPermission")
 
