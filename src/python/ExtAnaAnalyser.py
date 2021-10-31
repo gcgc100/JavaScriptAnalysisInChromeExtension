@@ -40,7 +40,9 @@ class ExtAnaAnalyser(Analyser):
 
     def detect(self, extension):
         # self.analyseExtension(extension.crxPath)
-        self.analyseExtension(extension)
+        ret = self.analyseExtension(extension)
+        if ret is None:
+            return
         with db_session:
             for js in self.jsFiles:
                 jsInc = self._db.JavaScriptInclusion(filepath=os.path.join(extension.srcPath, js), 
@@ -58,6 +60,9 @@ class ExtAnaAnalyser(Analyser):
 
         """
         crxFile = extension.crxPath
+        if crxFile == "is None":
+            self.jsFiles = []
+            return None
         logger.info("ExtAnalysis analysis start for {0}".format(crxFile))
         class NullWriter(object):
             def write(self, arg):

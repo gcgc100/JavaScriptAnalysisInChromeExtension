@@ -36,8 +36,8 @@ archive=$DATADIR$GCEXTANA_ARCHIVE
 #fi
 
 mkdir -p ${archive}crx/
-tmpData=$DATADIR/../../data/tmpData
-mkdir -p $tmpData
+#tmpData=$DATADIR/../../data/tmpData
+#mkdir -p $tmpData
 #if [[ ! -z $1 ]]; then
 #    if [[ $1 = "testNewVersion" ]]; then
 #        $PYTHON $BASEDIR/../python/bin/ExtensionTool.py NewVersionDownload $database --crxDir $crxDir --archiveDir $archive

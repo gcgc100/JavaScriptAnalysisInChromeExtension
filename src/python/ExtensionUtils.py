@@ -207,6 +207,7 @@ def setDetailAndDownloadInDB(db, crxDir, checkNewVersion=False, setChecked=False
 
     """
     eList = selectExtension(db)
+    commitCache = 0
     for extension in eList:
         eid = extension.extensionId
         logger.info("Start to check Extension({0},status:{1}".format(
@@ -245,7 +246,11 @@ def setDetailAndDownloadInDB(db, crxDir, checkNewVersion=False, setChecked=False
                                             "newest version, setChecked\x1b[0m")
                                     newExt.extensionStatus = ExtensionStatus.ExtensionChecked
                                     newExt.downloadTime = datetime.datetime.now()
-                                    db.commit()
+                                    if commitCache > 9:
+                                        db.commit()
+                                        commitCache = 0
+                                    else:
+                                        commitCache = commitCache + 1
                                 else:
                                     db.rollback()
                             else:
@@ -263,16 +268,24 @@ def setDetailAndDownloadInDB(db, crxDir, checkNewVersion=False, setChecked=False
                                 logger.info("\x1b[33;21mNew version founded "
                                         "for Extension({0} \x1b[0m".format(
                                     newExt.extensionId))
-                                db.commit()
+                                if commitCache > 9:
+                                    db.commit()
+                                    commitCache = 0
+                                else:
+                                    commitCache = commitCache + 1
                         elif retCode == 404:
-                            db.commit()
+                            pass
                         else:
                             if setChecked:
                                 logger.info("\x1b[33;21mExtension get detail failed,"
                                         "setChecked\x1b[0m")
                                 newExt.extensionStatus = ExtensionStatus.ExtensionChecked
                                 newExt.downloadTime = datetime.datetime.now()
-                                db.commit()
+                                if commitCache > 9:
+                                    db.commit()
+                                    commitCache = 0
+                                else:
+                                    commitCache = commitCache + 1
                             else:
                                 db.rollback()
                 else:

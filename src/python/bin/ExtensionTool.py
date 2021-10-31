@@ -152,11 +152,13 @@ def main():
                 extSrcPath = e.standardExtSrcPath(extSrcRootDir)
                 os.makedirs(extSrcPath, exist_ok=True)
                 try:
+                    logger.info("Start to unpack {0}".format(e.crxPath))
                     ExtensionUtils.unpackExtension(e.crxPath, extSrcPath)
                 except FileNotFoundError as err:
                     with open("UnpackCrxError.log", 'a') as f:
                         f.write(e.extensionId)
                         f.write("\n")
+                    logger.error("{0}({1}) extension unpack error:{2}".format(e.extensionId, e.id, err))
                     os.rmdir(extSrcPath)  # Remove version folder
                     ppath = os.path.dirname(extSrcPath)
                     if len(os.listdir(ppath)) == 0:

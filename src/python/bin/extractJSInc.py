@@ -60,15 +60,9 @@ def allPack(db, script_folder, static, dynamic, tarnish, extAnalysis, srcBasePat
     # eList = select(e for e in db.Extension if (e.extensionId, e.downloadTime) in ((e.extensionId, max(e.downloadTime)) for e in db.Extension))
     eList = selectExtension(db)
     for e in eList:
-        if e.extensionStatus == ExtensionStatus.Init:
+        if e.extensionStatus in [ExtensionStatus.Init, ExtensionStatus.UnPublished, ExtensionStatus.Detailed, ExtensionStatus.Downloaded, ExtensionStatus.LibSet, ExtensionStatus.Unpacked]:
             continue
-        if e.extensionStatus == ExtensionStatus.UnPublished:
-            continue
-        if e.extensionStatus == ExtensionStatus.Detailed:
-            continue
-        if e.extensionStatus == ExtensionStatus.Downloaded:
-            continue
-        if e.extensionStatus in [ExtensionStatus.Unpacked , ExtensionStatus.PermissionSetted, ExtensionStatus.LibSet]:
+        if e.extensionStatus in [ExtensionStatus.PermissionSetted]:
             try:
                 logger.info("Extension\n({0}, status:{1})\n to be analysed".format(e.extensionId,
                     e.extensionStatus.name))

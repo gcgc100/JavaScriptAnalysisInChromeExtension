@@ -34,6 +34,6 @@ database=$DATADIR$GCEXTANA_DATABASE
 #    fi
 #fi
 
-rm -rf /tmp/.org.chromium.Chromium.*
+#rm -rf /tmp/.org.chromium.Chromium.*
 echo "Start to unpack extensions"
 $PYTHON $BASEDIR/../python/bin/ExtensionTool.py unpackAllInDB ${database} --extSrcDir $extSrcDir
