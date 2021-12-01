@@ -44,17 +44,11 @@ def selectExtension(db):
 
     """
     # orm.sql_debug(True)
-    exts = select((e.extensionId, max(e.downloadTime)) for e in db.Extension if e.downloadTime>datetime.datetime.strptime("2021-09-10", "%Y-%m-%d"))
+    exts = select((e.extensionId, max(e.downloadTime)) for e in db.Extension if e.downloadTime>datetime.datetime.strptime("2021-11-10", "%Y-%m-%d"))
     for e in exts:
         extensions = select(ex for ex in db.Extension if ex.extensionId==e[0])
         extension = list(filter(lambda x: x.downloadTime==e[1], extensions))[0]
         if extension.extensionStatus != ExtensionStatus.PermissionSetted:
-            continue
-        if extension.extensionStatus == ExtensionStatus.UnPublished:
-            continue
-        if extension.extensionStatus == ExtensionStatus.ExtensionChecked:
-            continue
-        if extension.extensionStatus == ExtensionStatus.LibSet:
             continue
         yield extension
 
@@ -95,6 +89,9 @@ def prepareSelenium():
     chrome_options = Options()
     chrome_options.add_argument("--headless")
     chrome_options.add_argument("--window-size=1920x1080")
+    # Set the cache sizee to 0 to disable cache. But seems not working.
+    # Use random parameter in script url to avoid cache now.
+    chrome_options.add_argument("--disk-cache-size=0")
     driver = webdriver.Chrome(chrome_options=chrome_options)
     return driver
 
@@ -145,6 +142,16 @@ def selenium_get_version(filedir, driver, blockRun=False, lib_type_array=None):
         os.remove(scriptFile)
     shutil.copy(filedir, scriptFile)
     logger.debug("copy file done")
+    with open(os.path.join(real_server_dir, "index.html"), 'w') as f:
+        f.write("""
+<html>
+    <head>
+    <script src="script.js?ran={0}"></script>
+    </head>
+    <body>
+    </body>
+</html>
+        """.format(random.randint(0, 10000)))
     driver.get("http://localhost:8000/jqueryServer/index.html?ram=%s" % random.randint(0, 10000))
     for lib_type in lib_type_array:
         js_get_version = js_get_version_dict[lib_type]
@@ -179,6 +186,7 @@ def set_all_version(library_type=None, database="../data/data.db"):
             assert False, "Unknown library type"
         lib_type_array = [library_type]
     httpd = None
+    keyInterrupt = False
     with db_session:
         for extension in selectExtension(db):
             allFiles = extension.scripts
@@ -233,6 +241,7 @@ def set_all_version(library_type=None, database="../data/data.db"):
                 except SystemExit as e:
                     raise e
                 except KeyboardInterrupt as e:
+                    keyInterrupt = True
                     break
                 except exceptions.UnexpectedAlertPresentException as e:
                     shutdownChrome(driver)
@@ -243,4 +252,6 @@ def set_all_version(library_type=None, database="../data/data.db"):
             db.commit()
             shutil.rmtree(real_server_dir)
             shutdownChrome(driver)
+            if keyInterrupt:
+                break
     httpd["httpd"].shutdown()

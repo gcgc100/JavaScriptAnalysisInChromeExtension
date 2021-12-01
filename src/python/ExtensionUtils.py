@@ -37,6 +37,9 @@ def downloadExt(eid, name="", save_path=""):
     # os.makedirs(save_path, exist_ok=True)
     save_path = save_path + "/" + save_name + ".crx"
     logger.debug("Downloader says: save_path is " + save_path)
+    if os.path.isfile(save_path):
+        logger.warning("Crx file already exists. Skip the download")
+        return False
     # new download URL, issue #13
     dl_url = "https://clients2.google.com/service/update2/crx?response=redirect&os=win&arch=x86-64&os_arch=x86-64&nacl_arch=x86-64&prod=chromecrx&prodchannel=unknown&prodversion=81.0.4044.138&acceptformat=crx2,crx3&x=id%3D" + ext_id + "%26uc"
     print("Download URL: " + dl_url)
@@ -208,6 +211,7 @@ def setDetailAndDownloadInDB(db, crxDir, checkNewVersion=False, setChecked=False
     """
     eList = selectExtension(db)
     commitCache = 0
+    commitCacheSize = 1
     for extension in eList:
         eid = extension.extensionId
         logger.info("Start to check Extension({0},status:{1}".format(
@@ -222,7 +226,9 @@ def setDetailAndDownloadInDB(db, crxDir, checkNewVersion=False, setChecked=False
                     os.makedirs(crxDirTmp, exist_ok=True)
                     # Remove .crx by [:-4]
                     fileName = os.path.basename(standardCrxPath)[:-4]
-                    downloadExt(eid, name=fileName, save_path=crxDirTmp)
+                    ret = downloadExt(eid, name=fileName, save_path=crxDirTmp)
+                    if not ret:
+                        continue
                     extension.downloadTime = datetime.datetime.now()
                     extension.crxPath = standardCrxPath
                     extension.extensionStatus = ExtensionStatus.Downloaded
@@ -246,48 +252,48 @@ def setDetailAndDownloadInDB(db, crxDir, checkNewVersion=False, setChecked=False
                                             "newest version, setChecked\x1b[0m")
                                     newExt.extensionStatus = ExtensionStatus.ExtensionChecked
                                     newExt.downloadTime = datetime.datetime.now()
-                                    if commitCache > 9:
+                                    commitCache = commitCache + 1
+                                    if commitCache >= commitCacheSize:
                                         db.commit()
                                         commitCache = 0
-                                    else:
-                                        commitCache = commitCache + 1
                                 else:
-                                    db.rollback()
+                                    #TODO: If commitCacheSize > 1, success download i db may be rollback while the crx file is still there.
+                                    #Done. To be tested.
+                                    newExt.delete()
                             else:
-
-
                                 standardCrxPath = newExt.standardCrxPath(crxDir)
                                 crxDirTmp = os.path.dirname(standardCrxPath)
                                 os.makedirs(crxDirTmp, exist_ok=True)
                                 # Remove .crx by [:-4]
                                 fileName = os.path.basename(standardCrxPath)[:-4]
-                                downloadExt(eid, name=fileName, save_path=crxDirTmp)
+                                ret = downloadExt(eid, name=fileName, save_path=crxDirTmp)
+                                if not ret:
+                                    newExt.delete()
                                 newExt.downloadTime = datetime.datetime.now()
                                 newExt.crxPath = standardCrxPath
                                 newExt.extensionStatus = ExtensionStatus.Downloaded
                                 logger.info("\x1b[33;21mNew version founded "
                                         "for Extension({0} \x1b[0m".format(
                                     newExt.extensionId))
-                                if commitCache > 9:
+                                commitCache = commitCache + 1
+                                if commitCache >= commitCacheSize:
                                     db.commit()
                                     commitCache = 0
-                                else:
-                                    commitCache = commitCache + 1
-                        elif retCode == 404:
-                            pass
+                        # elif retCode == 404:
+                        #     #TODO: Why do nothing here. Disabled temporarily now.
+                        #     pass
                         else:
                             if setChecked:
                                 logger.info("\x1b[33;21mExtension get detail failed,"
                                         "setChecked\x1b[0m")
                                 newExt.extensionStatus = ExtensionStatus.ExtensionChecked
                                 newExt.downloadTime = datetime.datetime.now()
-                                if commitCache > 9:
+                                commitCache = commitCache + 1
+                                if commitCache >= commitCacheSize:
                                     db.commit()
                                     commitCache = 0
-                                else:
-                                    commitCache = commitCache + 1
                             else:
-                                db.rollback()
+                                newExt.delete()
                 else:
                     assert False, "Unknown extension status with solution"
             except Exception as e:

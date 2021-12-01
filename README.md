@@ -44,3 +44,10 @@ test_set_version.py is very slow and test_analyser.py need to config proxy in ad
 The library information will not be set automatically.
 setTimeForjqueryVersion.sh is used to get the release time of different version of jquery.
 getVul.sh is used to tag the vulnerable version of a library.
+
+* chromedriver outdated question. Mac need verify developer.
+Update newest chromedriver.
+Verify developer on Mac: xattr -d com.apple.quarantine chromedriver 
+[MacOS Catalina(v 10.15.3): Error: “chromedriver” cannot be opened because the developer cannot be verified. Unable to launch the chrome browser](https://stackoverflow.com/questions/60362018/macos-catalinav-10-15-3-error-chromedriver-cannot-be-opened-because-the-de)
+
+* PonyOrm [DBSessionIsOver error due to lazy loading](https://stackoverflow.com/questions/25719869/databasesessionisover-with-pony-orm-due-to-lazy-loading)

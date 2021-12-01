@@ -34,8 +34,8 @@ def selectExtension(db):
 
     """
     eList = []
-    # basetime = datetime.datetime.strptime("2021-09-10", "%Y-%m-%d")
-    # exts = select((e.extensionId, max(e.downloadTime)) for e in db.Extension if e.analysedStatus == 3 and e.downloadTime > basetime)
+    # basetime = datetime.datetime.strptime("2021-11-20", "%Y-%m-%d")
+    # exts = select((e.extensionId, max(e.downloadTime)) for e in db.Extension if e.analysedStatus == 129 and e.downloadTime > basetime)
     exts = select((e.extensionId, max(e.downloadTime)) for e in db.Extension)
     for e in exts:
         extensions = select(ex for ex in db.Extension if ex.extensionId==e[0])
@@ -47,7 +47,9 @@ def selectExtension(db):
         if extension.extensionStatus == ExtensionStatus.Downloaded:
             continue
         yield extension
-
+# DB session will be ended when line86-92 is executed. 
+# Reason: Lazy load in selectExtension function caused.
+# Not sure whether the bug is solved. Need more tetsts.
 @db_session
 def allPack(db, script_folder, static, dynamic, tarnish, extAnalysis, srcBasePath):
     """TODO: Docstring for allPack.
@@ -58,32 +60,34 @@ def allPack(db, script_folder, static, dynamic, tarnish, extAnalysis, srcBasePat
 
     """
     # eList = select(e for e in db.Extension if (e.extensionId, e.downloadTime) in ((e.extensionId, max(e.downloadTime)) for e in db.Extension))
-    eList = selectExtension(db)
+    with db_session:
+        eList = selectExtension(db)
     for e in eList:
-        if e.extensionStatus in [ExtensionStatus.Init, ExtensionStatus.UnPublished, ExtensionStatus.Detailed, ExtensionStatus.Downloaded, ExtensionStatus.LibSet, ExtensionStatus.Unpacked]:
-            continue
-        if e.extensionStatus in [ExtensionStatus.PermissionSetted]:
-            try:
-                logger.info("Extension\n({0}, status:{1})\n to be analysed".format(e.extensionId,
-                    e.extensionStatus.name))
-                if e.analysedStatus & AnalysedStatus.Error.value != 0:
-                    logger.warning("Extension ({0}) contains error not solved".format(e.extensionId))
-                    continue
-                crxPath = e.crxPath
-                if not os.path.exists(e.srcPath):
-                    logger.error("{0} extension src code not exists".format(e.srcPath))
-                    continue
-                detect(db, e, script_folder, static, dynamic, tarnish, extAnalysis)
-                logger.info("Extension:{0} analysed".format(e.extensionId))
-            except KeyboardInterrupt as e:
-                raise e
-            except Exception as err:
-                logger.error("{0},{1}".format(e.extensionId, err))
-                dbid = e.id
-                db.rollback()
-                e = db.Extension.get(id=dbid)
-                e.analysedStatus = e.analysedStatus | AnalysedStatus.Error.value
-                db.commit()
+        with db_session:
+            if e.extensionStatus in [ExtensionStatus.Init, ExtensionStatus.UnPublished, ExtensionStatus.Detailed, ExtensionStatus.Downloaded, ExtensionStatus.LibSet, ExtensionStatus.Unpacked]:
+                continue
+            if e.extensionStatus in [ExtensionStatus.PermissionSetted]:
+                try:
+                    logger.info("Extension\n({0}, status:{1})\n to be analysed".format(e.extensionId,
+                        e.extensionStatus.name))
+                    if e.analysedStatus & AnalysedStatus.Error.value != 0:
+                        logger.warning("Extension ({0}) contains error not solved".format(e.extensionId))
+                        continue
+                    crxPath = e.crxPath
+                    if not os.path.exists(e.srcPath):
+                        logger.error("{0} extension src code not exists".format(e.srcPath))
+                        continue
+                    detect(db, e, script_folder, static, dynamic, tarnish, extAnalysis)
+                    logger.info("Extension:{0} analysed".format(e.extensionId))
+                except KeyboardInterrupt as e:
+                    raise e
+                except Exception as err:
+                    logger.error("{0},{1}".format(e.extensionId, err))
+                    dbid = e.id
+                    db.rollback()
+                    e = db.Extension.get(id=dbid)
+                    e.analysedStatus = e.analysedStatus | AnalysedStatus.Error.value
+                    db.commit()
 
 def detect(db, extension, script_folder, static=True, dynamic=True, tarnish=True, extAnalysis=True, proxyDetection=False):
     """TODO: Docstring for detect.
