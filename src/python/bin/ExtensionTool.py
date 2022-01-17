@@ -77,6 +77,11 @@ def main():
     try:
         dbpath = os.path.abspath(args.db)
         db = define_database_and_entities(provider='sqlite', filename=dbpath, create_db=True)
+    except dbapiprovider.OperationalError as e:
+        logger.info(e)
+        logger.info("Database {0} not available.".format(dbpath))
+        exit(1)
+
     except BindingError as e:
         if e.args[0] != "Database object was already bound to SQLite provider":
             raise e

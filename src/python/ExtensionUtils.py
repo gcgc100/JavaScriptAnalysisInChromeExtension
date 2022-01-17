@@ -221,17 +221,18 @@ def setDetailAndDownloadInDB(db, crxDir, checkNewVersion=False, setChecked=False
             try:
                 if extension.extensionStatus == ExtensionStatus.Init:
                     retCode = setExtensionDetailForOne(extension)
-                    standardCrxPath = extension.standardCrxPath(crxDir)
-                    crxDirTmp = os.path.dirname(standardCrxPath)
-                    os.makedirs(crxDirTmp, exist_ok=True)
-                    # Remove .crx by [:-4]
-                    fileName = os.path.basename(standardCrxPath)[:-4]
-                    ret = downloadExt(eid, name=fileName, save_path=crxDirTmp)
-                    if not ret:
-                        continue
-                    extension.downloadTime = datetime.datetime.now()
-                    extension.crxPath = standardCrxPath
-                    extension.extensionStatus = ExtensionStatus.Downloaded
+                    if retCode == 1:
+                        standardCrxPath = extension.standardCrxPath(crxDir)
+                        crxDirTmp = os.path.dirname(standardCrxPath)
+                        os.makedirs(crxDirTmp, exist_ok=True)
+                        # Remove .crx by [:-4]
+                        fileName = os.path.basename(standardCrxPath)[:-4]
+                        ret = downloadExt(eid, name=fileName, save_path=crxDirTmp)
+                        if not ret:
+                            continue
+                        extension.downloadTime = datetime.datetime.now()
+                        extension.crxPath = standardCrxPath
+                        extension.extensionStatus = ExtensionStatus.Downloaded
                 elif extension.extensionStatus == ExtensionStatus.UnPublished:
                     pass
                 elif extension.extensionStatus == ExtensionStatus.ExtensionChecked:
