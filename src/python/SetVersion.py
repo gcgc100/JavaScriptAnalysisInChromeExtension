@@ -44,7 +44,7 @@ def selectExtension(db):
 
     """
     # orm.sql_debug(True)
-    exts = select((e.extensionId, max(e.downloadTime)) for e in db.Extension if e.downloadTime>datetime.datetime.strptime("2021-11-10", "%Y-%m-%d"))
+    exts = select((e.extensionId, max(e.downloadTime)) for e in db.Extension if e.downloadTime>datetime.datetime.strptime("2022-02-10", "%Y-%m-%d"))
     for e in exts:
         extensions = select(ex for ex in db.Extension if ex.extensionId==e[0])
         extension = list(filter(lambda x: x.downloadTime==e[1], extensions))[0]

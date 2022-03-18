@@ -280,9 +280,14 @@ def setDetailAndDownloadInDB(db, crxDir, checkNewVersion=False, setChecked=False
                                 if commitCache >= commitCacheSize:
                                     db.commit()
                                     commitCache = 0
-                        # elif retCode == 404:
-                        #     #TODO: Why do nothing here. Disabled temporarily now.
-                        #     pass
+                        elif retCode == 404:
+                            # When 404, set extensionStatus to unpublished
+                            logger.info("\x1b[33;21mExtension get detail failed,"
+                                    "setChecked\x1b[0m")
+                            commitCache = commitCache + 1
+                            if commitCache >= commitCacheSize:
+                                db.commit()
+                                commitCache = 0
                         else:
                             if setChecked:
                                 logger.info("\x1b[33;21mExtension get detail failed,"
