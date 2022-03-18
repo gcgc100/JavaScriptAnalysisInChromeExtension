@@ -15,7 +15,6 @@ if [[ $GCEXTANA_DATADIR == "/"* ]]; then
 else
     DATADIR=$BASEDIR/
 fi
-PYTHON=python3
 
 extSrcDir=$DATADIR$GCEXTANA_EXTSRC
 database=$DATADIR$GCEXTANA_DATABASE

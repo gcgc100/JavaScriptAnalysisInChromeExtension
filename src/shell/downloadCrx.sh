@@ -7,7 +7,6 @@ if [[ $GCEXTANA_DATADIR == "/"* ]]; then
 else
     DATADIR=$BASEDIR/
 fi
-PYTHON=python3
 
 echo $BASEDIR
 

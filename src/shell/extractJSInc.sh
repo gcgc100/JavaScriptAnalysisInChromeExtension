@@ -1,7 +1,6 @@
 #!/bin/zsh
 
 
-PYTHON=python3
 
 BASEDIR=$(dirname "$0")
 

@@ -13,6 +13,9 @@ The shell script is tested with bash.
 cd src/python
 pip3 install -r requirements.txt
 ```
+PONYORM module only support python 3.3-3.7。
+The python3 used can be configed in src/shell/config.sh | src/shell/testConfig.sh files with PYTHON variable.
+TODO: Use virtualenv to config python and modules.
 * [Set up chromedriver for selenium to control Chrome](http://chromedriver.chromium.org/getting-started)
 * Prepare extension id list. All the extension lists should be saved in json files in data/extensionIdList. The file name will be used as the category of the category.
 The default json files are used in my experiment.
