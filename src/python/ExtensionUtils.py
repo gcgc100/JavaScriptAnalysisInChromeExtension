@@ -188,6 +188,8 @@ def selectExtension(db):
             continue
         if extension.extensionStatus == ExtensionStatus.ExtensionChecked:
             continue
+        if extension.extensionStatus == ExtensionStatus.NetworkTimeout:
+            continue
         yield extension
     # eList = select(extension for extension in db.Extension 
     #         if (extension.extensionId, extension.downloadTime) in ((
@@ -233,6 +235,14 @@ def setDetailAndDownloadInDB(db, crxDir, checkNewVersion=False, setChecked=False
                         extension.downloadTime = datetime.datetime.now()
                         extension.crxPath = standardCrxPath
                         extension.extensionStatus = ExtensionStatus.Downloaded
+                    elif retCode == 404:
+                        # When 404, set extensionStatus to unpublished
+                        logger.info("\x1b[33;21mExtension get detail failed,"
+                                "set unpublished\x1b[0m")
+                        commitCache = commitCache + 1
+                        if commitCache >= commitCacheSize:
+                            db.commit()
+                            commitCache = 0
                 elif extension.extensionStatus == ExtensionStatus.UnPublished:
                     pass
                 elif extension.extensionStatus == ExtensionStatus.ExtensionChecked:
@@ -283,7 +293,7 @@ def setDetailAndDownloadInDB(db, crxDir, checkNewVersion=False, setChecked=False
                         elif retCode == 404:
                             # When 404, set extensionStatus to unpublished
                             logger.info("\x1b[33;21mExtension get detail failed,"
-                                    "setChecked\x1b[0m")
+                                    "set unpublished\x1b[0m")
                             commitCache = commitCache + 1
                             if commitCache >= commitCacheSize:
                                 db.commit()
@@ -292,7 +302,7 @@ def setDetailAndDownloadInDB(db, crxDir, checkNewVersion=False, setChecked=False
                             if setChecked:
                                 logger.info("\x1b[33;21mExtension get detail failed,"
                                         "setChecked\x1b[0m")
-                                newExt.extensionStatus = ExtensionStatus.ExtensionChecked
+                                newExt.extensionStatus = ExtensionStatus.NetworkTimeout
                                 newExt.downloadTime = datetime.datetime.now()
                                 commitCache = commitCache + 1
                                 if commitCache >= commitCacheSize:

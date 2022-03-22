@@ -30,6 +30,7 @@ class ExtensionStatus(Enum):
 
     # For temp check when the extension list is very big
     ExtensionChecked = 100
+    NetworkTimeout = 101
 
 class AnalysedStatus(Enum):
     Static = 1 << 0
