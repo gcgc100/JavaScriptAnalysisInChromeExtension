@@ -39,7 +39,7 @@ def downloadExt(eid, name="", save_path=""):
     logger.debug("Downloader says: save_path is " + save_path)
     if os.path.isfile(save_path):
         logger.warning("Crx file already exists. Skip the download")
-        return False
+        return True
     # new download URL, issue #13
     dl_url = "https://clients2.google.com/service/update2/crx?response=redirect&os=win&arch=x86-64&os_arch=x86-64&nacl_arch=x86-64&prod=chromecrx&prodchannel=unknown&prodversion=81.0.4044.138&acceptformat=crx2,crx3&x=id%3D" + ext_id + "%26uc"
     print("Download URL: " + dl_url)

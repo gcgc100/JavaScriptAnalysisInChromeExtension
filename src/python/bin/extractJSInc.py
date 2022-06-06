@@ -34,8 +34,8 @@ def selectExtension(db):
 
     """
     eList = []
-    # basetime = datetime.datetime.strptime("2021-11-20", "%Y-%m-%d")
-    # exts = select((e.extensionId, max(e.downloadTime)) for e in db.Extension if e.analysedStatus == 129 and e.downloadTime > basetime)
+    # basetime = datetime.datetime.strptime("2022-04-20", "%Y-%m-%d")
+    # exts = select((e.extensionId, max(e.downloadTime)) for e in db.Extension if e.analysedStatus == 128 and e.downloadTime > basetime)
     exts = select((e.extensionId, max(e.downloadTime)) for e in db.Extension)
     for e in exts:
         extensions = select(ex for ex in db.Extension if ex.extensionId==e[0])
@@ -45,6 +45,8 @@ def selectExtension(db):
         if extension.extensionStatus == ExtensionStatus.ExtensionChecked:
             continue
         if extension.extensionStatus == ExtensionStatus.Downloaded:
+            continue
+        if extension.extensionStatus == ExtensionStatus.LibSet:
             continue
         yield extension
 # DB session will be ended when line86-92 is executed. 

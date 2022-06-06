@@ -46,4 +46,5 @@ mkdir -p ${archive}crx/
 #else
 #    $PYTHON $BASEDIR/../python/bin/ExtensionTool.py allPack $database --crxDir $crxDir --archiveDir $archive
 #fi
+#$PYTHON $BASEDIR/../python/bin/ExtensionTool.py allPack $database --crxDir "../../data/5-2/crx/" --archiveDir "../../data/5-2/archive/" --checkNewVersion
 $PYTHON $BASEDIR/../python/bin/ExtensionTool.py allPack $database --crxDir $crxDir --archiveDir $archive --checkNewVersion
