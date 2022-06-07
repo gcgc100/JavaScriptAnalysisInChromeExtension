@@ -5,6 +5,7 @@ import sys
 import os
 import json
 from datetime import datetime
+import socket
 import urllib
 import urllib.request
 import zipfile
@@ -14,6 +15,7 @@ from OrmDatabase import *
 import mylogging
 logger = mylogging.logger
 
+socket.setdefaulttimeout(30)
 
 # Without database operation
 
@@ -53,10 +55,16 @@ def downloadExt(eid, name="", save_path=""):
             with open(os.path.dirname(save_path)+"/unexistExt.md", 'a') as f: 
                 f.write(ext_id + "\n")
         else:
-            logger.debug("urllib error")
+            logger.warning("urllib error")
             logger.debug(e)
+        return False
+    except socket.timeout as e:
+        #TODO: Make sure the file is removed, otherwise the file left may be not intact.
+        logger.warning("Download timeout")
+        logger.debug(e)
+        return False
     except Exception as e:
-        logger.debug("Error in downloader.py")
+        logger.warning("Error in downloader.py")
         logger.debug(e)
         return False
 
@@ -182,8 +190,19 @@ def selectExtension(db):
     eList = []
     exts = select((e.extensionId, max(e.downloadTime)) for e in db.Extension)
     for e in exts:
-        extensions = select(ex for ex in db.Extension if ex.extensionId==e[0])
-        extension = list(filter(lambda x: x.downloadTime==e[1], extensions))[0]
+        # extensions = select(ex for ex in db.Extension if ex.extensionId==e[0])
+        # extension = list(filter(lambda x: x.downloadTime==e[1], extensions))[0]
+        print(e)
+        if e[1] is None:
+            extensions = select(ex for ex in db.Extension if ex.extensionId==e[0])
+        else:
+            extensions = select(ex for ex in db.Extension if ex.extensionId==e[0] and
+                    orm.raw_sql("ex.downloadTime =datetime('{0}')".format(e[1])))
+        extension = extensions.get()
+        if extension is None:
+            return
+        if extension.extensionStatus not in [ExtensionStatus.Init, ExtensionStatus.LibSet]:
+            continue
         if extension.extensionStatus == ExtensionStatus.UnPublished:
             continue
         if extension.extensionStatus == ExtensionStatus.ExtensionChecked:
@@ -221,7 +240,9 @@ def setDetailAndDownloadInDB(db, crxDir, checkNewVersion=False, setChecked=False
             extension.extensionStatus.name))
         with db_session:
             try:
-                if extension.extensionStatus == ExtensionStatus.Init:
+                if extension.extensionStatus in [ExtensionStatus.Detailed, ExtensionStatus.Downloaded, ExtensionStatus.Unpacked, ExtensionStatus.PermissionSetted, ExtensionStatus.ExtensionChecked, ExtensionStatus.UnPublished]:
+                    pass
+                elif extension.extensionStatus == ExtensionStatus.Init:
                     retCode = setExtensionDetailForOne(extension)
                     if retCode == 1:
                         standardCrxPath = extension.standardCrxPath(crxDir)
@@ -243,66 +264,18 @@ def setDetailAndDownloadInDB(db, crxDir, checkNewVersion=False, setChecked=False
                         if commitCache >= commitCacheSize:
                             db.commit()
                             commitCache = 0
-                elif extension.extensionStatus == ExtensionStatus.UnPublished:
-                    pass
-                elif extension.extensionStatus == ExtensionStatus.ExtensionChecked:
-                    pass
-                elif extension.extensionStatus in [ExtensionStatus.Detailed, ExtensionStatus.Downloaded, ExtensionStatus.Unpacked, ExtensionStatus.PermissionSetted]:
-                    pass
-                elif extension.extensionStatus in [ExtensionStatus.LibSet]:
-                    if checkNewVersion:
-                        newExt = db.Extension(extensionId = extension.extensionId)
-                        newExt.analysedStatus = 0
-                        newExt.extensionStatus = ExtensionStatus.Init
-                        newExt.downloadTime = datetime.datetime.now()
-                        retCode = setExtensionDetailForOne(newExt)
-                        if retCode == 1:
-                            if newExt.version == extension.version:
-                                if setChecked:
-                                    logger.info("\x1b[33;21mExtension already the "
-                                            "newest version, setChecked\x1b[0m")
-                                    newExt.extensionStatus = ExtensionStatus.ExtensionChecked
-                                    newExt.downloadTime = datetime.datetime.now()
-                                    commitCache = commitCache + 1
-                                    if commitCache >= commitCacheSize:
-                                        db.commit()
-                                        commitCache = 0
-                                else:
-                                    #TODO: If commitCacheSize > 1, success download i db may be rollback while the crx file is still there.
-                                    #Done. To be tested.
-                                    newExt.delete()
-                            else:
-                                standardCrxPath = newExt.standardCrxPath(crxDir)
-                                crxDirTmp = os.path.dirname(standardCrxPath)
-                                os.makedirs(crxDirTmp, exist_ok=True)
-                                # Remove .crx by [:-4]
-                                fileName = os.path.basename(standardCrxPath)[:-4]
-                                ret = downloadExt(eid, name=fileName, save_path=crxDirTmp)
-                                if not ret:
-                                    newExt.delete()
-                                newExt.downloadTime = datetime.datetime.now()
-                                newExt.crxPath = standardCrxPath
-                                newExt.extensionStatus = ExtensionStatus.Downloaded
-                                logger.info("\x1b[33;21mNew version founded "
-                                        "for Extension({0} \x1b[0m".format(
-                                    newExt.extensionId))
-                                commitCache = commitCache + 1
-                                if commitCache >= commitCacheSize:
-                                    db.commit()
-                                    commitCache = 0
-                        elif retCode == 404:
-                            # When 404, set extensionStatus to unpublished
-                            logger.info("\x1b[33;21mExtension get detail failed,"
-                                    "set unpublished\x1b[0m")
-                            commitCache = commitCache + 1
-                            if commitCache >= commitCacheSize:
-                                db.commit()
-                                commitCache = 0
-                        else:
+                elif extension.extensionStatus == ExtensionStatus.LibSet and checkNewVersion:
+                    newExt = db.Extension(extensionId = extension.extensionId)
+                    newExt.analysedStatus = 0
+                    newExt.extensionStatus = ExtensionStatus.Init
+                    newExt.downloadTime = datetime.datetime.now()
+                    retCode = setExtensionDetailForOne(newExt)
+                    if retCode == 1:
+                        if newExt.version == extension.version:
                             if setChecked:
-                                logger.info("\x1b[33;21mExtension get detail failed,"
-                                        "setChecked\x1b[0m")
-                                newExt.extensionStatus = ExtensionStatus.NetworkTimeout
+                                logger.info("\x1b[33;21mExtension already the "
+                                        "newest version, setChecked\x1b[0m")
+                                newExt.extensionStatus = ExtensionStatus.ExtensionChecked
                                 newExt.downloadTime = datetime.datetime.now()
                                 commitCache = commitCache + 1
                                 if commitCache >= commitCacheSize:
@@ -310,6 +283,52 @@ def setDetailAndDownloadInDB(db, crxDir, checkNewVersion=False, setChecked=False
                                     commitCache = 0
                             else:
                                 newExt.delete()
+                        else:
+                            standardCrxPath = newExt.standardCrxPath(crxDir)
+                            crxDirTmp = os.path.dirname(standardCrxPath)
+                            os.makedirs(crxDirTmp, exist_ok=True)
+                            # Remove .crx by [:-4]
+                            fileName = os.path.basename(standardCrxPath)[:-4]
+                            ret = downloadExt(eid, name=fileName, save_path=crxDirTmp)
+                            if not ret:
+                                newExt.delete()
+                            else:
+                                newExt.downloadTime = datetime.datetime.now()
+                                newExt.crxPath = standardCrxPath
+                                newExt.extensionStatus = ExtensionStatus.Downloaded
+                                logger.info("\x1b[33;21mNew version founded "
+                                        "for Extension({0} \x1b[0m".format(
+                                    newExt.extensionId))
+                                commitCache = commitCache + 1
+                            if commitCache >= commitCacheSize:
+                                db.commit()
+                                commitCache = 0
+                    elif retCode == 404:
+                        # When 404, set extensionStatus to unpublished
+                        logger.info("\x1b[33;21mExtension get detail failed,"
+                                "set unpublished\x1b[0m")
+                        commitCache = commitCache + 1
+                        if commitCache >= commitCacheSize:
+                            db.commit()
+                            commitCache = 0
+                    else:
+                        if setChecked:
+                            logger.info("\x1b[33;21mExtension get detail failed,"
+                                    "setChecked\x1b[0m")
+                            newExt.extensionStatus = ExtensionStatus.NetworkTimeout
+                            newExt.downloadTime = datetime.datetime.now()
+                            commitCache = commitCache + 1
+                            if commitCache >= commitCacheSize:
+                                db.commit()
+                                commitCache = 0
+                        else:
+                            newExt.delete()
+                elif extension.extensionStatus == ExtensionStatus.UnPublished:
+                    pass
+                elif extension.extensionStatus == ExtensionStatus.ExtensionChecked:
+                    pass
+                elif extension.extensionStatus == ExtensionStatus.LibSet:
+                    pass
                 else:
                     assert False, "Unknown extension status with solution"
             except Exception as e:

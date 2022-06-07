@@ -34,24 +34,30 @@ def selectExtension(db):
 
     """
     eList = []
-    # basetime = datetime.datetime.strptime("2022-04-20", "%Y-%m-%d")
-    # exts = select((e.extensionId, max(e.downloadTime)) for e in db.Extension if e.analysedStatus == 128 and e.downloadTime > basetime)
-    exts = select((e.extensionId, max(e.downloadTime)) for e in db.Extension)
+
+
+    exts = select(e for e in db.Extension if 
+            orm.raw_sql("e.extensionStatus=='{0}'".format(ExtensionStatus.PermissionSetted.name)))
     for e in exts:
-        extensions = select(ex for ex in db.Extension if ex.extensionId==e[0])
-        extension = list(filter(lambda x: x.downloadTime==e[1], extensions))[0]
-        if extension.extensionStatus == ExtensionStatus.UnPublished:
-            continue
-        if extension.extensionStatus == ExtensionStatus.ExtensionChecked:
-            continue
-        if extension.extensionStatus == ExtensionStatus.Downloaded:
-            continue
-        if extension.extensionStatus == ExtensionStatus.LibSet:
-            continue
-        yield extension
-# DB session will be ended when line86-92 is executed. 
-# Reason: Lazy load in selectExtension function caused.
-# Not sure whether the bug is solved. Need more tetsts.
+        yield e
+    return
+
+    # # basetime = datetime.datetime.strptime("2022-04-20", "%Y-%m-%d")
+    # # exts = select((e.extensionId, max(e.downloadTime)) for e in db.Extension if e.analysedStatus == 128 and e.downloadTime > basetime)
+    # exts = select((e.extensionId, max(e.downloadTime)) for e in db.Extension)
+    # for e in exts:
+    #     extensions = select(ex for ex in db.Extension if ex.extensionId==e[0])
+    #     extension = list(filter(lambda x: x.downloadTime==e[1], extensions))[0]
+    #     if extension.extensionStatus == ExtensionStatus.UnPublished:
+    #         continue
+    #     if extension.extensionStatus == ExtensionStatus.ExtensionChecked:
+    #         continue
+    #     if extension.extensionStatus == ExtensionStatus.Downloaded:
+    #         continue
+    #     if extension.extensionStatus == ExtensionStatus.LibSet:
+    #         continue
+    #     yield extension
+
 @db_session
 def allPack(db, script_folder, static, dynamic, tarnish, extAnalysis, srcBasePath):
     """TODO: Docstring for allPack.
