@@ -83,9 +83,12 @@ def unpackExtension(crxPath, extSrcPath):
     :returns: 
 
     """
-    zip_contents = zipfile.ZipFile(crxPath, 'r')
-    zip_contents.extractall(extSrcPath)
-    zip_contents.close()
+    try:
+        zip_contents = zipfile.ZipFile(crxPath, 'r')
+        zip_contents.extractall(extSrcPath)
+        zip_contents.close()
+    except Exception as e:
+        logger.error("{0} unzip failed. Error:{1}".format(crxPath, e))
 
 
 # Including database operation
@@ -159,11 +162,19 @@ def setPermissionAllPack(db):
             logger.warning("Set permissions failed since already setted")
             continue
         logger.info("Start to set permissions for extension:{0}".format(extension.extensionId))
-        permissions = extension.getPermissions()
+        try:
+            permissions = extension.getPermissions()
+        except Exception as e:
+            logger.error("Extension {0}, set permissions failed. {1}".format(extension.extensionId, e))
+            continue
         i1 = 0
         i2 = 0
         for p in permissions:
+            # if extension.extensionId.startswith("dajojohmji"):
+            #     __import__('pdb').set_trace()  # XXX BREAKPOINT
             p = str(p)
+            if p == "":
+                continue
             permission = db.ExtensionPermission.get(permission = p)
             i1 += 1
             if permission is None:
@@ -192,12 +203,14 @@ def selectExtension(db):
     for e in exts:
         # extensions = select(ex for ex in db.Extension if ex.extensionId==e[0])
         # extension = list(filter(lambda x: x.downloadTime==e[1], extensions))[0]
-        print(e)
+        logger.debug(e)
+        # orm.sql_debug(True)
         if e[1] is None:
             extensions = select(ex for ex in db.Extension if ex.extensionId==e[0])
         else:
             extensions = select(ex for ex in db.Extension if ex.extensionId==e[0] and
-                    orm.raw_sql("ex.downloadTime =datetime('{0}')".format(e[1])))
+                    orm.raw_sql("ex.downloadTime ='{0}'".format(e[1])))
+        logger.debug(extensions)
         extension = extensions.get()
         if extension is None:
             return
@@ -314,7 +327,7 @@ def setDetailAndDownloadInDB(db, crxDir, checkNewVersion=False, setChecked=False
                     else:
                         if setChecked:
                             logger.info("\x1b[33;21mExtension get detail failed,"
-                                    "setChecked\x1b[0m")
+                                    "setNetworkTimeout\x1b[0m")
                             newExt.extensionStatus = ExtensionStatus.NetworkTimeout
                             newExt.downloadTime = datetime.datetime.now()
                             commitCache = commitCache + 1

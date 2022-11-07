@@ -10,3 +10,7 @@ UPDATE JavaScriptInclusion SET detectMethod = 'Static' WHERE classtype = "Backgr
 SELECT * FROM Extension WHERE ExtensionId in (SELECT extensionId FROM Extension WHERE downloadTime like "2021-09-2%" and extensionStatus = "Unpacked")
 -- SELECT * FROM Extension WHERE extensionId = "ajelnjmnjnchimodkgnhalconepoiodf"
 -- SELECT * FROM Extension WHERE downloadTime like "2021-09-2%" and extensionStatus = "Downloaded"
+
+
+UPDATE Extension SET analysedStatus = analysedStatus - 128 WHERE analysedStatus >= 128
+

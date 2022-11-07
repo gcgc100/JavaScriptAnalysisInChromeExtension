@@ -11,9 +11,25 @@ fi
 echo $BASEDIR
 
 extensionIdList=$DATADIR$GCEXTANA_EXTENSIONIDLIST
-database=$DATADIR$GCEXTANA_DATABASE
-crxDir=$DATADIR$GCEXTANA_CRXDIR
-archive=$DATADIR$GCEXTANA_ARCHIVE
+
+if [[ $GCEXTANA_DATABASE == "/"* ]]; then
+    database=$GCEXTANA_DATABASE
+else
+    database=$DATADIR$GCEXTANA_DATABASE
+fi
+
+if [[ $GCEXTANA_CRXDIR == "/"* ]]; then
+    crxDir=$GCEXTANA_CRXDIR
+else
+    crxDir=$DATADIR$GCEXTANA_CRXDIR
+fi
+
+if [[ $GCEXTANA_ARCHIVE == "/"* ]]; then
+    archive=$GCEXTANA_ARCHIVE
+else
+    archive=$DATADIR$GCEXTANA_ARCHIVE
+fi
+
 
 #if [[ ! -z $1 ]]; then
 #    if [[ $1 = "test" ]]; then
@@ -46,5 +62,7 @@ mkdir -p ${archive}crx/
 #else
 #    $PYTHON $BASEDIR/../python/bin/ExtensionTool.py allPack $database --crxDir $crxDir --archiveDir $archive
 #fi
-#$PYTHON $BASEDIR/../python/bin/ExtensionTool.py allPack $database --crxDir "../../data/5-2/crx/" --archiveDir "../../data/5-2/archive/" --checkNewVersion
+#
+
+
 $PYTHON $BASEDIR/../python/bin/ExtensionTool.py allPack $database --crxDir $crxDir --archiveDir $archive --checkNewVersion

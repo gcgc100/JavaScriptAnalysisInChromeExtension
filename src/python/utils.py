@@ -45,7 +45,7 @@ def getExtensionDetail(exDetailUrl):
             return urlObj.getcode()
         detailWebpage = urlObj.read().decode()
     except urllib.error.HTTPError as e:
-        logger.error("Get extension detail error:%s" % e)
+        logger.error("Get extension {0} detail error:{1}".format(exDetailUrl, e))
         return e.getcode()
     except urllib.error.URLError as e:
         logger.error("Get extension detail url error: %s" %e)

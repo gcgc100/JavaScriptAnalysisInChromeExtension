@@ -9,7 +9,11 @@ else
     DATADIR=$BASEDIR/
 fi
 
-database=$DATADIR$GCEXTANA_DATABASE
+if [[ $GCEXTANA_DATABASE == "/"* ]]; then
+    database=$GCEXTANA_DATABASE
+else
+    database=$DATADIR$GCEXTANA_DATABASE
+fi
 
 #dataDir=$BASEDIR/../../data/
 #database=$BASEDIR/../../data/data.db

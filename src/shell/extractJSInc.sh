@@ -10,11 +10,29 @@ else
     DATADIR=$BASEDIR/
 fi
 
-database=$DATADIR$GCEXTANA_DATABASE
-crxDir=$DATADIR$GCEXTANA_CRXDIR
-extSrcDir=$DATADIR$GCEXTANA_EXTSRC
-scriptDir=$DATADIR$GCEXTANA_SCRIPTDIR
+if [[ $GCEXTANA_EXTSRC == "/"* ]]; then
+    extSrcDir=$GCEXTANA_EXTSRC
+else
+    extSrcDir=$DATADIR$GCEXTANA_EXTSRC
+fi
 
+if [[ $GCEXTANA_DATABASE == "/"* ]]; then
+    database=$GCEXTANA_DATABASE
+else
+    database=$DATADIR$GCEXTANA_DATABASE
+fi
+
+if [[ $GCEXTANA_CRXDIR == "/"* ]]; then
+    crxDir=$GCEXTANA_CRXDIR
+else
+    crxDir=$DATADIR$GCEXTANA_CRXDIR
+fi
+
+if [[ $GCEXTANA_SCRIPTDIR == "/"* ]]; then
+    scriptDir=$GCEXTANA_SCRIPTDIR
+else
+    scriptDir=$DATADIR$GCEXTANA_SCRIPTDIR
+fi
 
 #dataDir=$BASEDIR/../../data/
 #if [[ ! -z $1 ]]; then

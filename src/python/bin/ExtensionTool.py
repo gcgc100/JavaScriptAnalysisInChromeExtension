@@ -114,8 +114,11 @@ def main():
         if not ret:
             sys.exit(1)
         logger.info("Set permission in sqlite databse for extensions")
-        ExtensionUtils.setPermissionAllPack(db)
-        logger.info("Permissions are all set in sqlite databse")
+        try:
+            ExtensionUtils.setPermissionAllPack(db)
+            logger.info("Permissions are all set in sqlite databse")
+        except Exception as e:
+            logger.error(e)
     elif args.cmd == "resetExtension":
         parametersToBeChecked = ["extensionId"]
         ret = True

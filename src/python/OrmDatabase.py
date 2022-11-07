@@ -159,7 +159,11 @@ def define_database_and_entities(**db_params):
             :returns: TODO
 
             """
-            return self.manifest.get("permissions",[])
+            try:
+                ret = self.manifest.get("permissions",[])
+            except Exception as e:
+                raise e
+            return ret
 
         def reset(self):
             """Reset to raw

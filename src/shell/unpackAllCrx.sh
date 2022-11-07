@@ -16,8 +16,19 @@ else
     DATADIR=$BASEDIR/
 fi
 
-extSrcDir=$DATADIR$GCEXTANA_EXTSRC
-database=$DATADIR$GCEXTANA_DATABASE
+if [[ $GCEXTANA_EXTSRC == "/"* ]]; then
+    extSrcDir=$GCEXTANA_EXTSRC
+else
+    extSrcDir=$DATADIR$GCEXTANA_EXTSRC
+fi
+
+
+if [[ $GCEXTANA_DATABASE == "/"* ]]; then
+    database=$GCEXTANA_DATABASE
+else
+    database=$DATADIR$GCEXTANA_DATABASE
+fi
+
 
 
 #if [[ ! -z $1 ]]; then
@@ -36,3 +47,4 @@ database=$DATADIR$GCEXTANA_DATABASE
 #rm -rf /tmp/.org.chromium.Chromium.*
 echo "Start to unpack extensions"
 $PYTHON $BASEDIR/../python/bin/ExtensionTool.py unpackAllInDB ${database} --extSrcDir $extSrcDir
+
