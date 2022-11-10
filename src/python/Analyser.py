@@ -35,8 +35,8 @@ class Analyser(object):
     def script_from_src(self, src):
         """Prepare a script from src
 
-        :src: TODO
-        :returns: TODO
+        :src: script url
+        :returns: 
 
         """
         script_data = None
@@ -73,8 +73,8 @@ def proxy_detect_javascript_in_html(extension, script_folder):
     """Detect all JavaScripts in html webpages with proxy method and set the scripts property in extension
 
     :extension: Must be Extension object
-    :script_folder: TODO
-    :returns: TODO
+    :script_folder: scriptWarehouse directory
+    :returns: 
 
     """
     p = utils.mitmproxy_start()

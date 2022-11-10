@@ -95,7 +95,7 @@ def unpackExtension(crxPath, extSrcPath):
 @db_session
 def init_database(db, extensionIdJson):
     """init database
-    :returns: TODO
+    :returns: 
 
     """
     addExtensionId(db, extensionIdJson)
@@ -106,7 +106,7 @@ def addExtensionId(db, extensionIdJson):
 
     :dbpath: sqlite database path
     :extensionIdJson: extension id list json file
-    :returns: TODO
+    :returns: 
 
     """
     with open(extensionIdJson) as f:
@@ -121,8 +121,8 @@ def addExtensionId(db, extensionIdJson):
 def setExtensionDetailForOne(extension):
     """Set the detail information for extension
 
-    :eid: TODO
-    :returns: TODO
+    :extension
+    :returns: 
 
     """
     assert extension.extensionStatus == ExtensionStatus.Init
@@ -150,8 +150,8 @@ def setExtensionDetailForOne(extension):
 def setPermissionAllPack(db):
     """Set the permissions for all extensions in database
 
-    :extensionCollection: TODO
-    :returns: TODO
+    :db: database 
+    :returns: 
 
     """
     exts = select(e for e in db.Extension if 
@@ -194,8 +194,8 @@ def setPermissionAllPack(db):
 def selectExtension(db):
     """Select the extensions which need to be handle
 
-    :db: TODO
-    :returns: TODO
+    :db: database
+    :returns: 
 
     """
     eList = []
@@ -240,7 +240,7 @@ def setDetailAndDownloadInDB(db, crxDir, checkNewVersion=False, setChecked=False
     :checkNewVersion: Ignore the downloaded extensions? False: ignore
     :setChecked: Tag the extensions already the newest and do not check next time.
                  Used when we can not go through the database in one time. 
-    :returns: TODO
+    :returns: 
 
     """
     eList = selectExtension(db)

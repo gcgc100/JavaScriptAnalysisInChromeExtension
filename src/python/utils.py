@@ -30,10 +30,10 @@ logger = mylogging.logger
 # logger.setLevel(logging.WARNING)
 
 def getExtensionDetail(exDetailUrl):
-    """TODO: Docstring for getExtensionDetail.
+    """Get the detail information from exDetailUrl webpage
 
-    :extensionId: TODO
-    :returns: TODO
+    :exDetailUrl: 
+    :returns: 
 
     """
     logger.info(exDetailUrl)
@@ -117,7 +117,7 @@ class MyHTMLParser(HTMLParser):
 
 def mitmproxy_start(mitmproxyPath="/home/gc/project/mitmproxy/"):
     """Start the mitmproxy
-    :returns: TODO
+    :returns: 
 
     """
     curDir = os.getcwd()
@@ -129,8 +129,7 @@ def mitmproxy_start(mitmproxyPath="/home/gc/project/mitmproxy/"):
 def mitmproxy_stop(p):
     """Stop mitmproxy
 
-    :arg1: TODO
-    :returns: TODO
+    :returns: 
 
     """
     p.send_signal(subprocess.signal.SIGTERM)

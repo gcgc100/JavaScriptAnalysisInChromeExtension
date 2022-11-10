@@ -23,9 +23,9 @@ class DynamicAnalyser(Analyser):
     """Dynamic analyse an extension"""
 
     def __init__(self, db):
-        """TODO: to be defined.
+        """Init
 
-        :db: TODO
+        :db: database
 
         """
         Analyser.__init__(self, db)

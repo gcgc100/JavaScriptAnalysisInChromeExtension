@@ -22,14 +22,14 @@ class StaticAnalyser(Analyser):
     """Static analyse an extension"""
 
     def __init__(self, db):
-        """TODO: to be defined. """
+        """Init """
         Analyser.__init__(self, db)
 
     def detect(self, extension, script_folder):
         """Detect the JavaScriptInclusions in the extension with static method
 
-        :extension: TODO
-        :returns: TODO
+        :extension: 
+        :returns: 
 
         """
         assert extension.analysedStatus & AnalysedStatus.Static.value == 0

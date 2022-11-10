@@ -55,8 +55,9 @@ class ExtAnaAnalyser(Analyser):
     def analyseExtension(self, extension, reportsDir="./src/python/ExtAnalysis/reports", log=False):
         """Analyse the crxFile extension
 
-        :crxFile: TODO
-        :returns: TODO
+        :extension:
+        :reportsDir:
+        :returns:
 
         """
         crxFile = extension.crxPath
@@ -83,13 +84,13 @@ class ExtAnaAnalyser(Analyser):
         return self.jsFiles
     
     def analyseExtensionSelenium(self, extension, extAnalysisUrl="http://127.0.0.1:8080/", headless=True, reportsDir="/Users/guanchong/MyDocuments/research/extensionAnalysis/ExtAnalysis/reports"):
-        """TODO: Docstring for analyseExtension.
+        """Analyse an extension with selenium framework
 
-        :extension: TODO
-        :extAnalysisUrl: TODO
-        :headless: TODO
-        :reportsDir: TODO
-        :returns: TODO
+        :extension: 
+        :extAnalysisUrl: 
+        :headless: 
+        :reportsDir: 
+        :returns: 
 
         """
         logger.info("ExtAnalysis analysis start for {0}(DBID:{1})".format(extension.extensionId, extension.id))
@@ -104,8 +105,8 @@ class ExtAnaAnalyser(Analyser):
             raise e
 
     def invokeBrowser(self, url):
-        """TODO: Docstring for invokeBrowser.
-        :returns: TODO
+        """Invoke the browser
+        :returns: 
 
         """
         if self.headless:
@@ -118,8 +119,8 @@ class ExtAnaAnalyser(Analyser):
         self.driver.find_element(By.XPATH, clickButXpath).click()
 
     def uploadAndAnalyse(self, localCrxDir):
-        """TODO: Docstring for uploadAndAnalyse.
-        :returns: TODO
+        """Analyse
+        :returns: 
 
         """
         driver = self.driver
@@ -133,8 +134,8 @@ class ExtAnaAnalyser(Analyser):
     def analyseWithExtensionId(self, extensionId):
         """Download crx file and analyse with an extensionId
 
-        :extensionId: TODO
-        :returns: TODO
+        :extensionId: 
+        :returns: 
 
         """
         # Input extension ID
@@ -154,8 +155,8 @@ class ExtAnaAnalyser(Analyser):
         driver.find_element(By.XPATH, clickButXpath).click()
 
     def getAnalysisResult(self, reportsDir):
-        """TODO: Docstring for getAnalysisResult.
-        :returns: TODO
+        """Get the result
+        :returns: 
 
         """
         driver = self.driver
@@ -176,8 +177,8 @@ class ExtAnaAnalyser(Analyser):
     def extractAnalysisResult(self, reportFileDir):
         """Extract analysis result from target report file
 
-        :reportFileDir: TODO
-        :returns: TODO
+        :reportFileDir: The result directory
+        :returns: 
 
         """
         ret = []

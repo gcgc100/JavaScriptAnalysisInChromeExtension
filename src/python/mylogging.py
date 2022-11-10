@@ -21,8 +21,8 @@ ROOT_DIR = os.path.abspath(sys.path[0])
 def contextLog(logger, level=logging.INFO):
     """Wrap the function and log when enter and exit the function
 
-    :logger: TODO
-    :returns: TODO
+    :logger: 
+    :returns: 
 
     """
     def decorator(func):

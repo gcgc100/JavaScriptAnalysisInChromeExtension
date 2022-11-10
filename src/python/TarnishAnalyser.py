@@ -23,14 +23,14 @@ class TarnishAnalyser(Analyser):
     """Analyse extension with tarnish"""
 
     def __init__(self, db):
-        """TODO: to be defined. """
+        """Init """
         Analyser.__init__(self, db)
 
     def detect(self, extension, headless=True):
-        """TODO: Docstring for detect.
+        """Detect
 
-        :extension: TODO
-        :returns: TODO
+        :extension: 
+        :returns: 
 
         """
         db = self._db

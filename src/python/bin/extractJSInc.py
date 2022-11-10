@@ -29,8 +29,8 @@ from ExtAnaAnalyser import ExtAnaAnalyser
 def selectExtension(db):
     """Select the extensions which need to be handle
 
-    :db: TODO
-    :returns: TODO
+    :db: database
+    :returns: 
 
     """
     eList = []
@@ -60,54 +60,52 @@ def selectExtension(db):
 
 @db_session
 def allPack(db, script_folder, static, dynamic, tarnish, extAnalysis, srcBasePath):
-    """TODO: Docstring for allPack.
+    """Detect the JavaScriptInclusions across the database one by one
 
-    :db_path: TODO
-    :script_folder: TODO
-    :returns: TODO
+    :db_path: database
+    :script_folder: scriptWarehouse directory
+    :returns: 
 
     """
     # eList = select(e for e in db.Extension if (e.extensionId, e.downloadTime) in ((e.extensionId, max(e.downloadTime)) for e in db.Extension))
-    with db_session:
-        eList = selectExtension(db)
+    eList = selectExtension(db)
     for e in eList:
-        with db_session:
-            if e.extensionStatus in [ExtensionStatus.Init, ExtensionStatus.UnPublished, ExtensionStatus.Detailed, ExtensionStatus.Downloaded, ExtensionStatus.LibSet, ExtensionStatus.Unpacked]:
-                continue
-            if e.extensionStatus in [ExtensionStatus.PermissionSetted]:
-                try:
-                    logger.info("Extension\n({0}, status:{1})\n to be analysed".format(e.extensionId,
-                        e.extensionStatus.name))
-                    if e.analysedStatus & AnalysedStatus.Error.value != 0:
-                        logger.warning("Extension ({0}) contains error not solved".format(e.extensionId))
-                        continue
-                    crxPath = e.crxPath
-                    if not os.path.exists(e.srcPath):
-                        logger.error("{0} extension src code not exists".format(e.srcPath))
-                        continue
-                    detect(db, e, script_folder, static, dynamic, tarnish, extAnalysis)
-                    logger.info("Extension:{0} analysed".format(e.extensionId))
-                except KeyboardInterrupt as e:
-                    raise e
-                except Exception as err:
-                    logger.error("{0},{1}".format(e.extensionId, err))
-                    dbid = e.id
-                    db.rollback()
-                    e = db.Extension.get(id=dbid)
-                    e.analysedStatus = e.analysedStatus | AnalysedStatus.Error.value
-                    db.commit()
+        if e.extensionStatus in [ExtensionStatus.Init, ExtensionStatus.UnPublished, ExtensionStatus.Detailed, ExtensionStatus.Downloaded, ExtensionStatus.LibSet, ExtensionStatus.Unpacked]:
+            continue
+        if e.extensionStatus in [ExtensionStatus.PermissionSetted]:
+            try:
+                logger.info("Extension\n({0}, status:{1})\n to be analysed".format(e.extensionId,
+                    e.extensionStatus.name))
+                if e.analysedStatus & AnalysedStatus.Error.value != 0:
+                    logger.warning("Extension ({0}) contains error not solved".format(e.extensionId))
+                    continue
+                crxPath = e.crxPath
+                if not os.path.exists(e.srcPath):
+                    logger.error("{0} extension src code not exists".format(e.srcPath))
+                    continue
+                detect(db, e, script_folder, static, dynamic, tarnish, extAnalysis)
+                logger.info("Extension:{0} analysed".format(e.extensionId))
+            except KeyboardInterrupt as e:
+                raise e
+            except Exception as err:
+                logger.error("{0},{1}".format(e.extensionId, err))
+                dbid = e.id
+                #TODO Get extension where time if need rollback
+                # db.rollback()
+                e = db.Extension.get(id=dbid)
+                e.analysedStatus = e.analysedStatus | AnalysedStatus.Error.value
 
 def detect(db, extension, script_folder, static=True, dynamic=True, tarnish=True, extAnalysis=True, proxyDetection=False):
-    """TODO: Docstring for detect.
+    """Detect the JavaScriptInclusions
 
-    :extension: TODO
-    :script_folder: TODO
-    :static: TODO
-    :dynamic: TODO
-    :tarnish: TODO
-    :extAnalysis: TODO
-    :proxy: TODO
-    :returns: TODO
+    :extension: 
+    :script_folder: scriptWarehouse directory
+    :static: enable static method
+    :dynamic: enable dynamic method
+    :tarnish: enable tarnish method
+    :extAnalysis: enable extAnalysis method
+    :proxy: enable proxy method(TODO)
+    :returns: 
 
     """
     if extension.analysedStatus & AnalysedStatus.Error.value != 0:

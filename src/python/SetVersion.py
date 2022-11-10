@@ -39,8 +39,8 @@ js_get_version_dict = {"jquery": "return $.fn.jquery"}
 def selectExtension(db):
     """Select the extensions which need to be handle
 
-    :db: TODO
-    :returns: TODO
+    :db: database
+    :returns: 
 
     """
     # orm.sql_debug(True)
@@ -54,7 +54,7 @@ def selectExtension(db):
 
 def simple_server():
     """Run a simple http server to server index.html
-    :returns: TODO
+    :returns: 
 
     """
     ret = {}
@@ -83,7 +83,7 @@ def simple_server():
 
 def prepareSelenium():
     """Open the headless chrome with selenium"
-    :returns: TODO
+    :returns: 
 
     """
     chrome_options = Options()
@@ -98,8 +98,8 @@ def prepareSelenium():
 def shutdownChrome(driver):
     """Shutdown the headless chrome
 
-    :driver: TODO
-    :returns: TODO
+    :driver: 
+    :returns: 
 
     """
     driver.close()
@@ -166,7 +166,7 @@ def selenium_get_version(filedir, driver, blockRun=False, lib_type_array=None):
 
 def set_all_version(library_type=None, database="../data/data.db"):
     """Set the jquery version for all javascript files in sqlite db
-    :returns: TODO 
+    :returns:
     """
     try:
         dbpath = os.path.abspath(database)

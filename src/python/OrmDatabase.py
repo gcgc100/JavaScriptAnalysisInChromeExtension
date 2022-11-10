@@ -137,8 +137,8 @@ def define_database_and_entities(**db_params):
             """Return a standard crxpath like 
             '{prefix}/{extensionId}/{version in (\d-\d-\d) format}
 
-            :withPrefix: TODO
-            :returns: TODO
+            :prefix: path prefix
+            :returns: 
 
             """
             return os.path.join(prefix, self.extensionId, 
@@ -148,15 +148,15 @@ def define_database_and_entities(**db_params):
             """Return a standard crxpath like 
             '{prefix}/{extensionId}/{version in (\d-\d-\d) format}
 
-            :withPrefix: TODO
-            :returns: TODO
+            :prefix: path prefix
+            :returns: 
 
             """
             return os.path.join(prefix, self.extensionId, self.version.replace(".", "-"))
 
         def getPermissions(self):
             """Output all permissions based on the manifest.json in source code
-            :returns: TODO
+            :returns: 
 
             """
             try:
@@ -167,7 +167,7 @@ def define_database_and_entities(**db_params):
 
         def reset(self):
             """Reset to raw
-            :returns: TODO
+            :returns: 
 
             """
             self.downloadTime = None
@@ -205,7 +205,7 @@ def define_database_and_entities(**db_params):
 
         def setHash(self, prefixPath=""):
             """Generate the hash for current js inclusion
-            :returns: TODO
+            :returns: 
 
             """
             path = os.path.join(prefixPath, self.filepath)
