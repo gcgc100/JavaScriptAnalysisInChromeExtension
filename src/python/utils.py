@@ -29,6 +29,20 @@ import mylogging
 logger = mylogging.logger
 # logger.setLevel(logging.WARNING)
 
+def checkVpn():
+    """Check whether the vpn connection is working.
+    :returns: True or False
+
+    """
+    try:
+        urlObj = urlopen("http://google.com", timeout=10)
+        if urlObj.getcode() == 200:
+            return True
+    except urllib.error.HTTPError as e:
+        return False
+    except urllib.error.URLError as e:
+        return False
+
 def getExtensionDetail(exDetailUrl):
     """Get the detail information from exDetailUrl webpage
 

@@ -5,6 +5,7 @@ import sys
 import os
 import re
 import socket
+import random
 import urllib.parse as urlparse
 
 from selenium import webdriver
@@ -112,6 +113,8 @@ class DynamicAnalyser(Analyser):
                     else:
                         filename = os.path.basename(
                                 urlparse.urlparse(src).path)[:20]
+                        if filename == "":
+                            filename = str(random.randint(0, 10000))
                         filepath = os.path.join(script_data_path, 
                                 extension.extensionId,
                                 self.format_filename(html_file),

@@ -19,10 +19,8 @@ read -k
 
 if [[ $REPLY = "C" ]]; then
     echo ""
-    #export GCEXTANA_CRXDIR=$DATADIR"crxFiles/"
-    #export GCEXTANA_ARCHIVE=$DATADIR"archive/"
-    export GCEXTANA_EXTSRC="/Volumes/ExtremeSSD/data/src/"
-    export GCEXTANA_SCRIPTDIR="/Volumes/ExtremeSSD/data/scripts/"
+    export GCEXTANA_CRXDIR=$DATADIR"crxFiles/"
+    export GCEXTANA_ARCHIVE=$DATADIR"archive/"
 else
     echo "\nExit"
 fi

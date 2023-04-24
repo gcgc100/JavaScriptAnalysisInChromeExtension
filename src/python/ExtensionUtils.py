@@ -203,14 +203,12 @@ def selectExtension(db):
     for e in exts:
         # extensions = select(ex for ex in db.Extension if ex.extensionId==e[0])
         # extension = list(filter(lambda x: x.downloadTime==e[1], extensions))[0]
-        logger.debug(e)
         # orm.sql_debug(True)
         if e[1] is None:
             extensions = select(ex for ex in db.Extension if ex.extensionId==e[0])
         else:
             extensions = select(ex for ex in db.Extension if ex.extensionId==e[0] and
                     orm.raw_sql("ex.downloadTime ='{0}'".format(e[1])))
-        logger.debug(extensions)
         extension = extensions.get()
         if extension is None:
             return
